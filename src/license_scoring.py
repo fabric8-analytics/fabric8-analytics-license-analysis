@@ -440,6 +440,8 @@ def license_scoring(payload):
     response = {
     "dependencies": [
       {
+        "package": "",
+        "version": "",
         "unknown_licenses": [],
         "license_conflict": False,
         "license_outlier": False
