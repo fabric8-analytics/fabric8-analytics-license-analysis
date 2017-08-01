@@ -1,0 +1,14 @@
+version: "2"
+services:
+  license-analysis:
+    build:
+      context: .
+      dockerfile: Dockerfile.license-analysis
+    image: license-analysis-image:latest
+    network_mode: bridge
+    entrypoint:
+      - /bin/entrypoint.sh
+    environment:
+      SERVICE_PORT: "6162"
+    ports:
+      - "6162:6162"
