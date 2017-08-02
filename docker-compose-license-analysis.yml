@@ -3,8 +3,7 @@ services:
   license-analysis:
     build:
       context: .
-      dockerfile: Dockerfile.license-analysis
-    image: license-analysis-image:latest
+    image: fabric8-analytics/license-analysis
     network_mode: bridge
     entrypoint:
       - /bin/entrypoint.sh

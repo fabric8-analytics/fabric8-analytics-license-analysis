@@ -1,10 +1,9 @@
 #!/usr/bin/env groovy
-@Library('github.com/msrb/cicd-pipeline-helpers')
 
 def commitId
 node('docker') {
 
-    def image = docker.image('license-analysis-image')
+    def image = docker.image('fabric8-analytics/license-analysis')
 
     stage('Checkout') {
         checkout scm
@@ -16,7 +15,6 @@ node('docker') {
     }
 
     stage('Build') {
-        dockerCleanup()
         docker.build(image.id, '--pull --no-cache .')
     }
 
@@ -33,7 +31,7 @@ node('docker') {
 if (env.BRANCH_NAME == 'master') {
     node('oc') {
 
-        def dcs = ['license-analysis' ]
+        def dcs = ['f8a-license-analysis']
         lock('f8a_staging') {
 
             stage('Deploy - stage') {
