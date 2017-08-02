@@ -38,7 +38,7 @@ if (env.BRANCH_NAME == 'master') {
 
             stage('Deploy - stage') {
                 unstash 'template'
-                sh "oc --context=rh-idev process -v IMAGE_TAG=${commitId} -v CPU_REQUEST=2 -f template.yaml | oc --context=rh-idev apply -f -"
+                sh "oc --context=rh-idev process -v IMAGE_TAG=${commitId} -v CPU_REQUEST=1 -f template.yaml | oc --context=rh-idev apply -f -"
             }
 
             stage('End-to-End Tests') {
