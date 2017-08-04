@@ -26,10 +26,10 @@ def heart_beat():
 @app.route('/api/v1/stack_license', methods=['POST'])
 def stack_license():
     input_json = request.get_json(force=True)
-    app.logger.debug("Stack analysis input: {}".format(input_json))
+    # app.logger.debug("Stack analysis input: {}".format(input_json))
 
     response = compute_stack_license(payload=input_json)
-    app.logger.debug("Stack analysis output: {}".format(response))
+    # app.logger.debug("Stack analysis output: {}".format(response))
 
     return flask.jsonify(response)
 
