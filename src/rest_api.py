@@ -1,13 +1,9 @@
 import flask
-from flask import Flask, request, redirect, make_response
+from flask import Flask, request
 from flask_cors import CORS
-import json
 import sys
-import codecs
 import logging
-import urllib
-import config
-import license_scoring
+from stack_license import compute_stack_license
 
 # Python2.x: Make default encoding as UTF-8
 if sys.version_info.major == 2:
@@ -15,7 +11,8 @@ if sys.version_info.major == 2:
     sys.setdefaultencoding('UTF8')
 
 
-logging.basicConfig(filename='/tmp/error.log', level=logging.DEBUG)
+# logging.basicConfig(filename='/tmp/error.log', level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 app = Flask(__name__)
 app.config.from_object('config')
 CORS(app)
@@ -29,23 +26,10 @@ def heart_beat():
 @app.route('/api/v1/stack_license', methods=['POST'])
 def stack_license():
     input_json = request.get_json(force=True)
-    print "This is the input"
-    print input_json
-    #Need to change this
-    #response = { "stack_license": "Apache 2.0",
-    #    "outlier_license": [
-    #        {
-    #            "pkg1-ver1": "license",
-    #            "pkg2-ver2": "license"
-    #        }],
-    #    "conflict_license": [
-    #        {
-    #        "pkg1-ver1": "license",
-    #        "pkg1-ver2": "license"
-    #        }]
-    #}
+    app.logger.debug("Stack analysis input: {}".format(input_json))
 
-    response = license_scoring.license_scoring(input_json)
+    response = compute_stack_license(payload=input_json)
+    app.logger.debug("Stack analysis output: {}".format(response))
 
     return flask.jsonify(response)
 
