@@ -2,6 +2,8 @@ from license_analysis import LicenseAnalyzer
 import logging
 import traceback
 
+from util.data_store.local_filesystem import LocalFileSystem
+
 
 def compute_stack_license(payload):
     output = payload  # output info will be inserted inside payload structure
@@ -15,8 +17,12 @@ def compute_stack_license(payload):
             logging.debug("stack license analysis input is invalid")
             return output
 
+        # Data store where license graph is available
+        src_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/license_graph"
+        data_store = LocalFileSystem(src_dir=src_dir)
+
         # First, let us try to compute representative license for each component
-        license_analyzer = LicenseAnalyzer()
+        license_analyzer = LicenseAnalyzer(data_store)
         list_comp_rep_licenses = []
         is_stack_license_possible = True
         for pkg in output['packages']:

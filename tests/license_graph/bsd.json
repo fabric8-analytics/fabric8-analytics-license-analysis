@@ -1,0 +1,6 @@
+{
+  "license": "BSD",
+  "type": "P",
+  "synonyms": [""],
+  "neighbours": ["apache", "mpl_1.1", "lgpl_v2.1", "lgpl_v2.1+", "lgpl_v3+"]
+}

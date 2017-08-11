@@ -102,15 +102,31 @@ class DirectedGraph(object):
 
         return list_reachable_vertices
 
-                # TODO: Incorporate it in license layer
-        # common_destination = None
-        # if len(list_reachable_vertices) > 0:
-        #     for reachable_vertex in list_reachable_vertices:
-        #         if reachable_vertex.id in input_vertex_ids:
-        #             common_destination = [reachable_vertex]
+    @staticmethod
+    def read_from_json(data_store):
+        list_vertex_files = data_store.list_files()
 
-            # if common_destination is None:
-            #     for license_type in self.license_type_tuple:
-            #         common_destination = [x for x in list_reachable_vertices if x.license_type is license_type]
-            #         if len(common_destination) > 0:
-            #             break
+        g = DirectedGraph()
+        file2vertex = {}
+        file2id = {}
+        # let us first read all vertices
+        for vertex_file in list_vertex_files:
+            v = data_store.read_json_file(vertex_file)
+            file2vertex[vertex_file] = v
+
+        # add vertex and store corresponding id
+        for k in file2vertex.keys():
+            v = file2vertex[k]
+            v_id = g.add_vertex(vertex_props=v)
+            file2id[k] = v_id
+
+        # add edge by using 'neighbours' property of a vertex
+        for k in file2vertex.keys():
+            v = file2vertex[k]
+            from_vertex = file2id[k]
+            for n in v['neighbours']:
+                # Note: each neighbour property points to a vertex file
+                to_vertex = file2id[n + '.json']
+                g.add_edge(from_id=from_vertex.id, to_id=to_vertex.id)
+
+        return g

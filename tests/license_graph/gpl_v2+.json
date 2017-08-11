@@ -1,0 +1,6 @@
+{
+  "license": "GPL V2+",
+  "type": "SP",
+  "synonyms": [""],
+  "neighbours": ["gpl_v2", "gpl_v3+"]
+}

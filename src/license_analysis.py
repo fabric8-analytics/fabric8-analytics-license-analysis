@@ -2,8 +2,9 @@ from directed_graph import Vertex, DirectedGraph
 
 
 class LicenseAnalyzer(object):
-    def __init__(self):
-        self.g = self._create_graph()
+    def __init__(self, data_store):
+        # self.g = self._create_graph()
+        self.g = DirectedGraph.read_from_json(data_store)
         self.known_licenses = [
             'PD',
             'MIT',
