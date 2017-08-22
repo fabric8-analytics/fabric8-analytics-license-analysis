@@ -19,10 +19,12 @@ def compute_stack_license(payload):
 
         # Data store where license graph is available
         src_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/license_graph"
-        data_store = LocalFileSystem(src_dir=src_dir)
+        graph_store = LocalFileSystem(src_dir=src_dir)
+        synonyms_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/synonyms"
+        synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
 
         # First, let us try to compute representative license for each component
-        license_analyzer = LicenseAnalyzer(data_store)
+        license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
         list_comp_rep_licenses = []
         is_stack_license_possible = True
         for pkg in output['packages']:

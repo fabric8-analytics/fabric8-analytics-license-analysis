@@ -1,5 +1,5 @@
 {
-  "license": "APACHE",
+  "license": "apache 2.0",
   "type": "P",
   "synonyms": [""],
   "neighbours": ["lgpl_v3+"]

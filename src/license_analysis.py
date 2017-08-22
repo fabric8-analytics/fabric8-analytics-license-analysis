@@ -1,43 +1,59 @@
 from directed_graph import Vertex, DirectedGraph
+from src.util import data_store
 
 
 class LicenseAnalyzer(object):
-    def __init__(self, data_store):
+    def __init__(self, graph_store, synonyms_store):
         # self.g = self._create_graph()
-        self.g = DirectedGraph.read_from_json(data_store)
+        self.g = DirectedGraph.read_from_json(graph_store)
         self.known_licenses = [
-            'PD',
-            'MIT',
-            'BSD',
-            'APACHE',
-            'LGPL V2.1',
-            'LGPL V2.1+',
-            'LGPL V3+',
-            'MPL 1.1',
-            'GPL V2',
-            'GPL V2+',
-            'GPL V3+',
-            'AGPL V3+'
+            'public domain',
+            'mit',
+            'bsd-new',
+            'apache 2.0',
+            'lgplv2.1',
+            'lgplv2.1+',
+            'lgplv3+',
+            'mpl 1.1',
+            'gplv2',
+            'gplv2+',
+            'gplv3+',
+            'affero gplv3'
         ]
 
         # IMPORTANT: Order matters in the following tuple
         self.license_type_tuple = ('P', 'WP', 'SP', 'NP')
 
+        list_synonym_jsons = synonyms_store.list_files()
+        for synonym_json in list_synonym_jsons:
+            self.syn = synonyms_store.read_json_file(synonym_json)
+            break  # currently only one synonym json is supported
+
+    def find_synonym(self, license_name):
+        if license_name in self.known_licenses:
+            return license_name
+
+        synonym = self.syn.get(license_name)
+        if synonym is None:
+            return 'unknown_license'
+        else:
+            return synonym
+
     @staticmethod
     def _create_graph():
         g = DirectedGraph()
-        pd = g.add_vertex(vertex_props={'license': 'PD', 'type': 'P'})
-        mit = g.add_vertex(vertex_props={'license': 'MIT', 'type': 'P'})
-        bsd = g.add_vertex(vertex_props={'license': 'BSD', 'type': 'P'})
-        apache = g.add_vertex(vertex_props={'license': 'APACHE', 'type': 'P'})
-        lgpl2 = g.add_vertex(vertex_props={'license': 'LGPL V2.1', 'type': 'WP'})
-        lgpl22 = g.add_vertex(vertex_props={'license': 'LGPL V2.1+', 'type': 'WP'})
-        lgpl3 = g.add_vertex(vertex_props={'license': 'LGPL V3+', 'type': 'WP'})
-        mpl = g.add_vertex(vertex_props={'license': 'MPL 1.1', 'type': 'WP'})
-        gpl2 = g.add_vertex(vertex_props={'license': 'GPL V2', 'type': 'SP'})
-        gpl22 = g.add_vertex(vertex_props={'license': 'GPL V2+', 'type': 'SP'})
-        gpl3 = g.add_vertex(vertex_props={'license': 'GPL V3+', 'type': 'SP'})
-        agpl3 = g.add_vertex(vertex_props={'license': 'AGPL V3+', 'type': 'NP'})
+        pd = g.add_vertex(vertex_props={'license': 'public domain', 'type': 'P'})
+        mit = g.add_vertex(vertex_props={'license': 'mit', 'type': 'P'})
+        bsd = g.add_vertex(vertex_props={'license': 'bsd-new', 'type': 'P'})
+        apache = g.add_vertex(vertex_props={'license': 'apache 2.0', 'type': 'P'})
+        lgpl2 = g.add_vertex(vertex_props={'license': 'lgplv2.1', 'type': 'WP'})
+        lgpl22 = g.add_vertex(vertex_props={'license': 'lgplv2.1+', 'type': 'WP'})
+        lgpl3 = g.add_vertex(vertex_props={'license': 'lgplv3+', 'type': 'WP'})
+        mpl = g.add_vertex(vertex_props={'license': 'mpl 1.1', 'type': 'WP'})
+        gpl2 = g.add_vertex(vertex_props={'license': 'gplv2', 'type': 'SP'})
+        gpl22 = g.add_vertex(vertex_props={'license': 'gplv2+', 'type': 'SP'})
+        gpl3 = g.add_vertex(vertex_props={'license': 'gplv3+', 'type': 'SP'})
+        agpl3 = g.add_vertex(vertex_props={'license': 'agplv3', 'type': 'NP'})
 
         # g.add_edge('PD', 'MIT')
         g.add_edge(pd.id, mit.id)
@@ -120,8 +136,11 @@ class LicenseAnalyzer(object):
         if len(input_licenses) == 0:
             return output
 
+        # Find synonyms
+        input_lic_synonyms = map(lambda y: self.find_synonym(y), input_licenses)
+
         # Check if all input licenses are known
-        if len(set(input_licenses) - set(self.known_licenses)) > 0:
+        if len(set(input_lic_synonyms) - set(self.known_licenses)) > 0:
             output['status'] = 'Unknown'
             output['reason'] = 'Some unknown licenses found'
             output['representative_license'] = None
@@ -130,11 +149,11 @@ class LicenseAnalyzer(object):
         # Let's try to find a representative license
         # First, we need to find vertices for input licenses
         license_vertices = []
-        for lic in input_licenses:
+        for lic in input_lic_synonyms:
             v = self.g.find_vertex(prop_name='license', prop_value=lic)
             assert v is not None
             license_vertices.append(v)
-        assert len(license_vertices) == len(input_licenses)
+        assert len(license_vertices) == len(input_lic_synonyms)
 
         # Find common reachable vertices from input license vertices
         reachable_vertices = DirectedGraph.find_common_reachable_vertices(license_vertices)
