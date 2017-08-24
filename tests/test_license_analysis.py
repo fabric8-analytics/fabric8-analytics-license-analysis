@@ -51,6 +51,7 @@ def test_compute_rep_license_unknown():
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] is 'Unknown'
     assert output['representative_license'] is None
+    assert set(output['unknown_licenses']) == set(['SOME_JUNK_LIC'])
 
 
 def test_compute_rep_license_conflict():
@@ -63,3 +64,17 @@ def test_compute_rep_license_conflict():
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] is 'Conflict'
     assert output['representative_license'] is None
+    expected_conflict_licenses = [['apache 2.0'], ['mpl 1.1']]
+    assert len(expected_conflict_licenses) == len(output['conflict_licenses'])
+    for l in output['conflict_licenses']:
+        assert l in expected_conflict_licenses
+
+
+def test_compatibility_classes():
+    src_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+    license_analyzer.compute_compatibility_classes()
+

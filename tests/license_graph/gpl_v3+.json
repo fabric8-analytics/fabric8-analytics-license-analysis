@@ -1,6 +1,6 @@
 {
   "license": "gplv3+",
   "type": "SP",
-  "synonyms": [""],
+  "group": ["g2"],
   "neighbours": ["agpl_v3+"]
 }

@@ -33,8 +33,8 @@ def compute_stack_license(payload):
             pkg['license_analysis'] = {
                 'status': la_output['status'],
                 '_representative_licenses': la_output['representative_license'],
-                'conflict_licenses': [], # place holder for future
-                'unknown_licenses': [], # place holder for future
+                'conflict_licenses': la_output['conflict_licenses'],
+                'unknown_licenses': la_output['unknown_licenses'],
                 '_message': la_output['reason']
             }
 

@@ -1,6 +1,6 @@
 {
   "license": "public domain",
   "type": "P",
-  "synonyms": [""],
+  "group": ["g1", "g2", "g3"],
   "neighbours": ["mit"]
 }

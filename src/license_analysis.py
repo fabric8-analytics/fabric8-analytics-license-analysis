@@ -34,10 +34,10 @@ class LicenseAnalyzer(object):
             return license_name
 
         synonym = self.syn.get(license_name)
-        if synonym is None:
-            return 'unknown_license'
+        if synonym in self.known_licenses:
+            return synonym  # return known synonym
         else:
-            return synonym
+            return license_name  # return unknown license itself
 
     @staticmethod
     def _create_graph():
@@ -125,11 +125,127 @@ class LicenseAnalyzer(object):
             v = self.g.find_vertex(prop_name='license', prop_value=lic)
             self._print_license_vertex(v)
 
+    @staticmethod
+    def _print_list_vertices(list_vertices):
+        str_vertices = ""
+        for v in list_vertices:
+            str_vertices += v.get_prop_value('license') + ', '
+
+        print(str_vertices)
+
+    def compute_compatibility_classes(self):
+        v_pd = self.g.find_vertex('license', 'public domain')
+        dfs_path = [v_pd]
+        dfs_stack = [v_pd]
+        dict_visited = {}
+        dict_classes = {}
+        list_leaf_vertices = []
+        while len(dfs_stack) > 0:
+            top = dfs_stack[len(dfs_stack) - 1]
+            visited = dict_visited.get(top, False)
+
+            if top.get_prop_value('license') != dfs_path[len(dfs_path)-1].get_prop_value('license'):
+                dfs_path.append(top)
+            print('------------------------------------------------------------------')
+            print('Input stack')
+            self._print_list_vertices(dfs_stack)
+            print('Input path')
+            self._print_list_vertices(dfs_path)
+
+            if not visited:
+                dict_visited[top] = True
+
+                # push children, if any
+                children = top.get_neighbours()
+                if children is None or len(children) == 0:
+                    list_leaf_vertices.append(top)
+
+                    list_vertices = dict_classes.get(top, [])
+                    dict_classes[top] = list_vertices + dfs_path
+
+                    print("Extending the class")
+                    print(top.get_prop_value('license'))
+                    self._print_list_vertices(dict_classes[top])
+
+                    dfs_stack.pop()
+                    dfs_path.pop()
+                else:
+                    print('Pushing children...{')
+                    for c in children:
+                        # if not dict_visited.get(c, False):
+                        print(c.get_prop_value('license'))
+                        dfs_stack.append(c)
+                    print('...}')
+            else:
+                list_vertices = dict_classes.get(top, [])
+                dict_classes[top] = list_vertices + dfs_path
+
+                dfs_stack.pop()
+                dfs_path.pop()
+
+            print('Output stack')
+            self._print_list_vertices(dfs_stack)
+            print('Output path')
+            self._print_list_vertices(dfs_path)
+            print('------------------------------------------------------------------')
+
+        # make all the lists unique
+        list_leaf_vertices = list(set(list_leaf_vertices))
+        for v in dict_classes.keys():
+            l = list(set(dict_classes[v]))
+            dict_classes[v] = l
+
+        # each leaf node represents a compatibility class
+        for leaf in list_leaf_vertices:
+            list_leaf_compatibles = dict_classes[leaf]
+            for v in list_leaf_compatibles:
+                if v.get_prop_value('license') != leaf.get_prop_value('license'):
+                    list_nonleaf_compatibles = dict_classes[v]
+
+
+
+
+        print('------------------------------------------------------------------')
+        print('Classes')
+        print('------------------------------------------------------------------')
+        for v in dict_classes.keys():
+            print(v.get_prop_value('license'))
+            l = list(set(dict_classes[v]))
+            self._print_list_vertices(l)
+            print(' ')
+
+
+    @staticmethod
+    def _find_conflict_licenses(license_vertices):
+        list_groups = []
+        for v in license_vertices:
+            vertex_groups = v.get_prop_value('group')
+            list_groups += vertex_groups
+
+        list_groups = list(set(list_groups))
+        list_items = map(lambda x: (x, []), list_groups)
+        map_groups = dict(list_items)
+
+        for v in license_vertices:
+            license = v.get_prop_value('license')
+            vertex_groups = v.get_prop_value('group')
+            if set(vertex_groups) != set(list_groups):
+                for g in vertex_groups:
+                    map_groups[g].append(license)
+
+        output = []
+        for l in map_groups.values():
+            output.append(list(set(l)))
+
+        return output
+
     def compute_representative_license(self, input_licenses):
         output = {
             'status': 'Failure',
             'reason': 'Input is invalid',
-            'representative_license': None
+            'representative_license': None,
+            'unknown_licenses': [],
+            'conflict_licenses': []
         }
         if input_licenses is None:
             return output
@@ -143,6 +259,7 @@ class LicenseAnalyzer(object):
         if len(set(input_lic_synonyms) - set(self.known_licenses)) > 0:
             output['status'] = 'Unknown'
             output['reason'] = 'Some unknown licenses found'
+            output['unknown_licenses'] = list(set(input_lic_synonyms) - set(self.known_licenses))
             output['representative_license'] = None
             return output
 
@@ -160,6 +277,7 @@ class LicenseAnalyzer(object):
         if len(reachable_vertices) == 0:  # i.e. conflict
             output['status'] = 'Conflict'
             output['reason'] = 'Some licenses are in conflict'
+            output['conflict_licenses'] = self._find_conflict_licenses(license_vertices)
             output['representative_license'] = None
             return output
 
