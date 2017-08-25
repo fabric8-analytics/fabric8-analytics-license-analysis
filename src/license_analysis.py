@@ -1,4 +1,4 @@
-from directed_graph import Vertex, DirectedGraph
+from directed_graph import Vertex, DirectedGraph, DAGExplorer
 from src.util import data_store
 
 
@@ -28,6 +28,13 @@ class LicenseAnalyzer(object):
         for synonym_json in list_synonym_jsons:
             self.syn = synonyms_store.read_json_file(synonym_json)
             break  # currently only one synonym json is supported
+
+        # compatibility classes
+        self.dict_compatibility_classes = {}
+        self.dict_type_compatibility_classes = {}
+
+        self._find_compatibility_classes()
+        self._find_type_compatibility_classes()
 
     def find_synonym(self, license_name):
         if license_name in self.known_licenses:
@@ -125,95 +132,72 @@ class LicenseAnalyzer(object):
             v = self.g.find_vertex(prop_name='license', prop_value=lic)
             self._print_license_vertex(v)
 
-    @staticmethod
-    def _print_list_vertices(list_vertices):
-        str_vertices = ""
-        for v in list_vertices:
-            str_vertices += v.get_prop_value('license') + ', '
+    def _find_walks_within_type(self, v, lic_type, current_walk):
+        current_walk.append(v)
 
-        print(str_vertices)
+        neighbours = v.get_neighbours()
+        neighbours = filter(lambda x: x.get_prop_value('type') == lic_type, neighbours)
 
-    def compute_compatibility_classes(self):
+        if neighbours is None or len(neighbours) == 0:
+            lic_walk = map(lambda x: x.get_prop_value('license'), current_walk)
+            print(', '.join(lic_walk))
+
+            dict_compatibles = self.dict_type_compatibility_classes.get(lic_type, {})
+            list_compatibles = dict_compatibles.get(v, [])
+            list_compatibles += lic_walk
+            dict_compatibles[v] = list_compatibles
+            self.dict_type_compatibility_classes[lic_type] = dict_compatibles
+        else:
+            for n in neighbours:
+                self._find_walks_within_type(n, lic_type, current_walk)
+
+        current_walk.pop()
+
+    def _find_type_compatibility_classes(self):
+        # find walks in the license graph and compatibility classes will by a by-product
+        # v_pd = self.g.find_vertex('license', 'public domain')
+        # v_type = v_pd.get_prop_value('type')
+        # self._find_walks_within_type(v_pd, v_type, [])
+        for v in self.g.get_vertices():
+            lic_type = v.get_prop_value('type')
+            self._find_walks_within_type(v, lic_type, [])
+
+        for t in self.dict_type_compatibility_classes.keys():
+            dict_compatibles = self.dict_type_compatibility_classes.get(t, {})
+            for v in dict_compatibles.keys():
+                list_compatibles = dict_compatibles.get(v, [])
+                list_compatibles = list(set(list_compatibles))
+                dict_compatibles[v] = list_compatibles
+                print(v.get_prop_value('license'))
+                print(list_compatibles)
+
+    def _find_walks(self, v, current_walk):
+        current_walk.append(v)
+
+        neighbours = v.get_neighbours()
+        if neighbours is None or len(neighbours) == 0:
+            lic_walk = map(lambda x: x.get_prop_value('license'), current_walk)
+            print(', '.join(lic_walk))
+            list_compatibles = self.dict_compatibility_classes.get(v, [])
+            list_compatibles += lic_walk
+            self.dict_compatibility_classes[v] = list_compatibles
+        else:
+            for n in neighbours:
+                self._find_walks(n, current_walk)
+
+        current_walk.pop()
+
+    def _find_compatibility_classes(self):
+        # find walks in the license graph and compatibility classes will by a by-product
         v_pd = self.g.find_vertex('license', 'public domain')
-        dfs_path = [v_pd]
-        dfs_stack = [v_pd]
-        dict_visited = {}
-        dict_classes = {}
-        list_leaf_vertices = []
-        while len(dfs_stack) > 0:
-            top = dfs_stack[len(dfs_stack) - 1]
-            visited = dict_visited.get(top, False)
+        self._find_walks(v_pd, [])
 
-            if top.get_prop_value('license') != dfs_path[len(dfs_path)-1].get_prop_value('license'):
-                dfs_path.append(top)
-            print('------------------------------------------------------------------')
-            print('Input stack')
-            self._print_list_vertices(dfs_stack)
-            print('Input path')
-            self._print_list_vertices(dfs_path)
-
-            if not visited:
-                dict_visited[top] = True
-
-                # push children, if any
-                children = top.get_neighbours()
-                if children is None or len(children) == 0:
-                    list_leaf_vertices.append(top)
-
-                    list_vertices = dict_classes.get(top, [])
-                    dict_classes[top] = list_vertices + dfs_path
-
-                    print("Extending the class")
-                    print(top.get_prop_value('license'))
-                    self._print_list_vertices(dict_classes[top])
-
-                    dfs_stack.pop()
-                    dfs_path.pop()
-                else:
-                    print('Pushing children...{')
-                    for c in children:
-                        # if not dict_visited.get(c, False):
-                        print(c.get_prop_value('license'))
-                        dfs_stack.append(c)
-                    print('...}')
-            else:
-                list_vertices = dict_classes.get(top, [])
-                dict_classes[top] = list_vertices + dfs_path
-
-                dfs_stack.pop()
-                dfs_path.pop()
-
-            print('Output stack')
-            self._print_list_vertices(dfs_stack)
-            print('Output path')
-            self._print_list_vertices(dfs_path)
-            print('------------------------------------------------------------------')
-
-        # make all the lists unique
-        list_leaf_vertices = list(set(list_leaf_vertices))
-        for v in dict_classes.keys():
-            l = list(set(dict_classes[v]))
-            dict_classes[v] = l
-
-        # each leaf node represents a compatibility class
-        for leaf in list_leaf_vertices:
-            list_leaf_compatibles = dict_classes[leaf]
-            for v in list_leaf_compatibles:
-                if v.get_prop_value('license') != leaf.get_prop_value('license'):
-                    list_nonleaf_compatibles = dict_classes[v]
-
-
-
-
-        print('------------------------------------------------------------------')
-        print('Classes')
-        print('------------------------------------------------------------------')
-        for v in dict_classes.keys():
+        for v in self.dict_compatibility_classes.keys():
+            list_compatibles = self.dict_compatibility_classes.get(v, [])
+            list_compatibles = list(set(list_compatibles))
+            self.dict_compatibility_classes[v] = list_compatibles
             print(v.get_prop_value('license'))
-            l = list(set(dict_classes[v]))
-            self._print_list_vertices(l)
-            print(' ')
-
+            print(list_compatibles)
 
     @staticmethod
     def _find_conflict_licenses(license_vertices):

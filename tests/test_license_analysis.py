@@ -76,5 +76,13 @@ def test_compatibility_classes():
     synonyms_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/synonyms"
     synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
-    license_analyzer.compute_compatibility_classes()
+    license_analyzer._find_compatibility_classes()
 
+
+def test_type_compatibility_classes():
+    src_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+    license_analyzer._find_type_compatibility_classes()
