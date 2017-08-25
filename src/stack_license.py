@@ -1,13 +1,17 @@
+import os
+
 from license_analysis import LicenseAnalyzer
 import logging
 import traceback
 
+from src import config
 from util.data_store.local_filesystem import LocalFileSystem
 
 
 def compute_stack_license(payload):
     output = payload  # output info will be inserted inside payload structure
-    output['conflict_packages'] = {}  # place holder for future
+    output['conflict_packages'] = []
+    output['outlier_packages'] = {}
 
     try:
         # Check input
@@ -18,9 +22,9 @@ def compute_stack_license(payload):
             return output
 
         # Data store where license graph is available
-        src_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/license_graph"
+        src_dir = os.path.join(config.DATA_DIR, "license_graph")
         graph_store = LocalFileSystem(src_dir=src_dir)
-        synonyms_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/synonyms"
+        synonyms_dir = os.path.join(config.DATA_DIR, "synonyms")
         synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
 
         # First, let us try to compute representative license for each component
@@ -35,13 +39,15 @@ def compute_stack_license(payload):
                 '_representative_licenses': la_output['representative_license'],
                 'conflict_licenses': la_output['conflict_licenses'],
                 'unknown_licenses': la_output['unknown_licenses'],
+                'outlier_licenses': la_output['outlier_licenses'],
+                'synonyms': la_output['synonyms'],
                 '_message': la_output['reason']
             }
 
-            if la_output['status'] is 'Conflict':
+            if la_output['status'] == 'Conflict':
                 output['status'] = 'ComponentLicenseConflict'
                 is_stack_license_possible = False
-            elif la_output['status'] is 'Unknown':
+            elif la_output['status'] == 'Unknown':
                 output['status'] = 'Unknown'
                 is_stack_license_possible = False
 
@@ -64,12 +70,35 @@ def compute_stack_license(payload):
             output['stack_license'] = None
             output['message'] = "Something weird happened!"
 
+        assert(len(output['packages']) == len(list_comp_rep_licenses))
+        dict_lic_pkg = {}
+        for i, lic in enumerate(list_comp_rep_licenses):
+            pkg = output['packages'][i]
+            dict_lic_pkg[lic] = pkg.get('package', 'unknown_package')
+
         # If we reach here, then that means we are all set to compute stack license !
         la_output = license_analyzer.compute_representative_license(list_comp_rep_licenses)
         output['status'] = la_output['status']
         output['stack_license'] = la_output['representative_license']
-        if la_output['status'] is 'Conflict':
+        if la_output['status'] == 'Conflict':
+            list_conflict_lic = la_output['conflict_licenses']
+            list_conflict_pkg = []
+            for lic_tuple in list_conflict_lic:
+                pkg_group = {
+                    dict_lic_pkg[lic_tuple[0]]: lic_tuple[0],
+                    dict_lic_pkg[lic_tuple[1]]: lic_tuple[1]
+                }
+                list_conflict_pkg.append(pkg_group)
+            output['conflict_packages'] = list_conflict_pkg
             output['status'] = 'StackLicenseConflict'
+
+        if (la_output['outlier_licenses']) > 0:
+            outlier_pkg = {}
+            for lic in la_output['outlier_licenses']:
+                outlier_pkg[dict_lic_pkg[lic]] = lic
+            output['outlier_packages'] = outlier_pkg
+        else:
+            output['outlier_packages'] = {}
 
     except:  # TODO custom exceptions
         output['status'] = 'Failure'

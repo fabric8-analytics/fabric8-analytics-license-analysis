@@ -3,18 +3,18 @@ from src.util.data_store.local_filesystem import LocalFileSystem
 
 
 def test_print_graph():
-    src_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/license_graph"
+    src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/synonyms"
+    synonyms_dir = "synonyms"
     synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
     license_analyzer.print_license_graph()
 
 
 def test_compute_rep_license_successful():
-    src_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/license_graph"
+    src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/synonyms"
+    synonyms_dir = "synonyms"
     synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
     output = license_analyzer.compute_representative_license(input_licenses=None)
@@ -40,11 +40,23 @@ def test_compute_rep_license_successful():
     assert output['status'] is 'Successful'
     assert output['representative_license'] == 'bsd-new'
 
+    list_licenses = ['MIT', 'BSD', 'PD', 'MPL 1.1']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] is 'Successful'
+    assert output['representative_license'] == 'mpl 1.1'
+    assert set(output['outlier_licenses']) == set(['mpl 1.1'])
+
+    list_licenses = ['MIT', 'BSD', 'PD', 'lgplv2.1', 'lgplv3+']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] is 'Successful'
+    assert output['representative_license'] == 'gplv3+'
+    assert set(output['outlier_licenses']) == set(['lgplv2.1', 'lgplv3+'])
+
 
 def test_compute_rep_license_unknown():
-    src_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/license_graph"
+    src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/synonyms"
+    synonyms_dir = "synonyms"
     synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
     list_licenses = ['SOME_JUNK_LIC']
@@ -55,34 +67,31 @@ def test_compute_rep_license_unknown():
 
 
 def test_compute_rep_license_conflict():
-    src_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/license_graph"
+    src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/synonyms"
+    synonyms_dir = "synonyms"
     synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
     list_licenses = ['APACHE', 'MPL 1.1']
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] is 'Conflict'
     assert output['representative_license'] is None
-    expected_conflict_licenses = [['apache 2.0'], ['mpl 1.1']]
-    assert len(expected_conflict_licenses) == len(output['conflict_licenses'])
-    for l in output['conflict_licenses']:
-        assert l in expected_conflict_licenses
+    expected_conflict_licenses = ('apache 2.0', 'mpl 1.1')
+    for tpl in output['conflict_licenses']:
+        assert set(tpl) == set(expected_conflict_licenses)
 
 
-def test_compatibility_classes():
-    src_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/license_graph"
+def test_compute_rep_license_conflict_2():
+    src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/synonyms"
+    synonyms_dir = "synonyms"
     synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
-    license_analyzer._find_compatibility_classes()
-
-
-def test_type_compatibility_classes():
-    src_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/license_graph"
-    graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "/Users/hmistry/work/license_analysis/src/fabric8-analytics-license-analysis/tests/synonyms"
-    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
-    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
-    license_analyzer._find_type_compatibility_classes()
+    list_licenses = ['MIT', 'APACHE', 'MPL 1.1', 'lgplv2.1', 'lgplv3+']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] is 'Conflict'
+    assert output['representative_license'] is None
+    expected_conflict_licenses = [('apache 2.0', 'mpl 1.1'),
+                                  ('lgplv2.1', 'mpl 1.1'),
+                                  ('lgplv3+', 'mpl 1.1')]
+    assert set(expected_conflict_licenses) == set(output['conflict_licenses'])

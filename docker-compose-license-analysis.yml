@@ -9,5 +9,6 @@ services:
       - /bin/entrypoint.sh
     environment:
       SERVICE_PORT: "6162"
+      DATA_DIR: "/"
     ports:
       - "6162:6162"

@@ -11,6 +11,8 @@ COPY ./requirements.txt /
 RUN pip install -r requirements.txt && rm requirements.txt
 
 COPY ./src /src
+COPY ./tests/license_graph /license_graph
+COPY ./tests/synonyms /synonyms
 RUN cp /src/config.py.template /src/config.py
 
 ADD scripts/entrypoint.sh /bin/entrypoint.sh

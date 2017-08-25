@@ -1,5 +1,8 @@
-from directed_graph import Vertex, DirectedGraph, DAGExplorer
-from src.util import data_store
+from math import ceil
+
+import itertools
+
+from directed_graph import DirectedGraph
 
 
 class LicenseAnalyzer(object):
@@ -140,12 +143,13 @@ class LicenseAnalyzer(object):
 
         if neighbours is None or len(neighbours) == 0:
             lic_walk = map(lambda x: x.get_prop_value('license'), current_walk)
-            print(', '.join(lic_walk))
+            # print(', '.join(lic_walk))
 
+            v_license = v.get_prop_value('license')
             dict_compatibles = self.dict_type_compatibility_classes.get(lic_type, {})
-            list_compatibles = dict_compatibles.get(v, [])
+            list_compatibles = dict_compatibles.get(v_license, [])
             list_compatibles += lic_walk
-            dict_compatibles[v] = list_compatibles
+            dict_compatibles[v_license] = list_compatibles
             self.dict_type_compatibility_classes[lic_type] = dict_compatibles
         else:
             for n in neighbours:
@@ -164,12 +168,12 @@ class LicenseAnalyzer(object):
 
         for t in self.dict_type_compatibility_classes.keys():
             dict_compatibles = self.dict_type_compatibility_classes.get(t, {})
-            for v in dict_compatibles.keys():
-                list_compatibles = dict_compatibles.get(v, [])
+            for lic in dict_compatibles.keys():
+                list_compatibles = dict_compatibles.get(lic, [])
                 list_compatibles = list(set(list_compatibles))
-                dict_compatibles[v] = list_compatibles
-                print(v.get_prop_value('license'))
-                print(list_compatibles)
+                dict_compatibles[lic] = list_compatibles
+                # print(lic)
+                # print(list_compatibles)
 
     def _find_walks(self, v, current_walk):
         current_walk.append(v)
@@ -177,10 +181,11 @@ class LicenseAnalyzer(object):
         neighbours = v.get_neighbours()
         if neighbours is None or len(neighbours) == 0:
             lic_walk = map(lambda x: x.get_prop_value('license'), current_walk)
-            print(', '.join(lic_walk))
-            list_compatibles = self.dict_compatibility_classes.get(v, [])
+            # print(', '.join(lic_walk))
+            v_license = v.get_prop_value('license')
+            list_compatibles = self.dict_compatibility_classes.get(v_license, [])
             list_compatibles += lic_walk
-            self.dict_compatibility_classes[v] = list_compatibles
+            self.dict_compatibility_classes[v_license] = list_compatibles
         else:
             for n in neighbours:
                 self._find_walks(n, current_walk)
@@ -192,36 +197,111 @@ class LicenseAnalyzer(object):
         v_pd = self.g.find_vertex('license', 'public domain')
         self._find_walks(v_pd, [])
 
-        for v in self.dict_compatibility_classes.keys():
-            list_compatibles = self.dict_compatibility_classes.get(v, [])
+        for lic in self.dict_compatibility_classes.keys():
+            list_compatibles = self.dict_compatibility_classes.get(lic, [])
             list_compatibles = list(set(list_compatibles))
-            self.dict_compatibility_classes[v] = list_compatibles
-            print(v.get_prop_value('license'))
-            print(list_compatibles)
+            self.dict_compatibility_classes[lic] = list_compatibles
+            # print(lic)
+            # print(list_compatibles)
 
-    @staticmethod
-    def _find_conflict_licenses(license_vertices):
+    def _find_conflict_licenses(self, license_vertices):
+        # first, let us find out compatibility classes for each vertex
+        vertex2groups = {}
+        for v in license_vertices:
+            for item in self.dict_compatibility_classes.items():
+                if v.get_prop_value('license') in item[1]:
+                    vertex_groups = vertex2groups.get(v, [])
+                    vertex_groups.append(item[0])
+                    vertex2groups[v] = vertex_groups
+
+        # also, we need to gather total unique classes for input vertices
         list_groups = []
         for v in license_vertices:
-            vertex_groups = v.get_prop_value('group')
+            vertex_groups = vertex2groups[v]
             list_groups += vertex_groups
 
+        # create a dictionary to store vertices per compatibility class
         list_groups = list(set(list_groups))
+        assert(len(list_groups) > 1)
+
         list_items = map(lambda x: (x, []), list_groups)
         map_groups = dict(list_items)
 
+        # insert each vertex into appropriate class
         for v in license_vertices:
             license = v.get_prop_value('license')
-            vertex_groups = v.get_prop_value('group')
+            vertex_groups = vertex2groups[v]
+            # ignore vertex if it falls into every class
             if set(vertex_groups) != set(list_groups):
                 for g in vertex_groups:
                     map_groups[g].append(license)
 
+        # prepare output i.e. list of vertex licenses for each class
         output = []
-        for l in map_groups.values():
-            output.append(list(set(l)))
+        for c1, c2 in itertools.combinations(list_groups, 2):
+            list1 = map_groups[c1]  # list of licenses in one class
+            list2 = map_groups[c2]  # list of licenses in the other class
+            common = set(list1).intersection(set(list2))
+            list1 = list(set(list1) - common)
+            list2 = list(set(list2) - common)
+            for l1 in list1:
+                for l2 in list2:
+                    output.append(tuple(sorted((l1, l2))))
 
+        output = list(set(output))
         return output
+
+    def _is_license_stricter(self, lic_type_a, lic_type_b):
+        return self.license_type_tuple.index(lic_type_a) > \
+               self.license_type_tuple.index(lic_type_b)
+
+    def _is_license_stricter_or_same(self, lic_type_a, lic_type_b):
+        return self.license_type_tuple.index(lic_type_a) >= \
+               self.license_type_tuple.index(lic_type_b)
+
+    def _find_outlier_licenses(self, license_vertices, stack_license_type):
+        # first, find how many vertices fall into each type-compatibility-class
+        dict_tcc_count = {}
+        dict_tcc_type = {}
+        dict_tcc_licenses = {}
+        for v in license_vertices:
+            for t in self.dict_type_compatibility_classes.keys():
+                dict_compatibles = self.dict_type_compatibility_classes.get(t, {})
+                for item in dict_compatibles.items():
+                    if v.get_prop_value('license') in item[1]:
+                        dict_tcc_type[item[0]] = t
+
+                        cnt = dict_tcc_count.get(item[0], 0)
+                        cnt += 1
+                        dict_tcc_count[item[0]] = cnt
+
+                        list_licenses = dict_tcc_licenses.get(item[0], [])
+                        list_licenses.append(v.get_prop_value('license'))
+                        dict_tcc_licenses[item[0]] = list_licenses
+
+        # check if there is a type-compatibility-class with majority
+        majority = ceil(len(license_vertices) * 0.6)
+        major_tcc_lic = None
+        for lic in dict_tcc_count.keys():
+            if dict_tcc_count[lic] >= majority:
+                major_tcc_lic = lic
+                break
+
+        if major_tcc_lic is not None:
+            v = self.g.find_vertex('license', major_tcc_lic)
+            major_tcc_type = v.get_prop_value('type')
+            if self._is_license_stricter(stack_license_type, major_tcc_type):
+                # find all the licenses that fall into same or stricter types
+                items = filter(lambda x:
+                               self._is_license_stricter_or_same(x[1], major_tcc_type),
+                               dict_tcc_type.items())
+                items = filter(lambda x: x[0] != major_tcc_lic, items)
+                list_outliers = []
+                for i in items:
+                    list_outliers += dict_tcc_licenses[i[0]]
+                return list_outliers
+
+        return []
 
     def compute_representative_license(self, input_licenses):
         output = {
@@ -229,7 +309,9 @@ class LicenseAnalyzer(object):
             'reason': 'Input is invalid',
             'representative_license': None,
             'unknown_licenses': [],
-            'conflict_licenses': []
+            'conflict_licenses': [],
+            'outlier_licenses': [],
+            'synonyms': {}
         }
         if input_licenses is None:
             return output
@@ -238,6 +320,7 @@ class LicenseAnalyzer(object):
 
         # Find synonyms
         input_lic_synonyms = map(lambda y: self.find_synonym(y), input_licenses)
+        output['synonyms'] = dict(zip(input_licenses, input_lic_synonyms))
 
         # Check if all input licenses are known
         if len(set(input_lic_synonyms) - set(self.known_licenses)) > 0:
@@ -278,6 +361,10 @@ class LicenseAnalyzer(object):
             output['reason'] = 'Representative license found'
             output['representative_license'] = \
                 common_destination.get_prop_value(prop_name='license')
+
+            rep_lic_vertex = self.g.find_vertex('license', output['representative_license'])
+            rep_lic_type = rep_lic_vertex.get_prop_value('type')
+            output['outlier_licenses'] = self._find_outlier_licenses(license_vertices, rep_lic_type)
             return output
 
         # If one of the input licenses is NOT the representative one, then
@@ -286,13 +373,17 @@ class LicenseAnalyzer(object):
             list_common_destinations = [
                 x
                 for x in reachable_vertices
-                if x.get_prop_value(prop_name='type') is license_type
+                if x.get_prop_value(prop_name='type') == license_type
             ]
             if len(list_common_destinations) > 0:
                 output['status'] = 'Successful'
                 output['reason'] = 'Representative license found'
                 output['representative_license'] = \
                     list_common_destinations[0].get_prop_value(prop_name='license')
+
+                rep_lic_vertex = self.g.find_vertex('license', output['representative_license'])
+                rep_lic_type = rep_lic_vertex.get_prop_value('type')
+                output['outlier_licenses'] = self._find_outlier_licenses(license_vertices, rep_lic_type)
                 return output
 
         # We should have returned by now ! Returning from here is unexpected !
