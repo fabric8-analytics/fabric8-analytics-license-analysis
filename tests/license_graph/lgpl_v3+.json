@@ -1,6 +1,5 @@
 {
   "license": "lgplv3+",
   "type": "WP",
-  "group": ["g2"],
   "neighbours": ["gpl_v3+"]
 }

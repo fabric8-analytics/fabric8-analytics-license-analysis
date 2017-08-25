@@ -1,6 +1,5 @@
 {
   "license": "gplv3+",
   "type": "SP",
-  "group": ["g2"],
   "neighbours": ["agpl_v3+"]
 }

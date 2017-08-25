@@ -3,11 +3,20 @@ from math import ceil
 import itertools
 
 from directed_graph import DirectedGraph
+from src import config
 
 
 class LicenseAnalyzer(object):
+    """
+    License Analysis logic is encapsulated by this class.
+    Mainly it offers the following:
+    - identifies representative license for the given set of licenses
+    - finds conflicting licenses
+    - locates outlier licenses
+    - flags unknown licenses
+    """
     def __init__(self, graph_store, synonyms_store):
-        # self.g = self._create_graph()
+        # load graph from given data store
         self.g = DirectedGraph.read_from_json(graph_store)
         self.known_licenses = [
             'public domain',
@@ -27,12 +36,13 @@ class LicenseAnalyzer(object):
         # IMPORTANT: Order matters in the following tuple
         self.license_type_tuple = ('P', 'WP', 'SP', 'NP')
 
+        # read the json that contains known synonyms
         list_synonym_jsons = synonyms_store.list_files()
         for synonym_json in list_synonym_jsons:
             self.syn = synonyms_store.read_json_file(synonym_json)
             break  # currently only one synonym json is supported
 
-        # compatibility classes
+        # identify compatibility classes among the licenses in graph
         self.dict_compatibility_classes = {}
         self.dict_type_compatibility_classes = {}
 
@@ -65,61 +75,34 @@ class LicenseAnalyzer(object):
         gpl3 = g.add_vertex(vertex_props={'license': 'gplv3+', 'type': 'SP'})
         agpl3 = g.add_vertex(vertex_props={'license': 'agplv3', 'type': 'NP'})
 
-        # g.add_edge('PD', 'MIT')
         g.add_edge(pd.id, mit.id)
-
-        # g.add_edge('MIT', 'BSD')
         g.add_edge(mit.id, bsd.id)
-
-        # g.add_edge('BSD', 'APACHE')
         g.add_edge(bsd.id, apache.id)
-
-        # g.add_edge('BSD', 'MPL 1.1')
         g.add_edge(bsd.id, mpl.id)
-
-        # g.add_edge('BSD', 'LGPL V2.1')
         g.add_edge(bsd.id, lgpl2.id)
-
-        # g.add_edge('BSD', 'LGPL V2.1+')
         g.add_edge(bsd.id, lgpl22.id)
-
-        # g.add_edge('BSD', 'LGPL V3+')
         g.add_edge(bsd.id, lgpl3.id)
-
-        # g.add_edge('APACHE', 'LGPL V3+')
         g.add_edge(apache.id, lgpl3.id)
-
-        # g.add_edge('LGPL V2.1+', 'LGPL V2.1')
         g.add_edge(lgpl22.id, lgpl2.id)
-
-        # g.add_edge('LGPL V2.1+', 'LGPL V3+')
         g.add_edge(lgpl22.id, lgpl3.id)
-
-        # g.add_edge('LGPL V2.1', 'GPL V2')
         g.add_edge(lgpl2.id, gpl2.id)
-
-        # g.add_edge('LGPL V2.1', 'GPL V2+')
         g.add_edge(lgpl2.id, gpl22.id)
-
-        # g.add_edge('LGPL V2.1+', 'GPL V2+')
         g.add_edge(lgpl22.id, gpl22.id)
-
-        # g.add_edge('LGPL V3+', 'GPL V3+')
         g.add_edge(lgpl3.id, gpl3.id)
-
-        # g.add_edge('GPL V2+', 'GPL V2')
         g.add_edge(gpl22.id, gpl2.id)
-
-        # g.add_edge('GPL V2+', 'GPL V3+')
         g.add_edge(gpl22.id, gpl3.id)
-
-        # g.add_edge('GPL V3+', 'AGPL V3+')
         g.add_edge(gpl3.id, agpl3.id)
 
         return g
 
     @staticmethod
     def _print_license_vertex(vertex):
+        """
+        Helper method to print the given license vertex
+
+        :param vertex: license vertex to be printed
+        :return: None
+        """
         print("Vertex {}: license: {} Type: {}".format(vertex.id,
                                                        vertex.get_prop_value('license'),
                                                        vertex.get_prop_value('type')))
@@ -131,11 +114,30 @@ class LicenseAnalyzer(object):
         print("")
 
     def print_license_graph(self):
+        """
+        Helper method to print the license graph
+        :return: None
+        """
         for lic in self.known_licenses:
             v = self.g.find_vertex(prop_name='license', prop_value=lic)
             self._print_license_vertex(v)
 
     def _find_walks_within_type(self, v, lic_type, current_walk):
+        """
+        Find all possible walks of license vertices within the scope of given
+        license-type. These walks will help identify compatibility classes
+        for given license-type.
+
+        IMPORTANT: It is assumed that license graph is a DAG i.e. no cycles.
+
+        Please note that this function has a side effect i.e. its output is
+        stored in the object variable 'dict_type_compatibility_classes'.
+
+        :param v: root vertex from where walks will start
+        :param lic_type: type of license that defines scope for walks
+        :param current_walk: book keeping variable
+        :return: None
+        """
         current_walk.append(v)
 
         neighbours = v.get_neighbours()
@@ -158,14 +160,48 @@ class LicenseAnalyzer(object):
         current_walk.pop()
 
     def _find_type_compatibility_classes(self):
-        # find walks in the license graph and compatibility classes will by a by-product
-        # v_pd = self.g.find_vertex('license', 'public domain')
-        # v_type = v_pd.get_prop_value('type')
-        # self._find_walks_within_type(v_pd, v_type, [])
+        """
+        Method to identify compatibility classes among the license subgraph
+        for each license-type.
+
+        A compatibility class can be defined as a set of mutually compatible
+        licenses i.e. there exists a representative license for each pair of
+        licenses in a compatibility class.
+
+        A type compatibility class is a compatibility class such that all its
+        licenses belong to same license-type and there exists a representative
+        license for each pair of licenses in the same license-type.
+
+        Algorithm to find all type compatibility classes is as follows:
+          for each license-vertex V:
+            enumerate all possible walks starting from V such that
+            each vertex in walk has same license-type as V.type
+
+            end-vertex of each walk identifies a compatibility class
+            and all the vertices of the walk are members of this class
+
+          for each unique type compatibility class:
+            deduplicate the member license-vertices
+
+        At the end of all walk enumeration, the type compatible classes will be
+        kept in dict_type_compatible_classes as follows:
+          dict_type_compatible_classes:
+            license-type:
+              class-representative-license: [list of member licenses]
+            ...
+            license-type:
+              class-representative-license: [list of member licenses]
+
+        Note: type compatible classes are useful for identifying license based
+        outlier packages.
+
+        :return: None
+        """
         for v in self.g.get_vertices():
             lic_type = v.get_prop_value('type')
             self._find_walks_within_type(v, lic_type, [])
 
+        # deduplicate the member licenses of each type compatibility class
         for t in self.dict_type_compatibility_classes.keys():
             dict_compatibles = self.dict_type_compatibility_classes.get(t, {})
             for lic in dict_compatibles.keys():
@@ -176,6 +212,19 @@ class LicenseAnalyzer(object):
                 # print(list_compatibles)
 
     def _find_walks(self, v, current_walk):
+        """
+        Find all possible walks of license vertices. These walks will help
+        us identify compatibility classes.
+
+        IMPORTANT: It is assumed that license graph is a DAG i.e. no cycles.
+
+        Please note that this function has a side effect i.e. its output is
+        stored in the object variable 'dict_compatibility_classes'.
+
+        :param v: root vertex from where walks will start
+        :param current_walk: book keeping variable
+        :return: None
+        """
         current_walk.append(v)
 
         neighbours = v.get_neighbours()
@@ -193,10 +242,38 @@ class LicenseAnalyzer(object):
         current_walk.pop()
 
     def _find_compatibility_classes(self):
+        """
+        Method to identify compatibility classes among the license graph.
+
+        A compatibility class can be defined as a set of mutually compatible
+        licenses i.e. there exists a representative license for each pair of
+        licenses in a compatibility class.
+
+        Algorithm to find all compatibility classes is as follows:
+          enumerate all possible walks starting from 'public domain' vertex
+
+          end-vertex of each walk identifies a compatibility class
+          and all the vertices of the walk are members of this class
+
+          for each unique compatibility class:
+            deduplicate the member license-vertices
+
+        At the end of all walk enumeration, the compatible classes will be
+        kept in dict_compatible_classes as follows:
+          dict_compatible_classes:
+            class-representative-license: [list of member licenses]
+            ...
+            class-representative-license: [list of member licenses]
+
+        Note: compatible classes are useful for identifying conflicting licenses
+
+        :return: None
+        """
         # find walks in the license graph and compatibility classes will by a by-product
         v_pd = self.g.find_vertex('license', 'public domain')
         self._find_walks(v_pd, [])
 
+        # deduplicate the member licenses of each compatibility class
         for lic in self.dict_compatibility_classes.keys():
             list_compatibles = self.dict_compatibility_classes.get(lic, [])
             list_compatibles = list(set(list_compatibles))
@@ -205,6 +282,20 @@ class LicenseAnalyzer(object):
             # print(list_compatibles)
 
     def _find_conflict_licenses(self, license_vertices):
+        """
+        Method to identify conflicting licenses among the given list. Note that
+        this method assumes that there is a conflict in the input licenses.
+
+        When there is a conflict in the given list of licenses then it is
+        guaranteed that all of them cannot be members of the same compatibility class.
+        Otherwise, there would have been a representative license identified.
+
+        This method distributes the given licenses into their respective compatibility
+        classes and then prepares output with each pair of conflicting licenses.
+
+        :param license_vertices: license vertices that have some conflicting licenses
+        :return: list of pairs of conflicting licenses
+        """
         # first, let us find out compatibility classes for each vertex
         vertex2groups = {}
         for v in license_vertices:
@@ -220,14 +311,14 @@ class LicenseAnalyzer(object):
             vertex_groups = vertex2groups[v]
             list_groups += vertex_groups
 
-        # create a dictionary to store vertices per compatibility class
+        # create a dictionary to store vertex licenses per compatibility class
         list_groups = list(set(list_groups))
         assert(len(list_groups) > 1)
 
         list_items = map(lambda x: (x, []), list_groups)
         map_groups = dict(list_items)
 
-        # insert each vertex into appropriate class
+        # insert each vertex license into appropriate class
         for v in license_vertices:
             license = v.get_prop_value('license')
             vertex_groups = vertex2groups[v]
@@ -236,9 +327,9 @@ class LicenseAnalyzer(object):
                 for g in vertex_groups:
                     map_groups[g].append(license)
 
-        # prepare output i.e. list of vertex licenses for each class
+        # prepare output i.e. list of tuples with two conflicting licenses
         output = []
-        for c1, c2 in itertools.combinations(list_groups, 2):
+        for c1, c2 in itertools.combinations(list_groups, 2):  # nC2
             list1 = map_groups[c1]  # list of licenses in one class
             list2 = map_groups[c2]  # list of licenses in the other class
             common = set(list1).intersection(set(list2))
@@ -248,6 +339,7 @@ class LicenseAnalyzer(object):
                 for l2 in list2:
                     output.append(tuple(sorted((l1, l2))))
 
+        # deduplicate the output tuples
         output = list(set(output))
         return output
 
@@ -260,6 +352,27 @@ class LicenseAnalyzer(object):
                self.license_type_tuple.index(lic_type_b)
 
     def _find_outlier_licenses(self, license_vertices, stack_license_type):
+        """
+        Method to identify outlier packages based on licenses.
+
+        A package is license based outlier, if
+          - its license is in minority
+          - it is not type-compatible with the licenses in majority.
+          - its license is not less restrictive than licenses in majority
+
+        Algorithm is as follows:
+          for each type-compatible class, count how many input licenses fall there
+
+          find the type-compatible class that has majority ( e.g. 60% ) of input licenses
+
+          if stack license type is stricter than major type compatibility class then
+            find all those licenses those fall into same or stricter type
+            return them outlier licenses
+
+        :param license_vertices: license vertices that have some conflicting licenses
+        :param stack_license_type: stack license type
+        :return:
+        """
         # first, find how many vertices fall into each type-compatibility-class
         dict_tcc_count = {}
         dict_tcc_type = {}
@@ -280,7 +393,7 @@ class LicenseAnalyzer(object):
                         dict_tcc_licenses[item[0]] = list_licenses
 
         # check if there is a type-compatibility-class with majority
-        majority = ceil(len(license_vertices) * 0.6)
+        majority = ceil(len(license_vertices) * float(config.MAJORITY_THRESHOLD))
         major_tcc_lic = None
         for lic in dict_tcc_count.keys():
             if dict_tcc_count[lic] >= majority:
@@ -304,6 +417,29 @@ class LicenseAnalyzer(object):
         return []
 
     def compute_representative_license(self, input_licenses):
+        """
+        Method to compute representative license for given list of licenses.
+
+        First, it tries to identify the input licenses by using known synonyms.
+        If there exists at least one unknown license, this method gives up.
+
+        It makes use of a very popular license graph available in [1]. After
+        identifying license vertices in the graph, it tries to find the
+        common reachable vertex from the input license vertices.
+
+        If a common reachable vertex is not possible then there is a conflict
+        and all pairs of conflicting licenses are identified by using the
+        concept of compatibility classes.
+
+        If a common reachable vertex is available, then its license becomes
+        representative license. Note that we also try to find outlier
+        licenses when representative license is available.
+
+        [1] https://www.dwheeler.com/essays/floss-license-slide.html
+
+        :param input_licenses: list of input licenses
+        :return: representative license with supporting information
+        """
         output = {
             'status': 'Failure',
             'reason': 'Input is invalid',

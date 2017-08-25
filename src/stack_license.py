@@ -9,6 +9,23 @@ from util.data_store.local_filesystem import LocalFileSystem
 
 
 def compute_stack_license(payload):
+    """
+    Function to perform a detailed license analysis for the given list of
+    packages.
+
+    It first identifies representative license for each package. Then, it
+    computes representative license for the entire stack itself.
+
+    If there is any unknown license, this function will give up.
+
+    If there is any conflict then it returns pairs of conflicting licenses.
+
+    If a representative stack-license is possible, then it tries to identify
+    license based outlier packages.
+
+    :param payload: Input list of package information
+    :return: Detailed license analysis output
+    """
     output = payload  # output info will be inserted inside payload structure
     output['conflict_packages'] = []
     output['outlier_packages'] = {}
@@ -70,6 +87,7 @@ def compute_stack_license(payload):
             output['stack_license'] = None
             output['message'] = "Something weird happened!"
 
+        # Prepare a map of license -> package, which is used later to prepare output
         assert(len(output['packages']) == len(list_comp_rep_licenses))
         dict_lic_pkg = {}
         for i, lic in enumerate(list_comp_rep_licenses):
@@ -80,6 +98,7 @@ def compute_stack_license(payload):
         la_output = license_analyzer.compute_representative_license(list_comp_rep_licenses)
         output['status'] = la_output['status']
         output['stack_license'] = la_output['representative_license']
+
         if la_output['status'] == 'Conflict':
             list_conflict_lic = la_output['conflict_licenses']
             list_conflict_pkg = []

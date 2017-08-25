@@ -1,6 +1,5 @@
 {
   "license": "mit",
   "type": "P",
-  "group": ["g1", "g2", "g3"],
   "neighbours": ["bsd"]
 }
