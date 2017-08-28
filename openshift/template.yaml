@@ -35,6 +35,10 @@ objects:
             value: "6162"
           - name: SERVICE_TIMEOUT
             value: "900"
+          - name: DATA_DIR
+            value: "/"
+          - name: MAJORITY_THRESHOLD
+            value: "0.6"
           name: f8a-license-analysis
           image: "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${IMAGE_TAG}"
           ports:
