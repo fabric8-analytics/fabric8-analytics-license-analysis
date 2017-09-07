@@ -6,7 +6,7 @@ import os
 # from pgmpy.readwrite import BIFReader
 # from pgmpy.readwrite import BIFWriter
 
-from abstract_data_store import AbstractDataStore
+from src.util.data_store.abstract_data_store import AbstractDataStore
 
 
 class LocalFileSystem(AbstractDataStore):
@@ -36,7 +36,7 @@ class LocalFileSystem(AbstractDataStore):
 
     def read_json_file(self, filename):
         """Read JSON file from the data_input source"""
-        return LocalFileSystem.byteify(json.load(open(os.path.join(self.src_dir, filename))))
+        return json.load(open(os.path.join(self.src_dir, filename)))
 
     def read_all_json_files(self):
         """Read all the files from the data_input source"""
@@ -76,18 +76,6 @@ class LocalFileSystem(AbstractDataStore):
     #
     # def write_pandas_df_into_json_file(self,data,filename):
     #     data.to_json(os.path.join(self.src_dir, filename))
-
-    @classmethod
-    def byteify(cls, input):
-        if isinstance(input, dict):
-            return {LocalFileSystem.byteify(key): LocalFileSystem.byteify(value)
-                    for key, value in input.iteritems()}
-        elif isinstance(input, list):
-            return [LocalFileSystem.byteify(element) for element in input]
-        elif isinstance(input, unicode):
-            return input.encode('utf-8')
-        else:
-            return input
 
     @classmethod
     def convert_list_of_tuples_to_string(cls, tuple_list):

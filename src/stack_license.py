@@ -1,11 +1,11 @@
 import os
 
-from license_analysis import LicenseAnalyzer
+from src.license_analysis import LicenseAnalyzer
 import logging
 import traceback
 
 from src import config
-from util.data_store.local_filesystem import LocalFileSystem
+from src.util.data_store.local_filesystem import LocalFileSystem
 
 
 def compute_stack_license(payload):
@@ -111,7 +111,7 @@ def compute_stack_license(payload):
             output['conflict_packages'] = list_conflict_pkg
             output['status'] = 'StackLicenseConflict'
 
-        if (la_output['outlier_licenses']) > 0:
+        if (len(la_output['outlier_licenses'])) > 0:
             outlier_pkg = {}
             for lic in la_output['outlier_licenses']:
                 outlier_pkg[dict_lic_pkg[lic]] = lic

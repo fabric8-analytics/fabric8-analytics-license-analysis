@@ -19,7 +19,7 @@ class Vertex(object):
         self.neighbours[vertex] = weight
 
     def get_neighbours(self):
-        return self.neighbours.keys()
+        return list(self.neighbours.keys())
 
     def get_id(self):
         return self.id

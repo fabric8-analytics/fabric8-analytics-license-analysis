@@ -2,7 +2,7 @@ from math import ceil
 
 import itertools
 
-from directed_graph import DirectedGraph
+from src.directed_graph import DirectedGraph
 from src import config
 
 
@@ -141,10 +141,10 @@ class LicenseAnalyzer(object):
         current_walk.append(v)
 
         neighbours = v.get_neighbours()
-        neighbours = filter(lambda x: x.get_prop_value('type') == lic_type, neighbours)
+        neighbours = list(filter(lambda x: x.get_prop_value('type') == lic_type, neighbours))
 
         if neighbours is None or len(neighbours) == 0:
-            lic_walk = map(lambda x: x.get_prop_value('license'), current_walk)
+            lic_walk = list(map(lambda x: x.get_prop_value('license'), current_walk))
             # print(', '.join(lic_walk))
 
             v_license = v.get_prop_value('license')
@@ -229,7 +229,7 @@ class LicenseAnalyzer(object):
 
         neighbours = v.get_neighbours()
         if neighbours is None or len(neighbours) == 0:
-            lic_walk = map(lambda x: x.get_prop_value('license'), current_walk)
+            lic_walk = list(map(lambda x: x.get_prop_value('license'), current_walk))
             # print(', '.join(lic_walk))
             v_license = v.get_prop_value('license')
             list_compatibles = self.dict_compatibility_classes.get(v_license, [])
@@ -315,7 +315,7 @@ class LicenseAnalyzer(object):
         list_groups = list(set(list_groups))
         assert(len(list_groups) > 1)
 
-        list_items = map(lambda x: (x, []), list_groups)
+        list_items = list(map(lambda x: (x, []), list_groups))
         map_groups = dict(list_items)
 
         # insert each vertex license into appropriate class
@@ -405,10 +405,10 @@ class LicenseAnalyzer(object):
             major_tcc_type = v.get_prop_value('type')
             if self._is_license_stricter(stack_license_type, major_tcc_type):
                 # find all the licenses that fall into same or stricter types
-                items = filter(lambda x:
-                               self._is_license_stricter_or_same(x[1], major_tcc_type),
-                               dict_tcc_type.items())
-                items = filter(lambda x: x[0] != major_tcc_lic, items)
+                items = list(filter(lambda x:
+                                    self._is_license_stricter_or_same(x[1], major_tcc_type),
+                                    dict_tcc_type.items()))
+                items = list(filter(lambda x: x[0] != major_tcc_lic, items))
                 list_outliers = []
                 for i in items:
                     list_outliers += dict_tcc_licenses[i[0]]
@@ -455,7 +455,7 @@ class LicenseAnalyzer(object):
             return output
 
         # Find synonyms
-        input_lic_synonyms = map(lambda y: self.find_synonym(y), input_licenses)
+        input_lic_synonyms = list(map(lambda y: self.find_synonym(y), input_licenses))
         output['synonyms'] = dict(zip(input_licenses, input_lic_synonyms))
 
         # Check if all input licenses are known
