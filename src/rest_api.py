@@ -1,9 +1,12 @@
+from imp import reload
+
 import flask
 from flask import Flask, request
 from flask_cors import CORS
 import sys
 import logging
-from stack_license import compute_stack_license
+from .stack_license import compute_stack_license
+
 
 # Python2.x: Make default encoding as UTF-8
 if sys.version_info.major == 2:

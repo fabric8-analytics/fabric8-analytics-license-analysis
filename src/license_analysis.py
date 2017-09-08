@@ -103,13 +103,13 @@ class LicenseAnalyzer(object):
         :param vertex: license vertex to be printed
         :return: None
         """
-        print("Vertex {}: license: {} Type: {}".format(vertex.id,
+        print(("Vertex {}: license: {} Type: {}".format(vertex.id,
                                                        vertex.get_prop_value('license'),
-                                                       vertex.get_prop_value('type')))
+                                                       vertex.get_prop_value('type'))))
         for n in vertex.get_neighbours():
-            print("> Neighbour {}: license: {} Type: {}".format(n.id,
+            print(("> Neighbour {}: license: {} Type: {}".format(n.id,
                                                                 n.get_prop_value('license'),
-                                                                n.get_prop_value('type')))
+                                                                n.get_prop_value('type'))))
 
         print("")
 
@@ -141,10 +141,10 @@ class LicenseAnalyzer(object):
         current_walk.append(v)
 
         neighbours = v.get_neighbours()
-        neighbours = list(filter(lambda x: x.get_prop_value('type') == lic_type, neighbours))
+        neighbours = [x for x in neighbours if x.get_prop_value('type') == lic_type]
 
         if neighbours is None or len(neighbours) == 0:
-            lic_walk = list(map(lambda x: x.get_prop_value('license'), current_walk))
+            lic_walk = [x.get_prop_value('license') for x in current_walk]
             # print(', '.join(lic_walk))
 
             v_license = v.get_prop_value('license')
@@ -202,9 +202,9 @@ class LicenseAnalyzer(object):
             self._find_walks_within_type(v, lic_type, [])
 
         # deduplicate the member licenses of each type compatibility class
-        for t in self.dict_type_compatibility_classes.keys():
+        for t in list(self.dict_type_compatibility_classes.keys()):
             dict_compatibles = self.dict_type_compatibility_classes.get(t, {})
-            for lic in dict_compatibles.keys():
+            for lic in list(dict_compatibles.keys()):
                 list_compatibles = dict_compatibles.get(lic, [])
                 list_compatibles = list(set(list_compatibles))
                 dict_compatibles[lic] = list_compatibles
@@ -229,7 +229,7 @@ class LicenseAnalyzer(object):
 
         neighbours = v.get_neighbours()
         if neighbours is None or len(neighbours) == 0:
-            lic_walk = list(map(lambda x: x.get_prop_value('license'), current_walk))
+            lic_walk = [x.get_prop_value('license') for x in current_walk]
             # print(', '.join(lic_walk))
             v_license = v.get_prop_value('license')
             list_compatibles = self.dict_compatibility_classes.get(v_license, [])
@@ -274,7 +274,7 @@ class LicenseAnalyzer(object):
         self._find_walks(v_pd, [])
 
         # deduplicate the member licenses of each compatibility class
-        for lic in self.dict_compatibility_classes.keys():
+        for lic in list(self.dict_compatibility_classes.keys()):
             list_compatibles = self.dict_compatibility_classes.get(lic, [])
             list_compatibles = list(set(list_compatibles))
             self.dict_compatibility_classes[lic] = list_compatibles
@@ -299,7 +299,7 @@ class LicenseAnalyzer(object):
         # first, let us find out compatibility classes for each vertex
         vertex2groups = {}
         for v in license_vertices:
-            for item in self.dict_compatibility_classes.items():
+            for item in list(self.dict_compatibility_classes.items()):
                 if v.get_prop_value('license') in item[1]:
                     vertex_groups = vertex2groups.get(v, [])
                     vertex_groups.append(item[0])
@@ -315,7 +315,7 @@ class LicenseAnalyzer(object):
         list_groups = list(set(list_groups))
         assert(len(list_groups) > 1)
 
-        list_items = list(map(lambda x: (x, []), list_groups))
+        list_items = [(x, []) for x in list_groups]
         map_groups = dict(list_items)
 
         # insert each vertex license into appropriate class
@@ -378,9 +378,9 @@ class LicenseAnalyzer(object):
         dict_tcc_type = {}
         dict_tcc_licenses = {}
         for v in license_vertices:
-            for t in self.dict_type_compatibility_classes.keys():
+            for t in list(self.dict_type_compatibility_classes.keys()):
                 dict_compatibles = self.dict_type_compatibility_classes.get(t, {})
-                for item in dict_compatibles.items():
+                for item in list(dict_compatibles.items()):
                     if v.get_prop_value('license') in item[1]:
                         dict_tcc_type[item[0]] = t
 
@@ -395,7 +395,7 @@ class LicenseAnalyzer(object):
         # check if there is a type-compatibility-class with majority
         majority = ceil(len(license_vertices) * float(config.MAJORITY_THRESHOLD))
         major_tcc_lic = None
-        for lic in dict_tcc_count.keys():
+        for lic in list(dict_tcc_count.keys()):
             if dict_tcc_count[lic] >= majority:
                 major_tcc_lic = lic
                 break
@@ -405,10 +405,8 @@ class LicenseAnalyzer(object):
             major_tcc_type = v.get_prop_value('type')
             if self._is_license_stricter(stack_license_type, major_tcc_type):
                 # find all the licenses that fall into same or stricter types
-                items = list(filter(lambda x:
-                                    self._is_license_stricter_or_same(x[1], major_tcc_type),
-                                    dict_tcc_type.items()))
-                items = list(filter(lambda x: x[0] != major_tcc_lic, items))
+                items = [x for x in dict_tcc_type.items() if
+                         self._is_license_stricter_or_same(x[1], major_tcc_type) and x[0] != major_tcc_lic]
                 list_outliers = []
                 for i in items:
                     list_outliers += dict_tcc_licenses[i[0]]
@@ -455,8 +453,8 @@ class LicenseAnalyzer(object):
             return output
 
         # Find synonyms
-        input_lic_synonyms = list(map(lambda y: self.find_synonym(y), input_licenses))
-        output['synonyms'] = dict(zip(input_licenses, input_lic_synonyms))
+        input_lic_synonyms = [self.find_synonym(y) for y in input_licenses]
+        output['synonyms'] = dict(list(zip(input_licenses, input_lic_synonyms)))
 
         # Check if all input licenses are known
         if len(set(input_lic_synonyms) - set(self.known_licenses)) > 0:

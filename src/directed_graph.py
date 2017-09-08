@@ -49,7 +49,7 @@ class DirectedGraph(object):
         self.num_vertices = 0
 
     def __iter__(self):
-        return iter(self.vertex_dict.values())
+        return iter(list(self.vertex_dict.values()))
 
     def add_vertex(self, vertex_props):
         v = Vertex(vertex_id=self.num_vertices, dict_props=vertex_props)
@@ -69,10 +69,10 @@ class DirectedGraph(object):
         self.vertex_dict[from_id].add_neighbor(self.vertex_dict[to_id], cost)
 
     def get_vertex_ids(self):
-        return self.vertex_dict.keys()
+        return list(self.vertex_dict.keys())
 
     def get_vertices(self):
-        return self.vertex_dict.values()
+        return list(self.vertex_dict.values())
 
     def find_vertex(self, prop_name, prop_value):
         for vertex in self.get_vertices():
@@ -115,13 +115,13 @@ class DirectedGraph(object):
             file2vertex[vertex_file] = v
 
         # add vertex and store corresponding id
-        for k in file2vertex.keys():
+        for k in list(file2vertex.keys()):
             v = file2vertex[k]
             v_id = g.add_vertex(vertex_props=v)
             file2id[k] = v_id
 
         # add edge by using 'neighbours' property of a vertex
-        for k in file2vertex.keys():
+        for k in list(file2vertex.keys()):
             v = file2vertex[k]
             from_vertex = file2id[k]
             for n in v['neighbours']:

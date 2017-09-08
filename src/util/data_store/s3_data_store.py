@@ -3,7 +3,7 @@ import json
 import boto3
 import botocore
 import pandas as pd
-from abstract_data_store import AbstractDataStore
+from .abstract_data_store import AbstractDataStore
 
 
 class S3DataStore(AbstractDataStore):
