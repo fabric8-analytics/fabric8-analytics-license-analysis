@@ -103,13 +103,13 @@ class LicenseAnalyzer(object):
         :param vertex: license vertex to be printed
         :return: None
         """
-        print(("Vertex {}: license: {} Type: {}".format(vertex.id,
+        print("Vertex {}: license: {} Type: {}".format(vertex.id,
                                                        vertex.get_prop_value('license'),
-                                                       vertex.get_prop_value('type'))))
+                                                       vertex.get_prop_value('type')))
         for n in vertex.get_neighbours():
-            print(("> Neighbour {}: license: {} Type: {}".format(n.id,
+            print("> Neighbour {}: license: {} Type: {}".format(n.id,
                                                                 n.get_prop_value('license'),
-                                                                n.get_prop_value('type'))))
+                                                                n.get_prop_value('type')))
 
         print("")
 
@@ -202,9 +202,9 @@ class LicenseAnalyzer(object):
             self._find_walks_within_type(v, lic_type, [])
 
         # deduplicate the member licenses of each type compatibility class
-        for t in list(self.dict_type_compatibility_classes.keys()):
+        for t in self.dict_type_compatibility_classes.keys():
             dict_compatibles = self.dict_type_compatibility_classes.get(t, {})
-            for lic in list(dict_compatibles.keys()):
+            for lic in dict_compatibles.keys():
                 list_compatibles = dict_compatibles.get(lic, [])
                 list_compatibles = list(set(list_compatibles))
                 dict_compatibles[lic] = list_compatibles
@@ -274,7 +274,7 @@ class LicenseAnalyzer(object):
         self._find_walks(v_pd, [])
 
         # deduplicate the member licenses of each compatibility class
-        for lic in list(self.dict_compatibility_classes.keys()):
+        for lic in self.dict_compatibility_classes.keys():
             list_compatibles = self.dict_compatibility_classes.get(lic, [])
             list_compatibles = list(set(list_compatibles))
             self.dict_compatibility_classes[lic] = list_compatibles
@@ -299,7 +299,7 @@ class LicenseAnalyzer(object):
         # first, let us find out compatibility classes for each vertex
         vertex2groups = {}
         for v in license_vertices:
-            for item in list(self.dict_compatibility_classes.items()):
+            for item in self.dict_compatibility_classes.items():
                 if v.get_prop_value('license') in item[1]:
                     vertex_groups = vertex2groups.get(v, [])
                     vertex_groups.append(item[0])
@@ -378,9 +378,9 @@ class LicenseAnalyzer(object):
         dict_tcc_type = {}
         dict_tcc_licenses = {}
         for v in license_vertices:
-            for t in list(self.dict_type_compatibility_classes.keys()):
+            for t in self.dict_type_compatibility_classes.keys():
                 dict_compatibles = self.dict_type_compatibility_classes.get(t, {})
-                for item in list(dict_compatibles.items()):
+                for item in dict_compatibles.items():
                     if v.get_prop_value('license') in item[1]:
                         dict_tcc_type[item[0]] = t
 
@@ -395,7 +395,7 @@ class LicenseAnalyzer(object):
         # check if there is a type-compatibility-class with majority
         majority = ceil(len(license_vertices) * float(config.MAJORITY_THRESHOLD))
         major_tcc_lic = None
-        for lic in list(dict_tcc_count.keys()):
+        for lic in dict_tcc_count.keys():
             if dict_tcc_count[lic] >= majority:
                 major_tcc_lic = lic
                 break

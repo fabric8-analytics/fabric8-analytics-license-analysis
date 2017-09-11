@@ -115,13 +115,13 @@ class DirectedGraph(object):
             file2vertex[vertex_file] = v
 
         # add vertex and store corresponding id
-        for k in list(file2vertex.keys()):
+        for k in file2vertex.keys():
             v = file2vertex[k]
             v_id = g.add_vertex(vertex_props=v)
             file2id[k] = v_id
 
         # add edge by using 'neighbours' property of a vertex
-        for k in list(file2vertex.keys()):
+        for k in file2vertex.keys():
             v = file2vertex[k]
             from_vertex = file2id[k]
             for n in v['neighbours']:
