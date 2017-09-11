@@ -18,7 +18,7 @@ def test_component_license_conflict():
     }
     output = compute_stack_license(payload=payload)
     assert output is not None
-    assert output['status'] is 'ComponentLicenseConflict'
+    assert output['status'] == 'ComponentLicenseConflict'
     assert output['stack_license'] is None
 
 
@@ -39,7 +39,7 @@ def test_stack_license_conflict():
     }
     output = compute_stack_license(payload=payload)
     assert output is not None
-    assert output['status'] is 'StackLicenseConflict'
+    assert output['status'] == 'StackLicenseConflict'
     assert output['stack_license'] is None
 
 
@@ -60,8 +60,8 @@ def test_stack_license_successful():
     }
     output = compute_stack_license(payload=payload)
     assert output is not None
-    assert output['status'] is 'Successful'
-    assert output['stack_license'] == 'GPL V2'
+    assert output['status'] == 'Successful'
+    assert output['stack_license'] == 'gplv2'
 
 
 def test_component_license_unknown():
@@ -81,5 +81,5 @@ def test_component_license_unknown():
     }
     output = compute_stack_license(payload=payload)
     assert output is not None
-    assert output['status'] is 'Unknown'
+    assert output['status'] == 'Unknown'
     assert output['stack_license'] is None

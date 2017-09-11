@@ -1,0 +1,5 @@
+{
+  "license": "lgplv2.1",
+  "type": "WP",
+  "neighbours": ["gpl_v2", "gpl_v2+"]
+}

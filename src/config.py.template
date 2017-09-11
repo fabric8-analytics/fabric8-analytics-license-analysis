@@ -4,3 +4,5 @@ TESTING = False
 DEBUG = True
 LOGFILE_PATH = os.environ.get("LOGFILE_PATH", "/tmp/error.log")
 SERVICE_PORT = os.environ.get("SERVICE_PORT", "")
+DATA_DIR = os.environ.get("DATA_DIR", "/")
+MAJORITY_THRESHOLD = os.environ.get("MAJORITY_THRESHOLD", "")

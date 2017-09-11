@@ -1,0 +1,5 @@
+{
+  "license": "bsd-new",
+  "type": "P",
+  "neighbours": ["apache", "mpl_1.1", "lgpl_v2.1", "lgpl_v2.1+", "lgpl_v3+"]
+}
