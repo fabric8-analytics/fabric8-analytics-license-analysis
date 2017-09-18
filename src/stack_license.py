@@ -18,6 +18,62 @@ class StackLicenseAnalyzer(object):
 
         self.license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
 
+    def _check_compatibility(self, stack_license, other_packages):
+        list_comp_rep_licenses = []
+        map_lic2pkg = {}
+        unknown_license_packages = []
+        conflict_packages = []
+        compatible_packages = []
+        for pkg in other_packages:
+            la_output = self.license_analyzer.compute_representative_license(pkg.get('licenses', []))
+
+            pkg['license_analysis'] = {
+                'status': la_output['status'],
+                '_representative_licenses': la_output['representative_license'],
+                'conflict_licenses': la_output['conflict_licenses'],
+                'unknown_licenses': la_output['unknown_licenses'],
+                'outlier_licenses': la_output['outlier_licenses'],
+                'synonyms': la_output['synonyms'],
+                '_message': la_output['reason']
+            }
+
+            if la_output['status'] == 'Successful':
+                pkg_license = la_output['representative_license']
+                list_comp_rep_licenses.append(pkg_license)
+
+                list_pkg = map_lic2pkg.get(pkg_license, [])
+                list_pkg.append(pkg.get('package', 'unknown_package'))
+                map_lic2pkg[pkg_license] = list_pkg
+            else:
+                unknown_license_packages.append(pkg.get('package', 'unknown_name'))
+
+        # deduplicate
+        list_comp_rep_licenses = list(set(list_comp_rep_licenses))
+        for k in map_lic2pkg:
+            map_lic2pkg[k] = list(set(map_lic2pkg[k]))
+
+        compatibility_output = self.license_analyzer.check_compatibility(lic_a=stack_license,
+                                                                         list_lic_b=list_comp_rep_licenses)
+
+        # now, map license to packages
+        assert len(compatibility_output['unknown_licenses']) == 0
+
+        for lic in compatibility_output['conflict_licenses']:
+            conflict_packages += map_lic2pkg[lic]
+
+        for list_lic in compatibility_output['compatible_licenses']:
+            list_packages = []
+            for lic in list_lic:
+                list_packages += map_lic2pkg[lic]
+            compatible_packages += list_packages
+
+        output = {
+            'unknown_license_packages': unknown_license_packages,
+            'conflict_packages': conflict_packages,
+            'compatible_packages': compatible_packages
+        }
+        return output
+
     def compute_stack_license(self, payload):
         """
         Function to perform a detailed license analysis for the given list of
@@ -121,6 +177,20 @@ class StackLicenseAnalyzer(object):
                 output['outlier_packages'] = outlier_pkg
             else:
                 output['outlier_packages'] = {}
+
+            # Analyze further and generate info for license filters
+            # let us try to compute representative license for each alternate component
+            if la_output['status'] == 'Successful':
+                lic_filter_for_alt = self._check_compatibility(output['stack_license'],
+                                                               output.get('alternate_packages', []))
+
+                lic_filter_for_com = self._check_compatibility(output['stack_license'],
+                                                               output.get('companion_packages', []))
+
+                output['license_filter'] = {
+                    'alternate_packages': lic_filter_for_alt,
+                    'companion_packages': lic_filter_for_com
+                }
 
         except:  # TODO custom exceptions
             output['status'] = 'Failure'

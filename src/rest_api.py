@@ -5,7 +5,7 @@ from flask import Flask, request
 from flask_cors import CORS
 import sys
 import logging
-from stack_license import compute_stack_license
+from stack_license import StackLicenseAnalyzer
 
 
 # Python2.x: Make default encoding as UTF-8
@@ -20,6 +20,13 @@ app = Flask(__name__)
 app.config.from_object('config')
 CORS(app)
 
+global stack_license_analyzer
+
+
+@app.before_first_request
+def load_model():
+    app.stack_license_analyzer = StackLicenseAnalyzer()
+
 
 @app.route('/')
 def heart_beat():
@@ -31,7 +38,7 @@ def stack_license():
     input_json = request.get_json(force=True)
     # app.logger.debug("Stack analysis input: {}".format(input_json))
 
-    response = compute_stack_license(payload=input_json)
+    response = app.stack_license_analyzer.compute_stack_license(payload=input_json)
     # app.logger.debug("Stack analysis output: {}".format(response))
 
     return flask.jsonify(response)
