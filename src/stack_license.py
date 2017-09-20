@@ -74,6 +74,16 @@ class StackLicenseAnalyzer(object):
         }
         return output
 
+    @staticmethod
+    def _generate_conflict_pairs(list_pkg1, list_pkg2):
+        list_tuples = []
+        for pkg1 in list_pkg1:
+            for pkg2 in list_pkg2:
+                list_tuples.append((pkg1, pkg2))
+
+        return
+
+
     def compute_stack_license(self, payload):
         """
         Function to perform a detailed license analysis for the given list of
@@ -148,10 +158,15 @@ class StackLicenseAnalyzer(object):
 
             # Prepare a map of license -> package, which is used later to prepare output
             assert(len(output['packages']) == len(list_comp_rep_licenses))
-            dict_lic_pkg = {}
+            dict_lic_pkgs = {}
             for i, lic in enumerate(list_comp_rep_licenses):
                 pkg = output['packages'][i]
-                dict_lic_pkg[lic] = pkg.get('package', 'unknown_package')
+                list_pkg = dict_lic_pkgs.get(lic, [])
+                list_pkg.append(pkg.get('package', 'unknown_package'))
+                dict_lic_pkgs[lic] = list_pkg
+
+            for lic in dict_lic_pkgs:
+                dict_lic_pkgs[lic] = list(set(dict_lic_pkgs[lic]))
 
             # If we reach here, then that means we are all set to compute stack license !
             la_output = self.license_analyzer.compute_representative_license(list_comp_rep_licenses)
@@ -161,19 +176,22 @@ class StackLicenseAnalyzer(object):
             if la_output['status'] == 'Conflict':
                 list_conflict_lic = la_output['conflict_licenses']
                 list_conflict_pkg = []
-                for lic_tuple in list_conflict_lic:
-                    pkg_group = {
-                        dict_lic_pkg[lic_tuple[0]]: lic_tuple[0],
-                        dict_lic_pkg[lic_tuple[1]]: lic_tuple[1]
-                    }
-                    list_conflict_pkg.append(pkg_group)
+                for lic1, lic2 in list_conflict_lic:
+                    for pkg1 in dict_lic_pkgs[lic1]:
+                        for pkg2 in dict_lic_pkgs[lic2]:
+                            pkg_group = {
+                                pkg1: lic1,
+                                pkg2: lic2
+                            }
+                            list_conflict_pkg.append(pkg_group)
                 output['conflict_packages'] = list_conflict_pkg
                 output['status'] = 'StackLicenseConflict'
 
             if (len(la_output['outlier_licenses'])) > 0:
                 outlier_pkg = {}
                 for lic in la_output['outlier_licenses']:
-                    outlier_pkg[dict_lic_pkg[lic]] = lic
+                    for pkg in dict_lic_pkgs[lic]:
+                        outlier_pkg[pkg] = lic
                 output['outlier_packages'] = outlier_pkg
             else:
                 output['outlier_packages'] = {}

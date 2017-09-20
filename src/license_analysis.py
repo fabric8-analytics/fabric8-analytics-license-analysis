@@ -528,9 +528,9 @@ class LicenseAnalyzer(object):
 
     def _get_compatibility_classes(self, input_license):
         list_comp_classes = []
-        for item in self.dict_compatibility_classes.items():
-            if input_license in item[1]:
-                list_comp_classes.append(item[0])
+        for comp_class, comp_licenses in self.dict_compatibility_classes.items():
+            if input_license in comp_licenses:
+                list_comp_classes.append(comp_class)
 
         return list_comp_classes
 
@@ -543,39 +543,34 @@ class LicenseAnalyzer(object):
             'compatible_licenses': [],
             'synonyms': []
         }
-        if lic_a is None:
-            return output
-        if len(list_lic_b) == 0:
+        if lic_a is None or not list_lic_b:
             return output
 
         # find synonyms
         lic_a = self.find_synonym(lic_a)
-        list_lic_b_sysnonyms = [self.find_synonym(y) for y in list_lic_b]
-        output['synonyms'] = dict(list(zip(list_lic_b, list_lic_b_sysnonyms)))
+        list_lic_b_synonyms = [self.find_synonym(y) for y in list_lic_b]
+        output['synonyms'] = dict(list(zip(list_lic_b, list_lic_b_synonyms)))
 
         # check if all input licenses are known
-        if len(set(list_lic_b_sysnonyms) - set(self.known_licenses)) > 0:
-            output['unknown_licenses'] = list(set(list_lic_b_sysnonyms) - set(self.known_licenses))
-            list_lic_b_sysnonyms = list(set(list_lic_b_sysnonyms).intersection(set(self.known_licenses)))
+        if len(set(list_lic_b_synonyms) - set(self.known_licenses)) > 0:
+            output['unknown_licenses'] = list(set(list_lic_b_synonyms) - set(self.known_licenses))
+            list_lic_b_synonyms = list(set(list_lic_b_synonyms).intersection(set(self.known_licenses)))
 
-            if len(list_lic_b_sysnonyms) == 0:
+            if len(list_lic_b_synonyms) == 0:
                 output['status'] = 'Failure'
                 output['reason'] = 'All the input licenses are unknown!'
                 return output
 
         # we will now work with the synonyms
-        list_lic_b = list_lic_b_sysnonyms
+        list_lic_b = list_lic_b_synonyms
 
         # now, we need to find compatibility class for lic_b and every lic_b
         lic_a_group = self._get_compatibility_classes(lic_a)
         assert(len(lic_a_group) > 0)
-        lic_b_groups = {}
-        for lic_b in list_lic_b:
-            lic_b_groups[lic_b] = self._get_compatibility_classes(lic_b)
+        lic_b_groups = {lic_b: self._get_compatibility_classes(lic_b) for lic_b in list_lic_b}
 
         # initialize dict that maps every lic_b to one of lic_a's compatibility classes
-        list_items = [(x, []) for x in lic_a_group]
-        map_compatibility = dict(list_items)
+        map_compatibility = {x: [] for x in lic_a_group}
 
         # create groups of licenses that are compatible with the given input license
         list_conflicting_licenses = []

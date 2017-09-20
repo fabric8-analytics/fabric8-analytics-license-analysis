@@ -20,8 +20,6 @@ app = Flask(__name__)
 app.config.from_object('config')
 CORS(app)
 
-global stack_license_analyzer
-
 
 @app.before_first_request
 def load_model():
