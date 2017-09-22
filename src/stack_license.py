@@ -74,16 +74,6 @@ class StackLicenseAnalyzer(object):
         }
         return output
 
-    @staticmethod
-    def _generate_conflict_pairs(list_pkg1, list_pkg2):
-        list_tuples = []
-        for pkg1 in list_pkg1:
-            for pkg2 in list_pkg2:
-                list_tuples.append((pkg1, pkg2))
-
-        return
-
-
     def compute_stack_license(self, payload):
         """
         Function to perform a detailed license analysis for the given list of
