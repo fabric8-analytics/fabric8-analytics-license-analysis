@@ -406,7 +406,8 @@ class LicenseAnalyzer(object):
             if self._is_license_stricter(stack_license_type, major_tcc_type):
                 # find all the licenses that fall into same or stricter types
                 items = [x for x in dict_tcc_type.items() if
-                         self._is_license_stricter_or_same(x[1], major_tcc_type) and x[0] != major_tcc_lic]
+                         self._is_license_stricter_or_same(x[1], major_tcc_type) and
+                         x[0] != major_tcc_lic]
                 list_outliers = []
                 for i in items:
                     list_outliers += dict_tcc_licenses[i[0]]
@@ -517,7 +518,8 @@ class LicenseAnalyzer(object):
 
                 rep_lic_vertex = self.g.find_vertex('license', output['representative_license'])
                 rep_lic_type = rep_lic_vertex.get_prop_value('type')
-                output['outlier_licenses'] = self._find_outlier_licenses(license_vertices, rep_lic_type)
+                output['outlier_licenses'] = self._find_outlier_licenses(license_vertices,
+                                                                         rep_lic_type)
                 return output
 
         # We should have returned by now ! Returning from here is unexpected !
@@ -554,7 +556,8 @@ class LicenseAnalyzer(object):
         # check if all input licenses are known
         if len(set(list_lic_b_synonyms) - set(self.known_licenses)) > 0:
             output['unknown_licenses'] = list(set(list_lic_b_synonyms) - set(self.known_licenses))
-            list_lic_b_synonyms = list(set(list_lic_b_synonyms).intersection(set(self.known_licenses)))
+            list_lic_b_synonyms = list(set(list_lic_b_synonyms).intersection(set(
+                self.known_licenses)))
 
             if len(list_lic_b_synonyms) == 0:
                 output['status'] = 'Failure'

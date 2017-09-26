@@ -96,4 +96,3 @@ def test_find_common_reachable_vertex():
     assert list_vertices is not None
     assert len(list_vertices) == 1
     assert list_vertices[0] == v1
-
