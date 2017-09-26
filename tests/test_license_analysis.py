@@ -141,7 +141,8 @@ def test_check_compatibility():
     assert len(output['compatible_licenses']) == 2
     compatible_licenses1 = set(output['compatible_licenses'][0])
     compatible_licenses2 = set(output['compatible_licenses'][1])
-    assert (compatible_licenses2 == set(['mit', 'apache 2.0']) or compatible_licenses1 == set(['mit', 'apache 2.0']))
+    assert (compatible_licenses2 == set(['mit', 'apache 2.0']) or
+            compatible_licenses1 == set(['mit', 'apache 2.0']))
     assert (compatible_licenses2 == set(['mit']) or compatible_licenses1 == set(['mit']))
 
     lic_a = 'APACHE'
