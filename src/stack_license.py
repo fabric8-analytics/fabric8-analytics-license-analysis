@@ -25,7 +25,8 @@ class StackLicenseAnalyzer(object):
         conflict_packages = []
         compatible_packages = []
         for pkg in other_packages:
-            la_output = self.license_analyzer.compute_representative_license(pkg.get('licenses', []))
+            la_output = self.license_analyzer.compute_representative_license(
+                pkg.get('licenses', []))
 
             pkg['license_analysis'] = {
                 'status': la_output['status'],
@@ -52,8 +53,8 @@ class StackLicenseAnalyzer(object):
         for k in map_lic2pkg:
             map_lic2pkg[k] = list(set(map_lic2pkg[k]))
 
-        compatibility_output = self.license_analyzer.check_compatibility(lic_a=stack_license,
-                                                                         list_lic_b=list_comp_rep_licenses)
+        compatibility_output = self.license_analyzer.check_compatibility(
+            lic_a=stack_license, list_lic_b=list_comp_rep_licenses)
 
         # now, map license to packages
         assert len(compatibility_output['unknown_licenses']) == 0
@@ -108,7 +109,8 @@ class StackLicenseAnalyzer(object):
             list_comp_rep_licenses = []
             is_stack_license_possible = True
             for pkg in output['packages']:
-                la_output = self.license_analyzer.compute_representative_license(pkg.get('licenses', []))
+                la_output = self.license_analyzer.compute_representative_license(
+                    pkg.get('licenses', []))
 
                 pkg['license_analysis'] = {
                     'status': la_output['status'],

@@ -8,11 +8,11 @@ class Vertex(object):
     def __str__(self):
         neighbour_ids = [x.id for x in self.neighbours]
         str_vertex = \
-        """
-        Vertex: {}
-        Neighbours: {}
-        Properties: {}
-        """.format(self.id, neighbour_ids, self.props)
+            """
+            Vertex: {}
+            Neighbours: {}
+            Properties: {}
+            """.format(self.id, neighbour_ids, self.props)
         return str_vertex
 
     def add_neighbor(self, vertex, weight=0):
