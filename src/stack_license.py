@@ -202,7 +202,7 @@ class StackLicenseAnalyzer(object):
                     'companion_packages': lic_filter_for_com
                 }
 
-        except:  # TODO custom exceptions
+        except Exception:  # TODO custom exceptions
             output['status'] = 'Failure'
             output['stack_license'] = None
             output['message'] = "Some unexpected exception happened!"
