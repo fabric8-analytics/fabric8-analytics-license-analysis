@@ -125,3 +125,19 @@ def test_component_license_unknown():
     assert output is not None
     assert output['status'] == 'Unknown'
     assert output['stack_license'] is None
+
+
+def test_component_license_failure():
+    payload = {
+        'packages': [
+            {
+                'package': 'p1',
+                'version': '1.1',
+                'licenses': []
+            }
+        ]
+    }
+    output = stack_license_analyzer.compute_stack_license(payload=payload)
+    assert output is not None
+    assert output['status'] == 'Failure'
+    assert output['stack_license'] is None
