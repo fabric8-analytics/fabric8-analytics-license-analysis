@@ -122,7 +122,10 @@ class StackLicenseAnalyzer(object):
                     '_message': la_output['reason']
                 }
 
-                if la_output['status'] == 'Conflict':
+                if la_output['status'] == 'Failure':
+                    output['status'] = 'Failure'
+                    is_stack_license_possible = False
+                elif la_output['status'] == 'Conflict':
                     output['status'] = 'ComponentLicenseConflict'
                     is_stack_license_possible = False
                 elif la_output['status'] == 'Unknown':
