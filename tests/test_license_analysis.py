@@ -17,7 +17,9 @@ def test_compute_rep_license_successful():
     synonyms_dir = "synonyms"
     synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
-    output = license_analyzer.compute_representative_license(input_licenses=None)
+
+    output = license_analyzer.compute_representative_license(
+        input_licenses=None)
     assert output['status'] == 'Failure'
     assert output['representative_license'] is None
 
