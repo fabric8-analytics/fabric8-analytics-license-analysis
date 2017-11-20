@@ -5,32 +5,31 @@ License Analysis Service analyzes the given stack and returns the following:
  - license based outlier packages, if any
  - stack level license, if possible
 
-## How to run the API locally:
-
-* Set the value of `MAJORITY_THRESHOLD` and `SERVICE_PORT` in the env.
-
-* set export PYTHONPATH=`pwd`/src
-
-* gunicorn -b 0.0.0.0:$SERVICE_PORT rest_api:app
-
-* curl localhost:<SERVICE_PORT> returns `{status: ok}`
-
 
 ## How to test locally:
 
-* Set the value of `MAJORITY_THRESHOLD` in the env.
+*  `./run-test-local.sh`
 
-* `cp src/config.py.template src/config.py`
-
-*  `cd tests`
-
-*  `pytest . -v`
+    * To run with different threshold `./run-test-local.sh -t <[0-1]>`
 
 
-Notes: 
+## How to run the API locally:
+
+* `./run-api-local.sh`
+
+    * To run on different port `./run-api-local.sh -p <Port>`
+
+    * To run with different threshold `./run-test-local.sh -t <[0-1]>`
+
+    * To run with different port and threshold `./run-api-local.sh -p <Port> -t <[0-1]>`
+
+* curl localhost:<SERVICE_PORT> should return `{status: ok}`
+
+
+## Notes:
 
 * By default the value of `MAJORITY_THRESHOLD` used is 0.6. If you wish to use any other value, modifications in the test cases will be required to reflect the new outliers.
 
-* For running tests set the the value of `DATA_DIR` to `.`
+* To run tests the the value of `DATA_DIR` is set to `.`
 
-* For running the API locally set the value of `DATA_DIR` to `tests`
+* To run the API locally the value of `DATA_DIR` is to `tests`
