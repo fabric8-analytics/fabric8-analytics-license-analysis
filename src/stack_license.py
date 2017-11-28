@@ -126,7 +126,7 @@ class StackLicenseAnalyzer(object):
                     output['status'] = 'Failure'
                     is_stack_license_possible = False
                 elif la_output['status'] == 'Conflict':
-                    output['status'] = 'ComponentLicenseConflict'
+                    output['status'] = 'ComponentConflict'
                     is_stack_license_possible = False
                 elif la_output['status'] == 'Unknown':
                     output['status'] = 'Unknown'
@@ -180,7 +180,7 @@ class StackLicenseAnalyzer(object):
                             }
                             list_conflict_pkg.append(pkg_group)
                 output['conflict_packages'] = list_conflict_pkg
-                output['status'] = 'StackLicenseConflict'
+                output['status'] = 'StackConflict'
 
             if (len(la_output['outlier_licenses'])) > 0:
                 outlier_pkg = {}
