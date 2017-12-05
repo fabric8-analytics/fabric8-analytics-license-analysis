@@ -39,4 +39,5 @@ export MAJORITY_THRESHOLD=$threshold
 export SERVICE_PORT=$port
 export DATA_DIR=tests
 export PYTHONPATH=`pwd`/src
+cp src/config.py.template src/config.py
 gunicorn -b 0.0.0.0:$SERVICE_PORT rest_api:app
