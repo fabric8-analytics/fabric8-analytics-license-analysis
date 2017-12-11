@@ -30,7 +30,8 @@ class LicenseAnalyzer(object):
             'gplv2',
             'gplv2+',
             'gplv3+',
-            'affero gplv3'
+            'affero gplv3',
+            'epl 1.0'
         ]
 
         # IMPORTANT: Order matters in the following tuple
@@ -59,6 +60,7 @@ class LicenseAnalyzer(object):
         else:
             return license_name  # return unknown license itself
 
+    # This function is not in use currently
     @staticmethod
     def _create_graph():
         g = DirectedGraph()
@@ -138,8 +140,8 @@ class LicenseAnalyzer(object):
         :param current_walk: book keeping variable
         :return: None
         """
-        current_walk.append(v)
 
+        current_walk.append(v)
         neighbours = v.get_neighbours()
         neighbours = [x for x in neighbours if x.get_prop_value('type') == lic_type]
 
@@ -156,8 +158,8 @@ class LicenseAnalyzer(object):
         else:
             for n in neighbours:
                 self._find_walks_within_type(n, lic_type, current_walk)
-
         current_walk.pop()
+
 
     def _find_type_compatibility_classes(self):
         """
@@ -211,6 +213,7 @@ class LicenseAnalyzer(object):
                 # print(lic)
                 # print(list_compatibles)
 
+
     def _find_walks(self, v, current_walk):
         """
         Find all possible walks of license vertices. These walks will help
@@ -226,7 +229,6 @@ class LicenseAnalyzer(object):
         :return: None
         """
         current_walk.append(v)
-
         neighbours = v.get_neighbours()
         if neighbours is None or len(neighbours) == 0:
             lic_walk = [x.get_prop_value('license') for x in current_walk]
@@ -304,20 +306,17 @@ class LicenseAnalyzer(object):
                     vertex_groups = vertex2groups.get(v, [])
                     vertex_groups.append(item[0])
                     vertex2groups[v] = vertex_groups
-
         # also, we need to gather total unique classes for input vertices
         list_groups = []
         for v in license_vertices:
             vertex_groups = vertex2groups[v]
             list_groups += vertex_groups
-
         # create a dictionary to store vertex licenses per compatibility class
         list_groups = list(set(list_groups))
         assert(len(list_groups) > 1)
 
         list_items = [(x, []) for x in list_groups]
         map_groups = dict(list_items)
-
         # insert each vertex license into appropriate class
         for v in license_vertices:
             license = v.get_prop_value('license')
@@ -326,7 +325,6 @@ class LicenseAnalyzer(object):
             if set(vertex_groups) != set(list_groups):
                 for g in vertex_groups:
                     map_groups[g].append(license)
-
         # prepare output i.e. list of tuples with two conflicting licenses
         output = []
         for c1, c2 in itertools.combinations(list_groups, 2):  # nC2
@@ -391,6 +389,7 @@ class LicenseAnalyzer(object):
                         list_licenses = dict_tcc_licenses.get(item[0], [])
                         list_licenses.append(v.get_prop_value('license'))
                         dict_tcc_licenses[item[0]] = list_licenses
+
 
         # check if there is a type-compatibility-class with majority
         majority = ceil(len(license_vertices) * float(config.MAJORITY_THRESHOLD))
