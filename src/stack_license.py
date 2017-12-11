@@ -4,16 +4,17 @@ from src.license_analysis import LicenseAnalyzer
 import logging
 import traceback
 
-from src import config
+from src.config import DATA_DIR
 from src.util.data_store.local_filesystem import LocalFileSystem
 
 
 class StackLicenseAnalyzer(object):
+
     def __init__(self):
         # Data store where license graph is available
-        src_dir = os.path.join(config.DATA_DIR, "license_graph")
+        src_dir = os.path.join(DATA_DIR, "license_graph")
         graph_store = LocalFileSystem(src_dir=src_dir)
-        synonyms_dir = os.path.join(config.DATA_DIR, "synonyms")
+        synonyms_dir = os.path.join(DATA_DIR, "synonyms")
         synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
 
         self.license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)

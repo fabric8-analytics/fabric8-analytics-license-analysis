@@ -5,7 +5,7 @@ from flask import Flask, request
 from flask_cors import CORS
 import sys
 import logging
-from stack_license import StackLicenseAnalyzer
+from src.stack_license import StackLicenseAnalyzer
 
 
 # Python2.x: Make default encoding as UTF-8
