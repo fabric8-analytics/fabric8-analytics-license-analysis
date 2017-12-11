@@ -142,6 +142,7 @@ class LicenseAnalyzer(object):
         """
 
         current_walk.append(v)
+
         neighbours = v.get_neighbours()
         neighbours = [x for x in neighbours if x.get_prop_value('type') == lic_type]
 
@@ -159,7 +160,6 @@ class LicenseAnalyzer(object):
             for n in neighbours:
                 self._find_walks_within_type(n, lic_type, current_walk)
         current_walk.pop()
-
 
     def _find_type_compatibility_classes(self):
         """
@@ -212,7 +212,6 @@ class LicenseAnalyzer(object):
                 dict_compatibles[lic] = list_compatibles
                 # print(lic)
                 # print(list_compatibles)
-
 
     def _find_walks(self, v, current_walk):
         """
@@ -306,11 +305,13 @@ class LicenseAnalyzer(object):
                     vertex_groups = vertex2groups.get(v, [])
                     vertex_groups.append(item[0])
                     vertex2groups[v] = vertex_groups
+
         # also, we need to gather total unique classes for input vertices
         list_groups = []
         for v in license_vertices:
             vertex_groups = vertex2groups[v]
             list_groups += vertex_groups
+
         # create a dictionary to store vertex licenses per compatibility class
         list_groups = list(set(list_groups))
         assert(len(list_groups) > 1)
@@ -325,6 +326,7 @@ class LicenseAnalyzer(object):
             if set(vertex_groups) != set(list_groups):
                 for g in vertex_groups:
                     map_groups[g].append(license)
+
         # prepare output i.e. list of tuples with two conflicting licenses
         output = []
         for c1, c2 in itertools.combinations(list_groups, 2):  # nC2
@@ -389,8 +391,6 @@ class LicenseAnalyzer(object):
                         list_licenses = dict_tcc_licenses.get(item[0], [])
                         list_licenses.append(v.get_prop_value('license'))
                         dict_tcc_licenses[item[0]] = list_licenses
-
-
         # check if there is a type-compatibility-class with majority
         majority = ceil(len(license_vertices) * float(config.MAJORITY_THRESHOLD))
         major_tcc_lic = None
