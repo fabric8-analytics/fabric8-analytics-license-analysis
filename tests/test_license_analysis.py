@@ -76,12 +76,8 @@ def test_compute_rep_license_conflict():
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
     list_licenses = ['APACHE', 'MPL 1.1']
     output = license_analyzer.compute_representative_license(list_licenses)
-    assert output['status'] == 'Conflict'
-    assert output['representative_license'] is None
-    expected_conflict_licenses = ('apache 2.0', 'mpl 1.1')
-    for tpl in output['conflict_licenses']:
-        assert set(tpl) == set(expected_conflict_licenses)
-
+    assert output['status'] == 'Successful'
+    assert output['representative_license'] == 'epl 1.0'
 
 def test_compute_rep_license_conflict_2():
     src_dir = "license_graph"
@@ -93,11 +89,23 @@ def test_compute_rep_license_conflict_2():
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] == 'Conflict'
     assert output['representative_license'] is None
-    expected_conflict_licenses = [('apache 2.0', 'mpl 1.1'),
+    expected_conflict_licenses = [('apache 2.0', 'lgplv2.1'),
                                   ('lgplv2.1', 'mpl 1.1'),
                                   ('lgplv3+', 'mpl 1.1')]
     assert set(expected_conflict_licenses) == set(output['conflict_licenses'])
 
+def test_compute_rep_license_conflict_3():
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+    list_licenses = ['epl 1.0', 'lgplv3+']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] == 'Conflict'
+    assert output['representative_license'] is None
+    expected_conflict_licenses = [('epl 1.0', 'lgplv3+')]
+    assert set(expected_conflict_licenses) == set(output['conflict_licenses'])
 
 def test_check_compatibility():
     src_dir = "license_graph"
@@ -157,3 +165,4 @@ def test_check_compatibility():
     assert len(output['conflict_licenses']) == 1
     conflict_licenses = set(output['conflict_licenses'][0])
     assert conflict_licenses == set('mpl 1.1')
+
