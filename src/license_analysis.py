@@ -30,7 +30,8 @@ class LicenseAnalyzer(object):
             'gplv2',
             'gplv2+',
             'gplv3+',
-            'affero gplv3'
+            'affero gplv3',
+            'epl 1.0'
         ]
 
         # IMPORTANT: Order matters in the following tuple
@@ -59,6 +60,7 @@ class LicenseAnalyzer(object):
         else:
             return license_name  # return unknown license itself
 
+    # This function is not in use currently
     @staticmethod
     def _create_graph():
         g = DirectedGraph()
@@ -138,6 +140,7 @@ class LicenseAnalyzer(object):
         :param current_walk: book keeping variable
         :return: None
         """
+
         current_walk.append(v)
 
         neighbours = v.get_neighbours()
@@ -156,7 +159,6 @@ class LicenseAnalyzer(object):
         else:
             for n in neighbours:
                 self._find_walks_within_type(n, lic_type, current_walk)
-
         current_walk.pop()
 
     def _find_type_compatibility_classes(self):
@@ -226,7 +228,6 @@ class LicenseAnalyzer(object):
         :return: None
         """
         current_walk.append(v)
-
         neighbours = v.get_neighbours()
         if neighbours is None or len(neighbours) == 0:
             lic_walk = [x.get_prop_value('license') for x in current_walk]
@@ -317,7 +318,6 @@ class LicenseAnalyzer(object):
 
         list_items = [(x, []) for x in list_groups]
         map_groups = dict(list_items)
-
         # insert each vertex license into appropriate class
         for v in license_vertices:
             license = v.get_prop_value('license')
@@ -391,7 +391,6 @@ class LicenseAnalyzer(object):
                         list_licenses = dict_tcc_licenses.get(item[0], [])
                         list_licenses.append(v.get_prop_value('license'))
                         dict_tcc_licenses[item[0]] = list_licenses
-
         # check if there is a type-compatibility-class with majority
         majority = ceil(len(license_vertices) * float(config.MAJORITY_THRESHOLD))
         major_tcc_lic = None
