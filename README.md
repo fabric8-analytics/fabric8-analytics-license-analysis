@@ -32,4 +32,20 @@ License Analysis Service analyzes the given stack and returns the following:
 
 * To run tests the the value of `DATA_DIR` is set to `.`
 
-* To run the API locally the value of `DATA_DIR` is to `tests`
+* To run the API locally the value of `DATA_DIR` is to `tests
+
+
+## Sample License analysis request input
+```
+ENDPOINT: /api/vi/stack_license
+BODY: JSON data
+[
+    "packages": [
+            {
+                "package": "p1",
+                "version": "1.1",
+                "licenses": ["APACHE", "EPL 1.0"]
+            }
+        ]
+]
+```
