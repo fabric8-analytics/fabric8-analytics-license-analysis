@@ -343,5 +343,6 @@
     "GPL V2": "gplv2",
     "GPL V2+": "gplv2+",
     "GPL V3+": "gplv3+",
-    "AGPLV3": "affero gplv3+"
+    "AGPLV3": "affero gplv3+",
+    "EPL 1.0": "epl 1.0"
 }
