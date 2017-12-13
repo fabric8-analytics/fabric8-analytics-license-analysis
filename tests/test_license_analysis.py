@@ -90,6 +90,7 @@ def test_compute_rep_license_conflict_2():
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] == 'Conflict'
     assert output['representative_license'] is None
+    # Assume that each tuple will be alphabetically sorted.
     expected_conflict_licenses = [('apache 2.0', 'lgplv2.1'),
                                   ('lgplv2.1', 'mpl 1.1'),
                                   ('lgplv3+', 'mpl 1.1')]

@@ -1,5 +1,6 @@
 
 class Vertex(object):
+
     def __init__(self, vertex_id, dict_props):
         self.id = vertex_id
         self.props = dict_props
@@ -44,6 +45,7 @@ class Vertex(object):
 
 
 class DirectedGraph(object):
+
     def __init__(self):
         self.vertex_dict = dict()
         self.num_vertices = 0
@@ -115,14 +117,12 @@ class DirectedGraph(object):
             file2vertex[vertex_file] = v
 
         # add vertex and store corresponding id
-        for k in file2vertex.keys():
-            v = file2vertex[k]
+        for k, v in file2vertex.items():
             v_id = g.add_vertex(vertex_props=v)
             file2id[k] = v_id
 
         # add edge by using 'neighbours' property of a vertex
-        for k in file2vertex.keys():
-            v = file2vertex[k]
+        for k, v in file2vertex.items():
             from_vertex = file2id[k]
             for n in v['neighbours']:
                 # Note: each neighbour property points to a vertex file

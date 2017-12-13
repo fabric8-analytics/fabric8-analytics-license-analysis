@@ -3,7 +3,7 @@ from math import ceil
 import itertools
 
 from src.directed_graph import DirectedGraph
-from src import config
+from src.config import MAJORITY_THRESHOLD
 
 
 class LicenseAnalyzer(object):
@@ -15,6 +15,7 @@ class LicenseAnalyzer(object):
     - locates outlier licenses
     - flags unknown licenses
     """
+
     def __init__(self, graph_store, synonyms_store):
         # load graph from given data store
         self.g = DirectedGraph.read_from_json(graph_store)
@@ -105,13 +106,15 @@ class LicenseAnalyzer(object):
         :param vertex: license vertex to be printed
         :return: None
         """
-        print("Vertex {}: license: {} Type: {}".format(vertex.id,
-                                                       vertex.get_prop_value('license'),
-                                                       vertex.get_prop_value('type')))
+        print(("Vertex {}: license: {} Type: {}".format(vertex.id,
+                                                        vertex.get_prop_value(
+                                                            'license'),
+                                                        vertex.get_prop_value('type'))))
         for n in vertex.get_neighbours():
-            print("> Neighbour {}: license: {} Type: {}".format(n.id,
-                                                                n.get_prop_value('license'),
-                                                                n.get_prop_value('type')))
+            print(("> Neighbour {}: license: {} Type: {}".format(n.id,
+                                                                 n.get_prop_value(
+                                                                     'license'),
+                                                                 n.get_prop_value('type'))))
 
         print("")
 
@@ -210,8 +213,6 @@ class LicenseAnalyzer(object):
                 list_compatibles = dict_compatibles.get(lic, [])
                 list_compatibles = list(set(list_compatibles))
                 dict_compatibles[lic] = list_compatibles
-                # print(lic)
-                # print(list_compatibles)
 
     def _find_walks(self, v, current_walk):
         """
@@ -270,7 +271,8 @@ class LicenseAnalyzer(object):
 
         :return: None
         """
-        # find walks in the license graph and compatibility classes will by a by-product
+        # find walks in the license graph and compatibility classes will by a
+        # by-product
         v_pd = self.g.find_vertex('license', 'public domain')
         self._find_walks(v_pd, [])
 
@@ -279,8 +281,6 @@ class LicenseAnalyzer(object):
             list_compatibles = self.dict_compatibility_classes.get(lic, [])
             list_compatibles = list(set(list_compatibles))
             self.dict_compatibility_classes[lic] = list_compatibles
-            # print(lic)
-            # print(list_compatibles)
 
     def _find_conflict_licenses(self, license_vertices):
         """
@@ -379,7 +379,8 @@ class LicenseAnalyzer(object):
         dict_tcc_licenses = {}
         for v in license_vertices:
             for t in self.dict_type_compatibility_classes.keys():
-                dict_compatibles = self.dict_type_compatibility_classes.get(t, {})
+                dict_compatibles = self.dict_type_compatibility_classes.get(t, {
+                })
                 for item in dict_compatibles.items():
                     if v.get_prop_value('license') in item[1]:
                         dict_tcc_type[item[0]] = t
@@ -392,7 +393,8 @@ class LicenseAnalyzer(object):
                         list_licenses.append(v.get_prop_value('license'))
                         dict_tcc_licenses[item[0]] = list_licenses
         # check if there is a type-compatibility-class with majority
-        majority = ceil(len(license_vertices) * float(config.MAJORITY_THRESHOLD))
+        majority = ceil(len(license_vertices) *
+                        float(MAJORITY_THRESHOLD))
         major_tcc_lic = None
         for lic in dict_tcc_count.keys():
             if dict_tcc_count[lic] >= majority:
@@ -460,7 +462,8 @@ class LicenseAnalyzer(object):
         if len(set(input_lic_synonyms) - set(self.known_licenses)) > 0:
             output['status'] = 'Unknown'
             output['reason'] = 'Some unknown licenses found'
-            output['unknown_licenses'] = list(set(input_lic_synonyms) - set(self.known_licenses))
+            output['unknown_licenses'] = list(
+                set(input_lic_synonyms) - set(self.known_licenses))
             output['representative_license'] = None
             return output
 
@@ -585,8 +588,10 @@ class LicenseAnalyzer(object):
                 list_conflicting_licenses.append(lic_b)
 
         # deduplicate the list of lists of compatible licenses
-        list_compatible_licenses = [x for x in map_compatibility.values() if len(x) > 0]
-        set_compatible_licenses = set(tuple(x) for x in list_compatible_licenses)
+        list_compatible_licenses = [
+            x for x in map_compatibility.values() if len(x) > 0]
+        set_compatible_licenses = set(tuple(x)
+                                      for x in list_compatible_licenses)
         list_compatible_licenses = [list(x) for x in set_compatible_licenses]
 
         output['status'] = 'Successful'
