@@ -15,6 +15,7 @@ class LicenseAnalyzer(object):
     - locates outlier licenses
     - flags unknown licenses
     """
+
     def __init__(self, graph_store, synonyms_store):
         # load graph from given data store
         self.g = DirectedGraph.read_from_json(graph_store)
@@ -206,14 +207,12 @@ class LicenseAnalyzer(object):
             self._find_walks_within_type(v, lic_type, [])
 
         # deduplicate the member licenses of each type compatibility class
-        for t in list(self.dict_type_compatibility_classes.keys()):
+        for t in self.dict_type_compatibility_classes.keys():
             dict_compatibles = self.dict_type_compatibility_classes.get(t, {})
-            for lic in list(dict_compatibles.keys()):
+            for lic in dict_compatibles.keys():
                 list_compatibles = dict_compatibles.get(lic, [])
                 list_compatibles = list(set(list_compatibles))
                 dict_compatibles[lic] = list_compatibles
-                # print(lic)
-                # print(list_compatibles)
 
     def _find_walks(self, v, current_walk):
         """
@@ -272,17 +271,16 @@ class LicenseAnalyzer(object):
 
         :return: None
         """
-        # find walks in the license graph and compatibility classes will by a by-product
+        # find walks in the license graph and compatibility classes will by a
+        # by-product
         v_pd = self.g.find_vertex('license', 'public domain')
         self._find_walks(v_pd, [])
 
         # deduplicate the member licenses of each compatibility class
-        for lic in list(self.dict_compatibility_classes.keys()):
+        for lic in self.dict_compatibility_classes.keys():
             list_compatibles = self.dict_compatibility_classes.get(lic, [])
             list_compatibles = list(set(list_compatibles))
             self.dict_compatibility_classes[lic] = list_compatibles
-            # print(lic)
-            # print(list_compatibles)
 
     def _find_conflict_licenses(self, license_vertices):
         """
@@ -302,7 +300,7 @@ class LicenseAnalyzer(object):
         # first, let us find out compatibility classes for each vertex
         vertex2groups = {}
         for v in license_vertices:
-            for item in list(self.dict_compatibility_classes.items()):
+            for item in self.dict_compatibility_classes.items():
                 if v.get_prop_value('license') in item[1]:
                     vertex_groups = vertex2groups.get(v, [])
                     vertex_groups.append(item[0])
@@ -380,10 +378,10 @@ class LicenseAnalyzer(object):
         dict_tcc_type = {}
         dict_tcc_licenses = {}
         for v in license_vertices:
-            for t in list(self.dict_type_compatibility_classes.keys()):
+            for t in self.dict_type_compatibility_classes.keys():
                 dict_compatibles = self.dict_type_compatibility_classes.get(t, {
                 })
-                for item in list(dict_compatibles.items()):
+                for item in dict_compatibles.items():
                     if v.get_prop_value('license') in item[1]:
                         dict_tcc_type[item[0]] = t
 
@@ -398,7 +396,7 @@ class LicenseAnalyzer(object):
         majority = ceil(len(license_vertices) *
                         float(MAJORITY_THRESHOLD))
         major_tcc_lic = None
-        for lic in list(dict_tcc_count.keys()):
+        for lic in dict_tcc_count.keys():
             if dict_tcc_count[lic] >= majority:
                 major_tcc_lic = lic
                 break
@@ -408,7 +406,7 @@ class LicenseAnalyzer(object):
             major_tcc_type = v.get_prop_value('type')
             if self._is_license_stricter(stack_license_type, major_tcc_type):
                 # find all the licenses that fall into same or stricter types
-                items = [x for x in list(dict_tcc_type.items()) if
+                items = [x for x in dict_tcc_type.items() if
                          self._is_license_stricter_or_same(x[1], major_tcc_type) and
                          x[0] != major_tcc_lic]
                 list_outliers = []
@@ -464,7 +462,8 @@ class LicenseAnalyzer(object):
         if len(set(input_lic_synonyms) - set(self.known_licenses)) > 0:
             output['status'] = 'Unknown'
             output['reason'] = 'Some unknown licenses found'
-            output['unknown_licenses'] = list(set(input_lic_synonyms) - set(self.known_licenses))
+            output['unknown_licenses'] = list(
+                set(input_lic_synonyms) - set(self.known_licenses))
             output['representative_license'] = None
             return output
 
@@ -533,7 +532,7 @@ class LicenseAnalyzer(object):
 
     def _get_compatibility_classes(self, input_license):
         list_comp_classes = []
-        for comp_class, comp_licenses in list(self.dict_compatibility_classes.items()):
+        for comp_class, comp_licenses in self.dict_compatibility_classes.items():
             if input_license in comp_licenses:
                 list_comp_classes.append(comp_class)
 
@@ -590,7 +589,7 @@ class LicenseAnalyzer(object):
 
         # deduplicate the list of lists of compatible licenses
         list_compatible_licenses = [
-            x for x in list(map_compatibility.values()) if len(x) > 0]
+            x for x in map_compatibility.values() if len(x) > 0]
         set_compatible_licenses = set(tuple(x)
                                       for x in list_compatible_licenses)
         list_compatible_licenses = [list(x) for x in set_compatible_licenses]
