@@ -4,16 +4,17 @@ from src.license_analysis import LicenseAnalyzer
 import logging
 import traceback
 
-from src import config
+from src.config import DATA_DIR
 from src.util.data_store.local_filesystem import LocalFileSystem
 
 
 class StackLicenseAnalyzer(object):
+
     def __init__(self):
         # Data store where license graph is available
-        src_dir = os.path.join(config.DATA_DIR, "license_graph")
+        src_dir = os.path.join(DATA_DIR, "license_graph")
         graph_store = LocalFileSystem(src_dir=src_dir)
-        synonyms_dir = os.path.join(config.DATA_DIR, "synonyms")
+        synonyms_dir = os.path.join(DATA_DIR, "synonyms")
         synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
 
         self.license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
@@ -50,8 +51,8 @@ class StackLicenseAnalyzer(object):
 
         # deduplicate
         list_comp_rep_licenses = list(set(list_comp_rep_licenses))
-        for k in map_lic2pkg:
-            map_lic2pkg[k] = list(set(map_lic2pkg[k]))
+        for k, v in map_lic2pkg.items():
+            map_lic2pkg[k] = list(set(v))
 
         compatibility_output = self.license_analyzer.check_compatibility(
             lic_a=stack_license, list_lic_b=list_comp_rep_licenses)
@@ -160,8 +161,8 @@ class StackLicenseAnalyzer(object):
                 list_pkg.append(pkg.get('package', 'unknown_package'))
                 dict_lic_pkgs[lic] = list_pkg
 
-            for lic in dict_lic_pkgs:
-                dict_lic_pkgs[lic] = list(set(dict_lic_pkgs[lic]))
+            for lic, value_list in dict_lic_pkgs.items():
+                dict_lic_pkgs[lic] = list(set(value_list))
 
             # If we reach here, then that means we are all set to compute stack license !
             la_output = self.license_analyzer.compute_representative_license(list_comp_rep_licenses)

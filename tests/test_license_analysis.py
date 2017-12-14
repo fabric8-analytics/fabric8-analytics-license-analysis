@@ -76,11 +76,8 @@ def test_compute_rep_license_conflict():
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
     list_licenses = ['APACHE', 'MPL 1.1']
     output = license_analyzer.compute_representative_license(list_licenses)
-    assert output['status'] == 'Conflict'
-    assert output['representative_license'] is None
-    expected_conflict_licenses = ('apache 2.0', 'mpl 1.1')
-    for tpl in output['conflict_licenses']:
-        assert set(tpl) == set(expected_conflict_licenses)
+    assert output['status'] == 'Successful'
+    assert output['representative_license'] == 'epl 1.0'
 
 
 def test_compute_rep_license_conflict_2():
@@ -93,9 +90,24 @@ def test_compute_rep_license_conflict_2():
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] == 'Conflict'
     assert output['representative_license'] is None
-    expected_conflict_licenses = [('apache 2.0', 'mpl 1.1'),
+    # Assume that each tuple will be alphabetically sorted.
+    expected_conflict_licenses = [('apache 2.0', 'lgplv2.1'),
                                   ('lgplv2.1', 'mpl 1.1'),
                                   ('lgplv3+', 'mpl 1.1')]
+    assert set(expected_conflict_licenses) == set(output['conflict_licenses'])
+
+
+def test_compute_rep_license_conflict_3():
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+    list_licenses = ['epl 1.0', 'lgplv3+']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] == 'Conflict'
+    assert output['representative_license'] is None
+    expected_conflict_licenses = [('epl 1.0', 'lgplv3+')]
     assert set(expected_conflict_licenses) == set(output['conflict_licenses'])
 
 
@@ -151,9 +163,11 @@ def test_check_compatibility():
     list_lic_b = ['MIT', 'lgplv2.1', 'MPL 1.1']
     output = license_analyzer.check_compatibility(lic_a, list_lic_b)
     assert output['status'] == 'Successful'
-    assert len(output['compatible_licenses']) == 1
-    compatible_licenses = set(output['compatible_licenses'][0])
-    assert compatible_licenses == set(['mit', 'lgplv2.1'])
-    assert len(output['conflict_licenses']) == 1
-    conflict_licenses = set(output['conflict_licenses'][0])
-    assert conflict_licenses == set('mpl 1.1')
+    assert len(output['compatible_licenses']) == 2
+    compatible_licenses1 = set(output['compatible_licenses'][0])
+    compatible_licenses2 = set(output['compatible_licenses'][1])
+    assert (compatible_licenses1 == set(['mit', 'lgplv2.1']) or
+            compatible_licenses2 == set(['mit', 'lgplv2.1']))
+    assert (compatible_licenses1 == set(['mit', 'mpl 1.1']) or
+            compatible_licenses2 == set(['mit', 'mpl 1.1']))
+    assert len(output['conflict_licenses']) == 0
