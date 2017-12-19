@@ -76,10 +76,9 @@ class StackLicenseAnalyzer(object):
         }
         return output
 
+    # TODO needs refactoring
     def compute_stack_license(self, payload):
-        """
-        Function to perform a detailed license analysis for the given list of
-        packages.
+        """Perform a detailed license analysis for the given list of packages.
 
         It first identifies representative license for each package. Then, it
         computes representative license for the entire stack itself.

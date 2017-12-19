@@ -1,3 +1,5 @@
+"""Class that encapsulates license analysis logic."""
+
 from math import ceil
 
 import itertools
@@ -7,8 +9,8 @@ from src.config import MAJORITY_THRESHOLD
 
 
 class LicenseAnalyzer(object):
-    """
-    License Analysis logic is encapsulated by this class.
+    """Class that encapsulates license analysis logic.
+
     Mainly it offers the following:
     - identifies representative license for the given set of licenses
     - finds conflicting licenses
@@ -100,27 +102,26 @@ class LicenseAnalyzer(object):
 
     @staticmethod
     def _print_license_vertex(vertex):
-        """
-        Helper method to print the given license vertex
+        """Print the given license vertex.
 
         :param vertex: license vertex to be printed
         :return: None
         """
-        print(("Vertex {}: license: {} Type: {}".format(vertex.id,
-                                                        vertex.get_prop_value(
-                                                            'license'),
-                                                        vertex.get_prop_value('type'))))
+        print("Vertex {}: license: {} Type: {}".format(vertex.id,
+                                                       vertex.get_prop_value(
+                                                           'license'),
+                                                       vertex.get_prop_value('type')))
         for n in vertex.get_neighbours():
-            print(("> Neighbour {}: license: {} Type: {}".format(n.id,
-                                                                 n.get_prop_value(
-                                                                     'license'),
-                                                                 n.get_prop_value('type'))))
+            print("> Neighbour {}: license: {} Type: {}".format(n.id,
+                                                                n.get_prop_value(
+                                                                    'license'),
+                                                                n.get_prop_value('type')))
 
         print("")
 
     def print_license_graph(self):
-        """
-        Helper method to print the license graph
+        """Print the license graph.
+
         :return: None
         """
         for lic in self.known_licenses:
@@ -128,9 +129,9 @@ class LicenseAnalyzer(object):
             self._print_license_vertex(v)
 
     def _find_walks_within_type(self, v, lic_type, current_walk):
-        """
-        Find all possible walks of license vertices within the scope of given
-        license-type. These walks will help identify compatibility classes
+        """Find all possible walks of license vertices within the scope of given license-type.
+
+        These walks will help identify compatibility classes
         for given license-type.
 
         IMPORTANT: It is assumed that license graph is a DAG i.e. no cycles.
@@ -143,7 +144,6 @@ class LicenseAnalyzer(object):
         :param current_walk: book keeping variable
         :return: None
         """
-
         current_walk.append(v)
 
         neighbours = v.get_neighbours()
@@ -165,9 +165,7 @@ class LicenseAnalyzer(object):
         current_walk.pop()
 
     def _find_type_compatibility_classes(self):
-        """
-        Method to identify compatibility classes among the license subgraph
-        for each license-type.
+        """Identify compatibility classes among the license subgraph for each license-type.
 
         A compatibility class can be defined as a set of mutually compatible
         licenses i.e. there exists a representative license for each pair of
@@ -215,9 +213,9 @@ class LicenseAnalyzer(object):
                 dict_compatibles[lic] = list_compatibles
 
     def _find_walks(self, v, current_walk):
-        """
-        Find all possible walks of license vertices. These walks will help
-        us identify compatibility classes.
+        """Find all possible walks of license vertices.
+
+        These walks will help us identify compatibility classes.
 
         IMPORTANT: It is assumed that license graph is a DAG i.e. no cycles.
 
@@ -244,8 +242,7 @@ class LicenseAnalyzer(object):
         current_walk.pop()
 
     def _find_compatibility_classes(self):
-        """
-        Method to identify compatibility classes among the license graph.
+        """Identify compatibility classes among the license graph.
 
         A compatibility class can be defined as a set of mutually compatible
         licenses i.e. there exists a representative license for each pair of
@@ -283,9 +280,9 @@ class LicenseAnalyzer(object):
             self.dict_compatibility_classes[lic] = list_compatibles
 
     def _find_conflict_licenses(self, license_vertices):
-        """
-        Method to identify conflicting licenses among the given list. Note that
-        this method assumes that there is a conflict in the input licenses.
+        """Identify conflicting licenses among the given list.
+
+        Note that this method assumes that there is a conflict in the input licenses.
 
         When there is a conflict in the given list of licenses then it is
         guaranteed that all of them cannot be members of the same compatibility class.
@@ -352,8 +349,7 @@ class LicenseAnalyzer(object):
                self.license_type_tuple.index(lic_type_b)
 
     def _find_outlier_licenses(self, license_vertices, stack_license_type):
-        """
-        Method to identify outlier packages based on licenses.
+        """Identify outlier packages based on licenses.
 
         A package is license based outlier, if
           - its license is in minority
@@ -416,9 +412,9 @@ class LicenseAnalyzer(object):
 
         return []
 
+    # TODO: needs refactoring
     def compute_representative_license(self, input_licenses):
-        """
-        Method to compute representative license for given list of licenses.
+        """Compute representative license for given list of licenses.
 
         First, it tries to identify the input licenses by using known synonyms.
         If there exists at least one unknown license, this method gives up.
