@@ -454,9 +454,11 @@ class LicenseAnalyzer(object):
             return output
         if len(input_licenses) == 0:
             return output
+
         # Find synonyms
         input_lic_synonyms = [self.find_synonym(y) for y in input_licenses]
         output['synonyms'] = dict(list(zip(input_licenses, input_lic_synonyms)))
+
         # Check if all input licenses are known
         if len(set(input_lic_synonyms) - set(self.known_licenses)) > 0:
             output['status'] = 'Unknown'
@@ -497,6 +499,7 @@ class LicenseAnalyzer(object):
             output['reason'] = 'Representative license found'
             output['representative_license'] = \
                 common_destination.get_prop_value(prop_name='license')
+
             rep_lic_vertex = self.g.find_vertex('license', output['representative_license'])
             rep_lic_type = rep_lic_vertex.get_prop_value('type')
             output['outlier_licenses'] = self._find_outlier_licenses(license_vertices, rep_lic_type)
@@ -596,4 +599,5 @@ class LicenseAnalyzer(object):
         output['reason'] = 'Compatibility and/or conflict identified'
         output['conflict_licenses'] = list_conflicting_licenses
         output['compatible_licenses'] = list_compatible_licenses
+
         return output
