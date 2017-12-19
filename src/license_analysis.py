@@ -107,15 +107,15 @@ class LicenseAnalyzer(object):
         :param vertex: license vertex to be printed
         :return: None
         """
-        print(("Vertex {}: license: {} Type: {}".format(vertex.id,
-                                                        vertex.get_prop_value(
-                                                            'license'),
-                                                        vertex.get_prop_value('type'))))
+        print("Vertex {}: license: {} Type: {}".format(vertex.id,
+                                                       vertex.get_prop_value(
+                                                           'license'),
+                                                       vertex.get_prop_value('type')))
         for n in vertex.get_neighbours():
-            print(("> Neighbour {}: license: {} Type: {}".format(n.id,
-                                                                 n.get_prop_value(
-                                                                     'license'),
-                                                                 n.get_prop_value('type'))))
+            print("> Neighbour {}: license: {} Type: {}".format(n.id,
+                                                                n.get_prop_value(
+                                                                    'license'),
+                                                                n.get_prop_value('type')))
 
         print("")
 
