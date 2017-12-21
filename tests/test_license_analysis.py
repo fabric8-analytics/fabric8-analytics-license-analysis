@@ -42,6 +42,12 @@ def test_compute_rep_license_successful():
     assert output['status'] == 'Successful'
     assert output['representative_license'] == 'bsd-new'
 
+    list_licenses = ['MIT', 'BSD', 'PD', 'APACHE', 'CDDL 1.0']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] == 'Successful'
+    assert output['representative_license'] == 'cddlv1.1+'
+    assert set(output['outlier_licenses']) == set(['cddlv1.1+'])
+
     list_licenses = ['MIT', 'BSD', 'PD', 'MPL 1.1']
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] == 'Successful'
@@ -170,4 +176,11 @@ def test_check_compatibility():
             compatible_licenses2 == set(['mit', 'lgplv2.1']))
     assert (compatible_licenses1 == set(['mit', 'mpl 1.1']) or
             compatible_licenses2 == set(['mit', 'mpl 1.1']))
-    assert len(output['conflict_licenses']) == 0
+
+    lic_a = 'CDDL 1.1'
+    list_lic_b = ['MIT', 'lgplv2.1', 'MPL 1.1']
+    output = license_analyzer.check_compatibility(lic_a, list_lic_b)
+    assert output['status'] == 'Successful'
+    assert len(output['compatible_licenses']) == 1
+    compatible_licenses = set(output['compatible_licenses'][0])
+    assert compatible_licenses == set(['mit', 'mpl 1.1'])
