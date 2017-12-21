@@ -1,5 +1,5 @@
 {
   "license": "mpl 1.1",
   "type": "WP",
-  "neighbours": ["epl_1.0"]
+  "neighbours": ["mpl_2.0"]
 }
