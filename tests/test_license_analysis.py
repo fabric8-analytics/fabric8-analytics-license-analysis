@@ -54,6 +54,12 @@ def test_compute_rep_license_successful():
     assert output['representative_license'] == 'mpl 1.1'
     assert set(output['outlier_licenses']) == set(['mpl 1.1'])
 
+    list_licenses = ['MIT', 'BSD', 'MPL 2.0']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] == 'Successful'
+    assert output['representative_license'] == 'mpl 2.0'
+    assert set(output['outlier_licenses']) == set(['mpl 2.0'])
+
     list_licenses = ['MIT', 'BSD', 'PD', 'lgplv2.1', 'lgplv3+']
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] == 'Successful'
