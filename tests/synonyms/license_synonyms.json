@@ -196,7 +196,7 @@
     "FSFUL": "unknown", 
     "GNU AGPLv3+ or BSD": "unknown", 
     "for any purpose": "public domain", 
-    "Mozilla Public License, Version 2.0": "unknown", 
+    "Mozilla Public License, Version 2.0": "mpl 2.0",
     "Common Development and Distribution License (CDDL) v1.0": "cddlv1.1+",
     "Common Development and Distribution License (CDDL) v2.0": "cddlv1.1+",
     "DoubleStroke": "unknown", 
@@ -249,7 +249,7 @@
     "Apache 2.0 License": "apache 2.0", 
     "Apache License, version 2.0": "apache 2.0", 
     "ASL": "apache v?", 
-    "Mozilla Public License 2.0 (MPL 2.0)": "unknown", 
+    "Mozilla Public License 2.0 (MPL 2.0)": "mpl 2.0",
     "and by any means.": "unknown", 
     "GNU GPL": "gpl v?", 
     "LGPL-2.1": "lgplv2.1", 
@@ -348,5 +348,7 @@
     "AGPLV3": "affero gplv3+",
     "EPL 1.0": "epl 1.0",
     "CDDL 2": "cddlv1.1+",
-    "CDDL 1.0": "cddlv1.1+"
+    "CDDL 1.0": "cddlv1.1+",
+    "MPL 2.0": "mpl 2.0",
+    "MPLv2.0": "mpl 2.0"
 }
