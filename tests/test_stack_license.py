@@ -16,7 +16,7 @@ def test_component_license_conflict():
             {
                 'package': 'p2',
                 'version': '1.1',
-                'licenses': ['APACHE', 'GPL V2']
+                'licenses': ['GPL V3+', 'GPL V2']
             }
         ]
     }
@@ -32,7 +32,7 @@ def test_stack_license_conflict():
             {
                 'package': 'p1',
                 'version': '1.1',
-                'licenses': ['APACHE', 'PD']
+                'licenses': ['APACHE', 'GPL V3+']
             },
             {
                 'package': 'p2',

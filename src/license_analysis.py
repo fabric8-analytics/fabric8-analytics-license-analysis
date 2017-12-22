@@ -35,7 +35,8 @@ class LicenseAnalyzer(object):
             'gplv3+',
             'affero gplv3',
             'epl 1.0',
-            'cddlv1.1+'
+            'cddlv1.1+',
+            'mpl 2.0'
         ]
 
         # IMPORTANT: Order matters in the following tuple
