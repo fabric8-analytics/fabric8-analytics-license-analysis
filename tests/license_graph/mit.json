@@ -1,5 +1,5 @@
 {
   "license": "mit",
   "type": "P",
-  "neighbours": ["bsd"]
+  "neighbours": ["bsd_simplified"]
 }

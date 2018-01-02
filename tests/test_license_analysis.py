@@ -169,3 +169,11 @@ def test_check_compatibility():
     assert len(output['compatible_licenses']) == 1
     compatible_licenses = set(output['compatible_licenses'][0])
     assert compatible_licenses == set(['lgplv2.1', 'mit', 'mpl 1.1'])
+
+    lic_a = 'PD'
+    list_lic_b = ['MIT', 'BSD (2 clause)']
+    output = license_analyzer.check_compatibility(lic_a, list_lic_b)
+    assert output['status'] == 'Successful'
+    assert len(output['compatible_licenses']) == 1
+    compatible_licenses = set(output['compatible_licenses'][0])
+    assert compatible_licenses == set(['bsd-simplified', 'mit'])
