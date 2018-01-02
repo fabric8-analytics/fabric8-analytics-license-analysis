@@ -25,6 +25,7 @@ class LicenseAnalyzer(object):
             'public domain',
             'mit',
             'bsd-new',
+            'bsd-simplified',
             'apache 2.0',
             'lgplv2.1',
             'lgplv2.1+',
