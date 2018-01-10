@@ -94,6 +94,7 @@ class StackLicenseAnalyzer(object):
         :return: Detailed license analysis output
         """
         output = payload  # output info will be inserted inside payload structure
+        count_comp_no_license = 0  # keep track of number of component with no license
         output['conflict_packages'] = []
         output['outlier_packages'] = {}
 
@@ -123,6 +124,7 @@ class StackLicenseAnalyzer(object):
                 }
 
                 if la_output['status'] == 'Failure':
+                    count_comp_no_license = count_comp_no_license + 1
                     output['status'] = 'Failure'
                     is_stack_license_possible = False
                 elif la_output['status'] == 'Conflict':
@@ -142,7 +144,8 @@ class StackLicenseAnalyzer(object):
             if is_stack_license_possible is False:
                 # output['status'] should have been set already
                 output['stack_license'] = None
-                output['message'] = "Component license not available. Cannot compute stack license."
+                output['message'] = "No declared licenses found for {} component(s).".\
+                    format(count_comp_no_license)
                 return output
 
             # If there is no component license then something unexpected happened
