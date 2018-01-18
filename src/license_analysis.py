@@ -38,7 +38,8 @@ class LicenseAnalyzer(object):
             'epl 1.0',
             'cddlv1.1+',
             'mpl 2.0',
-            'w3c'
+            'w3c',
+            'bouncycastle'
         ]
 
         # IMPORTANT: Order matters in the following tuple
