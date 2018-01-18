@@ -1,5 +1,5 @@
 {
   "license": "bouncycastle",
   "type": "P",
-  "neighbours": ["bsd_simplified"]
+  "neighbours": ["cc0_v1.0"]
 }
