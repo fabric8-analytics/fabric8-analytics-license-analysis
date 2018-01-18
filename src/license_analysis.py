@@ -42,7 +42,8 @@ class LicenseAnalyzer(object):
             'bouncycastle',
             'cc0v1.0',
             'cc-by-3.0',
-            'edl'
+            'edl',
+            'postgresql'
         ]
 
         # IMPORTANT: Order matters in the following tuple
