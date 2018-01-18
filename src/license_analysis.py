@@ -44,7 +44,8 @@ class LicenseAnalyzer(object):
             'cc-by-3.0',
             'edl',
             'postgresql',
-            'apache 1.1'
+            'apache 1.1',
+            'cpl 1.0'
         ]
 
         # IMPORTANT: Order matters in the following tuple
