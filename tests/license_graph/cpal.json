@@ -1,0 +1,5 @@
+{
+  "license": "cpal 1.0",
+  "type": "WP",
+  "neighbours": ["mpl_2.0"]
+}
