@@ -40,7 +40,9 @@ class LicenseAnalyzer(object):
             'mpl 2.0',
             'w3c',
             'bouncycastle',
-            'cc-by-3.0'
+            'cc0v1.0',
+            'cc-by-3.0',
+            'edl'
         ]
 
         # IMPORTANT: Order matters in the following tuple
