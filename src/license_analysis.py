@@ -43,6 +43,7 @@ class LicenseAnalyzer(object):
             'cc0v1.0',
             'cc-by-3.0',
             'edl',
+            'json',
             'postgresql',
             'apache 1.1',
             'cpl 1.0',

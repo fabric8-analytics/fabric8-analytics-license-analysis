@@ -47,6 +47,21 @@ def test_compute_rep_license_successful():
     assert output['status'] == 'Successful'
     assert output['representative_license'] == 'bsd-new'
 
+    list_licenses = ['MIT', 'W3C', 'APACHE', 'BOUNCYCASTLE']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] == 'Successful'
+    assert output['representative_license'] == 'apache 2.0'
+
+    list_licenses = ['GPL 2', 'W3C', 'APACHE', 'BOUNCYCASTLE', 'CDDL 2', 'CPAL']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] == 'Successful'
+    assert output['representative_license'] == 'gplv2'
+
+    list_licenses = ['CPAL', 'CPL', 'EPL', 'MIT']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] == 'Successful'
+    assert output['representative_license'] == 'mpl 2.0'
+
     list_licenses = ['MIT', 'BSD', 'PD', 'APACHE', 'CDDL 1.0']
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] == 'Successful'
@@ -177,3 +192,11 @@ def test_check_compatibility():
     assert len(output['compatible_licenses']) == 1
     compatible_licenses = set(output['compatible_licenses'][0])
     assert compatible_licenses == set(['bsd-simplified', 'mit'])
+
+    lic_a = 'CPL'
+    list_lic_b = ['MIT', 'CPAL', 'PostgreSQL', 'JSON']
+    output = license_analyzer.check_compatibility(lic_a, list_lic_b)
+    assert output['status'] == 'Successful'
+    assert len(output['compatible_licenses']) == 1
+    compatible_licenses = set(output['compatible_licenses'][0])
+    assert compatible_licenses == set(['mit', 'postgresql', 'cpal 1.0', 'json'])
