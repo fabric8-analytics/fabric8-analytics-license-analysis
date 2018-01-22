@@ -1,0 +1,5 @@
+{
+  "license": "postgresql",
+  "type": "P",
+  "neighbours": ["bsd_simplified"]
+}
