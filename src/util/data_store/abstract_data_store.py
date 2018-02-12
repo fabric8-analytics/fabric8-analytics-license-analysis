@@ -1,7 +1,10 @@
+"""Abstract class to be inherited by concrete data store implementations."""
+
 import abc
 
 
 class AbstractDataStore(object):
+    """Abstract class to be inherited by concrete data store implementations."""
 
     @abc.abstractmethod
     def get_name(self):
