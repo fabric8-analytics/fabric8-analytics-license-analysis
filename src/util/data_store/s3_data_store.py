@@ -1,3 +1,5 @@
+"""Class representing the data store that uses AWS S3."""
+
 import json
 
 import boto3
@@ -7,7 +9,10 @@ from .abstract_data_store import AbstractDataStore
 
 
 class S3DataStore(AbstractDataStore):
+    """Class representing the data store that uses AWS S3."""
+
     def __init__(self, src_bucket_name, access_key, secret_key):
+        """Construct the class, creates session to AWS S3, and initialize attributes."""
         self.session = boto3.session.Session(aws_access_key_id=access_key,
                                              aws_secret_access_key=secret_key)
         self.s3_resource = self.session.resource('s3', config=botocore.client.Config(
@@ -16,6 +21,7 @@ class S3DataStore(AbstractDataStore):
         self.bucket_name = src_bucket_name
 
     def get_name(self):
+        """Return printable name of this storage."""
         return "S3:" + self.bucket_name
 
     def read_json_file(self, filename):
@@ -77,9 +83,11 @@ class S3DataStore(AbstractDataStore):
         return None
 
     def write_pandas_df_into_json_file(self, data, filename):
+        """Write Pandas results into JSON and store it into the AWS S3."""
         self.write_json_file(filename=filename, contents=data.to_json())
         return None
 
     def read_json_file_into_pandas_df(self, filename, index_col=False):
+        """Read Pandas results in JSON format from the AWS S3."""
         json_string = self.read_json_file(filename=filename)
         return pd.read_json(json_string)

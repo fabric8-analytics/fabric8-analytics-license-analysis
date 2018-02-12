@@ -1,3 +1,5 @@
+"""Class representing the data store that uses local file system."""
+
 import fnmatch
 import json
 import os
@@ -10,12 +12,16 @@ from src.util.data_store.abstract_data_store import AbstractDataStore
 
 
 class LocalFileSystem(AbstractDataStore):
+    """Class representing the data store that uses local file system."""
+
     def __init__(self, src_dir):
+        """Construct the class and initializes the src_dir attribute."""
         self.src_dir = src_dir
         # ensure path ends with a forward slash
         self.src_dir = self.src_dir if self.src_dir.endswith("/") else self.src_dir + "/"
 
     def get_name(self):
+        """Return printable name of this storage."""
         return "Local filesytem dir: " + self.src_dir
 
     def list_files(self, prefix=None):
@@ -79,5 +85,6 @@ class LocalFileSystem(AbstractDataStore):
 
     @classmethod
     def convert_list_of_tuples_to_string(cls, tuple_list):
+        """Perform conversion from list of tuples to string."""
         string_value = str(tuple_list)
         return string_value
