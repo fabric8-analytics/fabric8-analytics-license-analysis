@@ -1,5 +1,6 @@
 """Implementation of directed graph and vertex classes."""
 
+
 class Vertex(object):
     """Class representing vertex in a directed graph."""
 
