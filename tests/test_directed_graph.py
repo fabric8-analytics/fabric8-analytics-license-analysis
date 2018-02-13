@@ -163,6 +163,9 @@ def test_add_edge_between_nonexistent_vertices():
     v0 = Vertex(0, {})
     v1 = Vertex(1, {})
 
+    # neither vertex are put into the directed graph, so it is impossible
+    # to add an edge to connect them. ATM the exception thrown by the
+    # add_edge method is not very specific, it might need to be improved.
     with pytest.raises(Exception):
         g.add_edge(from_id=v0.id, to_id=v1.id)
 
@@ -206,8 +209,6 @@ def test_find_vertex():
 
 def test_find_common_reachable_vertex_empty_graph():
     """Test if method DirectedGraph.find_common_reachable_vertices() works correctly."""
-    g = DirectedGraph()
-
     list_vertices = DirectedGraph.find_common_reachable_vertices(input_vertices=None)
     assert list_vertices is None
 
