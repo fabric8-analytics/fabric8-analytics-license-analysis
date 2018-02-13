@@ -1,3 +1,5 @@
+"""Class representing stack license analyzer."""
+
 import os
 
 from src.license_analysis import LicenseAnalyzer
@@ -9,8 +11,10 @@ from src.util.data_store.local_filesystem import LocalFileSystem
 
 
 class StackLicenseAnalyzer(object):
+    """Class representing stack license analyzer."""
 
     def __init__(self):
+        """Initialize stack license analyzer."""
         # Data store where license graph is available
         src_dir = os.path.join(DATA_DIR, "license_graph")
         graph_store = LocalFileSystem(src_dir=src_dir)

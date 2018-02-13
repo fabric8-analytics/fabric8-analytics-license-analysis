@@ -1,3 +1,5 @@
+"""Definition of all REST API endpoints of the license analysis module."""
+
 from imp import reload
 
 import flask
@@ -23,16 +25,19 @@ CORS(app)
 
 @app.before_first_request
 def load_model():
+    """Initialize the stack license analyzer before the first request."""
     app.stack_license_analyzer = StackLicenseAnalyzer()
 
 
 @app.route('/')
 def heart_beat():
+    """Handle the REST API endpoint /."""
     return flask.jsonify({"status": "ok"})
 
 
 @app.route('/api/v1/stack_license', methods=['POST'])
 def stack_license():
+    """Handle the REST API endpoint /api/v1/stack_license."""
     input_json = request.get_json(force=True)
     # app.logger.debug("Stack analysis input: {}".format(input_json))
 
