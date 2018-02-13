@@ -189,7 +189,7 @@ def test_compute_rep_license_conflict_3():
     assert 'gplv2' in conflicts[0]
     assert 'gplv2' in conflicts[1]
     assert 'gplv3+' in conflicts[0] or 'gplv3+' in conflicts[1]
-    assert 'affero gplv3' in conflicts[0] or 'gplv3+' in conflicts[1]
+    assert 'affero gplv3' in conflicts[0] or 'affero gplv3' in conflicts[1]
 
 
 def test_check_compatibility():

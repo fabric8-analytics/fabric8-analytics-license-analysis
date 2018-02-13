@@ -44,4 +44,5 @@ function prepare_venv() {
 
 # the module src/config.py must exists because it is included from stack_license and license_analysis.py as well.
 cp src/config.py.template src/config.py
-PYTHONDONTWRITEBYTECODE=1 python3 `which pytest` -v tests
+cd tests
+PYTHONDONTWRITEBYTECODE=1 python3 `which pytest` --cov=../src/ -vv .
