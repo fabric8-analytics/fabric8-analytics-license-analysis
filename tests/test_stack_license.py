@@ -1,3 +1,5 @@
+"""Unit tests for the StackLicenseAnalyzer module."""
+
 from src.stack_license import StackLicenseAnalyzer
 
 
@@ -6,6 +8,7 @@ stack_license_analyzer = StackLicenseAnalyzer()
 
 
 def test_component_license_conflict():
+    """Check if the conflict between licenses is detected properly."""
     payload = {
         'packages': [
             {
@@ -27,6 +30,7 @@ def test_component_license_conflict():
 
 
 def test_stack_license_conflict():
+    """Check if the conflict between representative licenses is detected properly."""
     payload = {
         'packages': [
             {
@@ -48,6 +52,7 @@ def test_stack_license_conflict():
 
 
 def test_stack_license_successful():
+    """Test if the representative license can be found."""
     payload = {
         'packages': [
             {
@@ -69,6 +74,7 @@ def test_stack_license_successful():
 
 
 def test_stack_license_filter():
+    """Test if the representative licenses are computed correctly."""
     payload = {
         'packages': [
             {
@@ -107,6 +113,7 @@ def test_stack_license_filter():
 
 
 def test_component_license_unknown():
+    """Test if unknown license is detected properly."""
     payload = {
         'packages': [
             {
@@ -128,6 +135,7 @@ def test_component_license_unknown():
 
 
 def test_component_license_failure():
+    """Test how the package w/o any license is handled."""
     payload = {
         'packages': [
             {

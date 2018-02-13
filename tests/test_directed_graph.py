@@ -1,13 +1,17 @@
+"""Tests for the class DirectedGraph."""
+
 from src.directed_graph import Vertex, DirectedGraph
 
 
 def test_add_vertex():
+    """Check that new vertex can be added to directed graph."""
     g = DirectedGraph()
     v0 = g.add_vertex(vertex_props=None)
     assert v0.id >= 0
 
 
 def test_get_vertex():
+    """Check if vertex can be retrieved from directed graph."""
     g = DirectedGraph()
     g.add_vertex(vertex_props=None)
     v = g.get_vertex(vertex_id=0)
@@ -15,6 +19,7 @@ def test_get_vertex():
 
 
 def test_get_vertex_ids():
+    """Test whether method DirectedGraph.get_vertex_ids() works correctly."""
     g = DirectedGraph()
     v0 = g.add_vertex(vertex_props=None)
     v1 = g.add_vertex(vertex_props=None)
@@ -26,6 +31,7 @@ def test_get_vertex_ids():
 
 
 def test_get_vertices():
+    """Test whether method DirectedGraph.get_vertices() works correctly."""
     g = DirectedGraph()
     v0 = g.add_vertex(vertex_props=None)
     v1 = g.add_vertex(vertex_props=None)
@@ -37,6 +43,7 @@ def test_get_vertices():
 
 
 def test_add_edge():
+    """Test whether method DirectedGraph.add_edge() works correctly."""
     g = DirectedGraph()
     v0 = g.add_vertex(vertex_props=None)
     v1 = g.add_vertex(vertex_props=None)
@@ -54,6 +61,7 @@ def test_add_edge():
 
 
 def test_find_vertex():
+    """Test if method DirectedGraph.find_vertex() works correctly."""
     g = DirectedGraph()
     v0 = g.add_vertex(vertex_props={'license': 'L0', 'type': 'P'})
     v1 = g.add_vertex(vertex_props={'license': 'L1', 'type': 'WP'})
@@ -67,6 +75,7 @@ def test_find_vertex():
 
 
 def test_find_common_reachable_vertex():
+    """Test if method DirectedGraph.find_common_reachable_vertices() works correctly."""
     g = DirectedGraph()
     v0 = g.add_vertex(vertex_props={'license': 'L0', 'type': 'P'})
     v1 = g.add_vertex(vertex_props={'license': 'L1', 'type': 'WP'})
