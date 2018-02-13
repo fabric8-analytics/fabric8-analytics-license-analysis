@@ -19,6 +19,7 @@ class LicenseAnalyzer(object):
     """
 
     def __init__(self, graph_store, synonyms_store):
+        """Initialize the analyzer and read known synonyms."""
         # load graph from given data store
         self.g = DirectedGraph.read_from_json(graph_store)
         self.known_licenses = [
@@ -67,6 +68,7 @@ class LicenseAnalyzer(object):
         self._find_type_compatibility_classes()
 
     def find_synonym(self, license_name):
+        """Find synomym for given license name."""
         if license_name in self.known_licenses:
             return license_name
 
@@ -548,6 +550,7 @@ class LicenseAnalyzer(object):
         return list_comp_classes
 
     def check_compatibility(self, lic_a, list_lic_b):
+        """Check the compatibility of two licenses."""
         output = {
             'status': 'Failure',
             'reason': 'Input is invalid',
