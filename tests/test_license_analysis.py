@@ -1,17 +1,22 @@
+"""Unit tests for the LicenseAnalyzer module."""
+
 from src.license_analysis import LicenseAnalyzer
 from src.util.data_store.local_filesystem import LocalFileSystem
 
 
 def test_print_graph():
+    """Check the method print_license_graph."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
     synonyms_dir = "synonyms"
     synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+    # TODO does not check the actual output!
     license_analyzer.print_license_graph()
 
 
 def test_compute_rep_license_successful():
+    """Test the method LicenseAnalyzer.compute_representative_license()."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
     synonyms_dir = "synonyms"
@@ -88,6 +93,7 @@ def test_compute_rep_license_successful():
 
 
 def test_compute_rep_license_unknown():
+    """Test the method LicenseAnalyzer.compute_representative_license() for unknown license."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
     synonyms_dir = "synonyms"
@@ -101,6 +107,7 @@ def test_compute_rep_license_unknown():
 
 
 def test_compute_rep_license_conflict():
+    """Test method LicenseAnalyzer.compute_representative_license() for non-conflicting licenses."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
     synonyms_dir = "synonyms"
@@ -113,6 +120,7 @@ def test_compute_rep_license_conflict():
 
 
 def test_compute_rep_license_conflict_2():
+    """Test method LicenseAnalyzer.compute_representative_license() for non-conflicting licenses."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
     synonyms_dir = "synonyms"
@@ -125,6 +133,7 @@ def test_compute_rep_license_conflict_2():
 
 
 def test_check_compatibility():
+    """Test the method LicenseAnalyzer.check_compatibility()."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
     synonyms_dir = "synonyms"
