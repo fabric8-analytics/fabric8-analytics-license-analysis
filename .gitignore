@@ -103,3 +103,4 @@ ENV/
 .idea/
 .pyc
 config.py
+.pytest_cache

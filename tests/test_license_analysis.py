@@ -106,7 +106,7 @@ def test_compute_rep_license_unknown():
     assert set(output['unknown_licenses']) == set(['SOME_JUNK_LIC'])
 
 
-def test_compute_rep_license_conflict():
+def test_compute_rep_license_no_conflict():
     """Test method LicenseAnalyzer.compute_representative_license() for non-conflicting licenses."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
@@ -117,9 +117,11 @@ def test_compute_rep_license_conflict():
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] == 'Successful'
     assert output['representative_license'] == 'mpl 2.0'
+    assert "conflict_licenses" in output
+    assert output['conflict_licenses'] == []
 
 
-def test_compute_rep_license_conflict_2():
+def test_compute_rep_license_no_conflict_2():
     """Test method LicenseAnalyzer.compute_representative_license() for non-conflicting licenses."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
@@ -130,6 +132,64 @@ def test_compute_rep_license_conflict_2():
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] == 'Successful'
     assert output['representative_license'] == 'gplv3+'
+    assert "conflict_licenses" in output
+    assert output['conflict_licenses'] == []
+
+
+def test_compute_rep_license_conflict_1():
+    """Test the method LicenseAnalyzer.compute_representative_license() for conflicting licenses."""
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+    list_licenses = ['gplv2', 'gplv3+']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] == 'Conflict'
+    assert output['representative_license'] is None
+    assert "conflict_licenses" in output
+    conflicts = output["conflict_licenses"]
+    assert len(conflicts) == 1
+    assert 'gplv2' in conflicts[0]
+    assert 'gplv3+' in conflicts[0]
+
+
+def test_compute_rep_license_conflict_2():
+    """Test the method LicenseAnalyzer.compute_representative_license() for conflicting licenses."""
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+    list_licenses = ['gplv2', 'gplv3+', 'MIT', 'APACHE']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] == 'Conflict'
+    assert output['representative_license'] is None
+    assert "conflict_licenses" in output
+    conflicts = output["conflict_licenses"]
+    assert len(conflicts) == 1
+    assert 'gplv2' in conflicts[0]
+    assert 'gplv3+' in conflicts[0]
+
+
+def test_compute_rep_license_conflict_3():
+    """Test the method LicenseAnalyzer.compute_representative_license() for conflicting licenses."""
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+    list_licenses = ['affero gplv3', 'gplv3+', 'gplv2']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] == 'Conflict'
+    assert output['representative_license'] is None
+    assert "conflict_licenses" in output
+    conflicts = output["conflict_licenses"]
+    assert len(conflicts) == 2
+    assert 'gplv2' in conflicts[0]
+    assert 'gplv2' in conflicts[1]
+    assert 'gplv3+' in conflicts[0] or 'gplv3+' in conflicts[1]
+    assert 'affero gplv3' in conflicts[0] or 'affero gplv3' in conflicts[1]
 
 
 def test_check_compatibility():
