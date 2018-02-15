@@ -252,3 +252,28 @@ def test_find_common_reachable_vertex():
     assert list_vertices is not None
     assert len(list_vertices) == 1
     assert list_vertices[0] == v1
+
+
+def test_iterator():
+    """Test that the iterator over all vertexes works correctly."""
+    g = DirectedGraph()
+    items = [item for item in g]
+    assert not items
+
+    v0 = g.add_vertex(vertex_props={'license': 'L0', 'type': 'P'})
+    items = [item for item in g]
+    assert len(items) == 1
+    assert items[0] == v0
+
+    v1 = g.add_vertex(vertex_props={'license': 'L1', 'type': 'WP'})
+    items = [item for item in g]
+    assert len(items) == 2
+    assert v0 in items
+    assert v1 in items
+
+    v2 = g.add_vertex(vertex_props={})
+    items = [item for item in g]
+    assert len(items) == 3
+    assert v0 in items
+    assert v1 in items
+    assert v2 in items
