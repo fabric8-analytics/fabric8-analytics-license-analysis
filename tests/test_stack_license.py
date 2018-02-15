@@ -160,3 +160,67 @@ def test_component_license_failure():
     assert output is not None
     assert output['status'] == 'Failure'
     assert output['stack_license'] is None
+
+
+def test_check_compatibility():
+    """Test the method _check_compatibility."""
+    packages = [{
+                'package': 'p1',
+                'version': '1.1',
+                'licenses': ['GPL V2']
+                }]
+    output = stack_license_analyzer._check_compatibility('GPL V2', packages)
+    assert output['compatible_packages'] == ['p1']
+    assert not output['unknown_license_packages']
+    assert not output['conflict_packages']
+
+    packages = [{
+                'package': 'p1',
+                'version': '1.1',
+                'licenses': ['GPL V2']
+                },
+                {
+                'package': 'p2',
+                'version': '1.1',
+                'licenses': ['GPL V2']
+                }]
+    output = stack_license_analyzer._check_compatibility('GPL V2', packages)
+    assert 'p1' in output['compatible_packages']
+    assert 'p2' in output['compatible_packages']
+    assert not output['unknown_license_packages']
+    assert not output['conflict_packages']
+
+
+def test_check_compatibility_conflicts():
+    """Test the method _check_compatibility in case some licenses are in conflict."""
+    packages = [{
+                'package': 'p1',
+                'version': '1.1',
+                'licenses': ['GPL V2']
+                },
+                {
+                'package': 'p2',
+                'version': '1.1',
+                'licenses': ['GPL V2']
+                }]
+    output = stack_license_analyzer._check_compatibility('GPL V3+', packages)
+    assert not output['compatible_packages']
+    assert not output['unknown_license_packages']
+    assert 'p1' in output['conflict_packages']
+    assert 'p2' in output['conflict_packages']
+
+    packages = [{
+                'package': 'p1',
+                'version': '1.1',
+                'licenses': ['GPL V2']
+                },
+                {
+                'package': 'p2',
+                'version': '1.1',
+                'licenses': ['GPL V3+']
+                }]
+    output = stack_license_analyzer._check_compatibility('GPL V3+', packages)
+    print(output)
+    assert 'p2' in output['compatible_packages']
+    assert 'p1' in output['conflict_packages']
+    assert not output['unknown_license_packages']
