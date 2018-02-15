@@ -104,6 +104,9 @@ def test_compute_rep_license_unknown():
     assert output['status'] == 'Unknown'
     assert output['representative_license'] is None
     assert set(output['unknown_licenses']) == set(['SOME_JUNK_LIC'])
+    assert output['reason'] == 'Some unknown licenses found'
+    assert not output['conflict_licenses']
+    assert not output['outlier_licenses']
 
 
 def test_compute_rep_license_no_conflict():
@@ -118,7 +121,8 @@ def test_compute_rep_license_no_conflict():
     assert output['status'] == 'Successful'
     assert output['representative_license'] == 'mpl 2.0'
     assert "conflict_licenses" in output
-    assert output['conflict_licenses'] == []
+    assert not output['conflict_licenses']
+    assert not output['outlier_licenses']
 
 
 def test_compute_rep_license_no_conflict_2():
@@ -213,6 +217,8 @@ def test_check_compatibility():
     assert output['reason'] == 'All the input licenses are unknown!'
     unknown_licenses = set(output['unknown_licenses'])
     assert unknown_licenses == set(['abcd', 'xyz'])
+    assert not output['conflict_licenses']
+    assert not output['compatible_licenses']
 
     lic_a = 'APACHE'
     list_lic_b = ['PD', 'MIT', 'BSD']  # all permissive
