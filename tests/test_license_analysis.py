@@ -275,3 +275,36 @@ def test_check_compatibility():
     assert len(output['compatible_licenses']) == 1
     compatible_licenses = set(output['compatible_licenses'][0])
     assert compatible_licenses == set(['mit', 'postgresql', 'cpal 1.0', 'json'])
+
+
+def test_check_compatibility_conflicting_licenses():
+    """Test the method LicenseAnalyzer.check_compatibility()."""
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+
+    lic_a = 'gplv2'
+    list_lic_b = ['gplv3+']
+    output = license_analyzer.check_compatibility(lic_a, list_lic_b)
+    assert output['status'] == 'Successful'
+    assert output['reason'] == 'Compatibility and/or conflict identified'
+    assert output['conflict_licenses'] == ['gplv3+']
+
+
+def test_check_compatibility_conflicting_licenses_2():
+    """Test the method LicenseAnalyzer.check_compatibility()."""
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+
+    lic_a = 'gplv2'
+    # the license 'gplv2' is repeated here:
+    list_lic_b = ['gplv2', 'gplv3+']
+    output = license_analyzer.check_compatibility(lic_a, list_lic_b)
+    assert output['status'] == 'Successful'
+    assert output['reason'] == 'Compatibility and/or conflict identified'
+    assert output['conflict_licenses'] == ['gplv3+']
