@@ -7,6 +7,17 @@ from src.stack_license import StackLicenseAnalyzer
 stack_license_analyzer = StackLicenseAnalyzer()
 
 
+def test_input_sanity_checks():
+    """Check if the method compute_stack_license perform input sanity checking."""
+    payload = {
+        'packages': []
+    }
+    output = stack_license_analyzer.compute_stack_license(payload=payload)
+    assert output is not None
+    assert output['status'] == 'Failure'
+    assert output['message'] == 'Input was invalid'
+
+
 def test_component_license_conflict():
     """Check if the conflict between licenses is detected properly."""
     payload = {
