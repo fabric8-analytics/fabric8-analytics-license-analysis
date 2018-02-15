@@ -196,6 +196,60 @@ def test_compute_rep_license_conflict_3():
     assert 'affero gplv3' in conflicts[0] or 'affero gplv3' in conflicts[1]
 
 
+def test_compute_rep_license_repeating_licenses():
+    """Test the method LicenseAnalyzer.compute_representative_license() for correct behaviour."""
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+    list_licenses = ['gplv2', 'gplv2', 'gplv2']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] == 'Successful'
+    assert output['reason'] == 'Representative license found'
+    assert output['representative_license'] == 'gplv2'
+    assert not output['unknown_licenses']
+    assert not output['conflict_licenses']
+    assert not output['outlier_licenses']
+    assert 'gplv2' in output['synonyms']
+
+
+def test_check_compatibility_input_sanity_checks():
+    """Test the method LicenseAnalyzer.check_compatibility(): the input sanity checks."""
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+
+    lic_a = None
+    list_lic_b = []
+    output = license_analyzer.check_compatibility(lic_a, list_lic_b)
+    assert output['status'] == 'Failure'
+    assert output['reason'] == 'Input is invalid'
+    assert not output['unknown_licenses']
+    assert not output['conflict_licenses']
+    assert not output['compatible_licenses']
+
+    lic_a = None
+    list_lic_b = ["x", "y", "z"]
+    output = license_analyzer.check_compatibility(lic_a, list_lic_b)
+    assert output['status'] == 'Failure'
+    assert output['reason'] == 'Input is invalid'
+    assert not output['unknown_licenses']
+    assert not output['conflict_licenses']
+    assert not output['compatible_licenses']
+
+    lic_a = 'APACHE'
+    list_lic_b = []
+    output = license_analyzer.check_compatibility(lic_a, list_lic_b)
+    assert output['status'] == 'Failure'
+    assert output['reason'] == 'Input is invalid'
+    assert not output['unknown_licenses']
+    assert not output['conflict_licenses']
+    assert not output['compatible_licenses']
+
+
 def test_check_compatibility():
     """Test the method LicenseAnalyzer.check_compatibility()."""
     src_dir = "license_graph"
@@ -203,12 +257,6 @@ def test_check_compatibility():
     synonyms_dir = "synonyms"
     synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
-
-    lic_a = 'APACHE'
-    list_lic_b = []
-    output = license_analyzer.check_compatibility(lic_a, list_lic_b)
-    assert output['status'] == 'Failure'
-    assert output['reason'] == 'Input is invalid'
 
     lic_a = 'APACHE'
     list_lic_b = ['abcd', 'xyz']  # some unknown
