@@ -308,3 +308,10 @@ def test_check_compatibility_conflicting_licenses_2():
     assert output['status'] == 'Successful'
     assert output['reason'] == 'Compatibility and/or conflict identified'
     assert output['conflict_licenses'] == ['gplv3+']
+
+
+def test_create_graph():
+    """Test the method _create_graph()."""
+    # this is quite dummy test, because the method _create_graph is not used ATM
+    g = LicenseAnalyzer._create_graph()
+    assert g is not None
