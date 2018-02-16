@@ -23,6 +23,8 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 app = Flask(__name__)
 app.config.from_object('config')
 CORS(app)
+licenselist = json.load(open(os.path.abspath('tests/synonyms/license_synonyms.json')))
+    
 
 
 @app.before_first_request
@@ -40,7 +42,6 @@ def heart_beat():
 @app.route('/api/v1/stack_license', methods=['POST'])
 def stack_license():
     """Handle the REST API endpoint /api/v1/stack_license."""
-    licenselist = json.load(open(os.path.abspath('tests/synonyms/license_synonyms.json')))
     
     input_json = json.loads(request.values.get('packages'))
     app.logger.debug("Stack analysis input: {}".format(input_json))
