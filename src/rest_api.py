@@ -53,6 +53,7 @@ def stack_license():
                 for lic in licenselist:
                     if line.decode("utf-8").strip() == lic:
                         matchedLicense = lic
+                        break
 
         input_json["matchedlicense"] = matchedLicense
 
