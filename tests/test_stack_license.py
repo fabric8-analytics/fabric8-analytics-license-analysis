@@ -236,3 +236,33 @@ def test_check_compatibility_conflicts():
     assert 'p2' in output['compatible_packages']
     assert 'p1' in output['conflict_packages']
     assert not output['unknown_license_packages']
+
+
+def test_stack_licenses_computation():
+    """Check that the stack license is computed."""
+    payload = {
+        'packages': [
+            {
+                'package': 'p1',
+                'version': '1.1',
+                'licenses': ['PD', 'APACHE', 'CDDL 1.0']
+            },
+            {
+                'package': 'p2',
+                'version': '1.1',
+                'licenses': ['MIT']
+            },
+            {
+                'package': 'p3',
+                'version': '1.1',
+                'licenses': ['BSD']
+            },
+        ]
+    }
+    output = stack_license_analyzer.compute_stack_license(payload=payload)
+    assert output is not None
+    print(output)
+    print(output["outlier_packages"])
+    assert output['status'] == 'Successful'
+    assert output['stack_license'] == 'cddlv1.1+'
+    assert output["outlier_packages"] == {'p1': 'cddlv1.1+'}
