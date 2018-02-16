@@ -266,3 +266,17 @@ def test_stack_licenses_computation():
     assert output['status'] == 'Successful'
     assert output['stack_license'] == 'cddlv1.1+'
     assert output["outlier_packages"] == {'p1': 'cddlv1.1+'}
+
+
+def test_unexpected_exception_handling():
+    """Test that the improper payload is process w/o failures."""
+    # the payload is not correct so we expect the exception to occur
+    payload = {
+        'packages': 'garbage'
+    }
+    output = stack_license_analyzer.compute_stack_license(payload=payload)
+    assert output is not None
+    print(output)
+    assert output['status'] == 'Failure'
+    assert output['stack_license'] is None
+    assert output['message'] == "Some unexpected exception happened!"
