@@ -14,7 +14,7 @@ import requests
 
 def api_route_for(route):
     """Construct an URL to the endpoint for given route."""
-    return '/api/v1' + route
+    return '/api/v1/' + route
 
 
 def get_json_from_response(response):
@@ -26,6 +26,30 @@ def test_heart_beat_endpoint(client):
     """Test the heart beat endpoint."""
     response = client.get("/")
     assert response.status_code == 200
-    json = get_json_from_response(response)
-    assert "status" in json
-    assert json["status"] == "ok"
+    json_data = get_json_from_response(response)
+    assert "status" in json_data
+    assert json_data["status"] == "ok"
+
+
+def test_stack_license_endpoint(client):
+    """Test the endpont /api/v1/stack_license."""
+    payload = {
+        'packages': [
+            {
+                'package': 'p1',
+                'version': '1.1',
+                'licenses': ['MIT', 'PD']
+            },
+            {
+                'package': 'p2',
+                'version': '1.1',
+                'licenses': ['BSD', 'GPL V2']
+            }
+        ]
+    }
+    response = client.post(api_route_for("stack_license"), data=json.dumps(payload))
+    assert response.status_code == 200
+    json_data = get_json_from_response(response)
+    assert "status" in json_data
+    assert json_data["status"] == "Successful"
+    assert json_data['stack_license'] == 'gplv2'
