@@ -50,7 +50,6 @@ def stack_license():
         license = request.files['LICENSE']
         if license is not None:
             for line in license.readlines():
-                #print(line.decode("utf-8").strip())
                 for lic in licenselist:
                     if line.decode("utf-8").strip() == lic:
                         matchedLicense = lic
