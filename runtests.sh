@@ -6,6 +6,8 @@ threshold=0.6
 export MAJORITY_THRESHOLD=$threshold
 export DATA_DIR=.
 
+export PYTHONPATH=`pwd`/src
+
 function prepare_venv() {
     VIRTUALENV=`which virtualenv`
     if [ $? -eq 1 ]; then

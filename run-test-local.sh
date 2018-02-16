@@ -36,6 +36,8 @@ done
 export MAJORITY_THRESHOLD=$threshold
 export DATA_DIR=.
 
+export PYTHONPATH=`pwd`/src
+
 function prepare_venv() {
 	virtualenv -p python3 venv && source venv/bin/activate && python3 `which pip3` install -r requirements.txt
 }
