@@ -8,6 +8,8 @@ from flask_cors import CORS
 import sys
 import logging
 from src.stack_license import StackLicenseAnalyzer
+import json
+import os
 
 
 # Python2.x: Make default encoding as UTF-8
@@ -32,14 +34,30 @@ def load_model():
 @app.route('/')
 def heart_beat():
     """Handle the REST API endpoint /."""
-    return flask.jsonify({"status": "ok"})
+    return flask.jsonify({"status": "okayy"})
 
 
 @app.route('/api/v1/stack_license', methods=['POST'])
 def stack_license():
     """Handle the REST API endpoint /api/v1/stack_license."""
-    input_json = request.get_json(force=True)
-    # app.logger.debug("Stack analysis input: {}".format(input_json))
+    licenselist = json.load(open(os.path.abspath('tests/synonyms/license_synonyms.json')))
+    
+    input_json = json.loads(request.values.get('packages'))
+    app.logger.debug("Stack analysis input: {}".format(input_json))
+
+    if request.files:
+        license = request.files['LICENSE']
+        if license is not None:
+            for line in license.readlines():
+                #print(line.decode("utf-8").strip())
+                for lic in licenselist:
+                    if line.decode("utf-8").strip() == lic:
+                        matchedLicense = lic
+
+        input_json["matchedlicense"] = matchedLicense
+
+    app.logger.debug("Stack analysis input: {}".format(input_json))
+
 
     response = app.stack_license_analyzer.compute_stack_license(payload=input_json)
     # app.logger.debug("Stack analysis output: {}".format(response))
