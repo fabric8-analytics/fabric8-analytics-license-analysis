@@ -2,10 +2,7 @@
 
 import json
 import os
-try:
-    import urlparse
-except ImportError:
-    import urllib.parse as urlparse
+import urllib.parse as urlparse
 
 from flask import current_app, url_for
 import pytest
