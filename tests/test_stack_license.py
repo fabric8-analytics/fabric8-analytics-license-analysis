@@ -9,6 +9,18 @@ stack_license_analyzer = StackLicenseAnalyzer()
 
 def test_input_sanity_checks():
     """Check if the method compute_stack_license perform input sanity checking."""
+    payload = None
+    output = stack_license_analyzer.compute_stack_license(payload=payload)
+    assert output is not None
+    assert output['status'] == 'Failure'
+    assert output['message'] == 'Input was invalid'
+
+    payload = {}
+    output = stack_license_analyzer.compute_stack_license(payload=payload)
+    assert output is not None
+    assert output['status'] == 'Failure'
+    assert output['message'] == 'Input was invalid'
+
     payload = {
         'packages': []
     }
