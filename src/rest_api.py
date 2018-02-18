@@ -23,7 +23,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 app = Flask(__name__)
 app.config.from_object('config')
 CORS(app)
-licenselist = json.load(open(os.path.abspath('tests/synonyms/license_synonyms.json')))
+licenselist = json.load(open(os.path.abspath('src/license_synonyms.json')))
     
 
 
@@ -36,16 +36,14 @@ def load_model():
 @app.route('/')
 def heart_beat():
     """Handle the REST API endpoint /."""
-    return flask.jsonify({"status": "okayy"})
+    return flask.jsonify({"status": "ok"})
 
 
 @app.route('/api/v1/stack_license', methods=['POST'])
 def stack_license():
     """Handle the REST API endpoint /api/v1/stack_license."""
-    
     input_json = json.loads(request.values.get('packages'))
     app.logger.debug("Stack analysis input: {}".format(input_json))
-
     if request.files:
         license = request.files['LICENSE']
         if license is not None:
@@ -54,15 +52,10 @@ def stack_license():
                     if line.decode("utf-8").strip() == lic:
                         matchedLicense = lic
                         break
-
         input_json["matchedlicense"] = matchedLicense
-
     app.logger.debug("Stack analysis input: {}".format(input_json))
-
-
     response = app.stack_license_analyzer.compute_stack_license(payload=input_json)
     # app.logger.debug("Stack analysis output: {}".format(response))
-
     return flask.jsonify(response)
 
 
