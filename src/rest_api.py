@@ -24,7 +24,6 @@ app = Flask(__name__)
 app.config.from_object('config')
 CORS(app)
 licenselist = json.load(open(os.path.abspath('src/license_synonyms.json')))
-    
 
 
 @app.before_first_request
