@@ -22,7 +22,7 @@ class LocalFileSystem(AbstractDataStore):
 
     def get_name(self):
         """Return printable name of this storage."""
-        return "Local filesytem dir: " + self.src_dir
+        return "Local filesystem dir: " + self.src_dir
 
     def list_files(self, prefix=None):
         """List all the files in the source directory."""
