@@ -9,4 +9,5 @@ botocore==1.6.6           # via boto3, s3transfer
 jmespath==0.9.3           # via boto3, botocore
 python-dateutil==2.6.1    # via botocore
 s3transfer==0.1.10        # via boto3
-pandas
+cython==0.25.2
+pandas==0.19.2
