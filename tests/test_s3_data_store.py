@@ -19,7 +19,6 @@ def test_get_name():
 
 def test_read_json_file():
     """Check the method read_json_file()."""
-
     # try for improper access_key and secret_key
     s3DataStore = S3DataStore("bucket", "access_key", "sercet_key")
     with pytest.raises(Exception):
@@ -28,7 +27,6 @@ def test_read_json_file():
 
 def test_write_json_file():
     """Check the method write_json_file()."""
-
     # try for improper access_key and secret_key
     s3DataStore = S3DataStore("bucket", "access_key", "sercet_key")
     with pytest.raises(Exception):
@@ -37,7 +35,6 @@ def test_write_json_file():
 
 def test_list_files():
     """Check the method list_files()."""
-
     # try for improper access_key and secret_key
     s3DataStore = S3DataStore("bucket", "access_key", "sercet_key")
     with pytest.raises(Exception):
@@ -46,7 +43,6 @@ def test_list_files():
 
 def test_read_all_json_files():
     """Check the method read_all_json_files()."""
-
     # try for improper access_key and secret_key
     s3DataStore = S3DataStore("bucket", "access_key", "sercet_key")
     with pytest.raises(Exception):
