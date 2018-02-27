@@ -97,19 +97,21 @@ class StackLicenseAnalyzer(object):
         :param payload: Input list of package information
         :return: Detailed license analysis output
         """
+        # check input
+        if not payload or not payload.get('packages'):
+            output = {
+                'status': 'Failure',
+                'message': 'Input was invalid'
+            }
+            logging.debug("stack license analysis input is invalid")
+            return output
+
         output = payload  # output info will be inserted inside payload structure
         count_comp_no_license = 0  # keep track of number of component with no license
         output['conflict_packages'] = []
         output['outlier_packages'] = {}
 
         try:
-            # Check input
-            if payload is None or len(payload['packages']) == 0:
-                output['status'] = 'Failure'
-                output['message'] = 'Input was invalid'
-                logging.debug("stack license analysis input is invalid")
-                return output
-
             # First, let us try to compute representative license for each component
             list_comp_rep_licenses = []
             is_stack_license_possible = True
@@ -148,7 +150,7 @@ class StackLicenseAnalyzer(object):
             if is_stack_license_possible is False:
                 # output['status'] should have been set already
                 output['stack_license'] = None
-                output['message'] = "No declared licenses found for {} component(s).".\
+                output['message'] = "No declared licenses found for {} component(s).". \
                     format(count_comp_no_license)
                 return output
 
@@ -159,7 +161,7 @@ class StackLicenseAnalyzer(object):
                 output['message'] = "Something weird happened!"
 
             # Prepare a map of license -> package, which is used later to prepare output
-            assert(len(output['packages']) == len(list_comp_rep_licenses))
+            assert (len(output['packages']) == len(list_comp_rep_licenses))
             dict_lic_pkgs = {}
             for i, lic in enumerate(list_comp_rep_licenses):
                 pkg = output['packages'][i]
