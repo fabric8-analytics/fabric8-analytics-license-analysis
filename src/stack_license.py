@@ -98,10 +98,11 @@ class StackLicenseAnalyzer(object):
         :return: Detailed license analysis output
         """
         # check input
-        if not payload or not payload['packages']:
-            output = dict()
-            output['status'] = 'Failure'
-            output['message'] = 'Input was invalid'
+        if not payload or not payload.get('packages'):
+            output = {
+                'status': 'Failure',
+                'message': 'Input was invalid'
+            }
             logging.debug("stack license analysis input is invalid")
             return output
 
