@@ -106,120 +106,119 @@ class StackLicenseAnalyzer(object):
             logging.debug("stack license analysis input is invalid")
             return output
 
-        else:
-            output = payload  # output info will be inserted inside payload structure
-            count_comp_no_license = 0  # keep track of number of component with no license
-            output['conflict_packages'] = []
-            output['outlier_packages'] = {}
+        output = payload  # output info will be inserted inside payload structure
+        count_comp_no_license = 0  # keep track of number of component with no license
+        output['conflict_packages'] = []
+        output['outlier_packages'] = {}
 
-            try:
-                # First, let us try to compute representative license for each component
-                list_comp_rep_licenses = []
-                is_stack_license_possible = True
-                for pkg in output['packages']:
-                    la_output = self.license_analyzer.compute_representative_license(
-                        pkg.get('licenses', []))
+        try:
+            # First, let us try to compute representative license for each component
+            list_comp_rep_licenses = []
+            is_stack_license_possible = True
+            for pkg in output['packages']:
+                la_output = self.license_analyzer.compute_representative_license(
+                    pkg.get('licenses', []))
 
-                    pkg['license_analysis'] = {
-                        'status': la_output['status'],
-                        '_representative_licenses': la_output['representative_license'],
-                        'conflict_licenses': la_output['conflict_licenses'],
-                        'unknown_licenses': la_output['unknown_licenses'],
-                        'outlier_licenses': la_output['outlier_licenses'],
-                        'synonyms': la_output['synonyms'],
-                        '_message': la_output['reason']
-                    }
+                pkg['license_analysis'] = {
+                    'status': la_output['status'],
+                    '_representative_licenses': la_output['representative_license'],
+                    'conflict_licenses': la_output['conflict_licenses'],
+                    'unknown_licenses': la_output['unknown_licenses'],
+                    'outlier_licenses': la_output['outlier_licenses'],
+                    'synonyms': la_output['synonyms'],
+                    '_message': la_output['reason']
+                }
 
-                    if la_output['status'] == 'Failure':
-                        count_comp_no_license = count_comp_no_license + 1
-                        output['status'] = 'Failure'
-                        is_stack_license_possible = False
-                    elif la_output['status'] == 'Conflict':
-                        output['status'] = 'ComponentConflict'
-                        is_stack_license_possible = False
-                    elif la_output['status'] == 'Unknown':
-                        output['status'] = 'Unknown'
-                        is_stack_license_possible = False
-
-                    if la_output['representative_license'] is None:
-                        # This will later indicate that no need to compute stack license
-                        is_stack_license_possible = False
-                    else:
-                        list_comp_rep_licenses.append(la_output['representative_license'])
-
-                # Return if we could not compute license for some component
-                if is_stack_license_possible is False:
-                    # output['status'] should have been set already
-                    output['stack_license'] = None
-                    output['message'] = "No declared licenses found for {} component(s).". \
-                        format(count_comp_no_license)
-                    return output
-
-                # If there is no component license then something unexpected happened
-                if len(list_comp_rep_licenses) == 0:
+                if la_output['status'] == 'Failure':
+                    count_comp_no_license = count_comp_no_license + 1
                     output['status'] = 'Failure'
-                    output['stack_license'] = None
-                    output['message'] = "Something weird happened!"
+                    is_stack_license_possible = False
+                elif la_output['status'] == 'Conflict':
+                    output['status'] = 'ComponentConflict'
+                    is_stack_license_possible = False
+                elif la_output['status'] == 'Unknown':
+                    output['status'] = 'Unknown'
+                    is_stack_license_possible = False
 
-                # Prepare a map of license -> package, which is used later to prepare output
-                assert (len(output['packages']) == len(list_comp_rep_licenses))
-                dict_lic_pkgs = {}
-                for i, lic in enumerate(list_comp_rep_licenses):
-                    pkg = output['packages'][i]
-                    list_pkg = dict_lic_pkgs.get(lic, [])
-                    list_pkg.append(pkg.get('package', 'unknown_package'))
-                    dict_lic_pkgs[lic] = list_pkg
-
-                for lic, value_list in dict_lic_pkgs.items():
-                    dict_lic_pkgs[lic] = list(set(value_list))
-
-                # If we reach here, then that means we are all set to compute stack license !
-                la_output = self.license_analyzer.compute_representative_license(list_comp_rep_licenses)
-                output['status'] = la_output['status']
-                output['stack_license'] = la_output['representative_license']
-
-                if la_output['status'] == 'Conflict':
-                    list_conflict_lic = la_output['conflict_licenses']
-                    list_conflict_pkg = []
-                    for lic1, lic2 in list_conflict_lic:
-                        for pkg1 in dict_lic_pkgs[lic1]:
-                            for pkg2 in dict_lic_pkgs[lic2]:
-                                pkg_group = {
-                                    pkg1: lic1,
-                                    pkg2: lic2
-                                }
-                                list_conflict_pkg.append(pkg_group)
-                    output['conflict_packages'] = list_conflict_pkg
-                    output['status'] = 'StackConflict'
-
-                if (len(la_output['outlier_licenses'])) > 0:
-                    outlier_pkg = {}
-                    for lic in la_output['outlier_licenses']:
-                        for pkg in dict_lic_pkgs[lic]:
-                            outlier_pkg[pkg] = lic
-                    output['outlier_packages'] = outlier_pkg
+                if la_output['representative_license'] is None:
+                    # This will later indicate that no need to compute stack license
+                    is_stack_license_possible = False
                 else:
-                    output['outlier_packages'] = {}
+                    list_comp_rep_licenses.append(la_output['representative_license'])
 
-                # Analyze further and generate info for license filters
-                # let us try to compute representative license for each alternate component
-                if la_output['status'] == 'Successful':
-                    lic_filter_for_alt = self._check_compatibility(output['stack_license'],
-                                                                   output.get('alternate_packages', []))
+            # Return if we could not compute license for some component
+            if is_stack_license_possible is False:
+                # output['status'] should have been set already
+                output['stack_license'] = None
+                output['message'] = "No declared licenses found for {} component(s).". \
+                    format(count_comp_no_license)
+                return output
 
-                    lic_filter_for_com = self._check_compatibility(output['stack_license'],
-                                                                   output.get('companion_packages', []))
-
-                    output['license_filter'] = {
-                        'alternate_packages': lic_filter_for_alt,
-                        'companion_packages': lic_filter_for_com
-                    }
-
-            except Exception:  # TODO custom exceptions
+            # If there is no component license then something unexpected happened
+            if len(list_comp_rep_licenses) == 0:
                 output['status'] = 'Failure'
                 output['stack_license'] = None
-                output['message'] = "Some unexpected exception happened!"
-                msg = traceback.format_exc()
-                logging.error("Unexpected error happened!\n{}".format(msg))
+                output['message'] = "Something weird happened!"
 
-            return output
+            # Prepare a map of license -> package, which is used later to prepare output
+            assert (len(output['packages']) == len(list_comp_rep_licenses))
+            dict_lic_pkgs = {}
+            for i, lic in enumerate(list_comp_rep_licenses):
+                pkg = output['packages'][i]
+                list_pkg = dict_lic_pkgs.get(lic, [])
+                list_pkg.append(pkg.get('package', 'unknown_package'))
+                dict_lic_pkgs[lic] = list_pkg
+
+            for lic, value_list in dict_lic_pkgs.items():
+                dict_lic_pkgs[lic] = list(set(value_list))
+
+            # If we reach here, then that means we are all set to compute stack license !
+            la_output = self.license_analyzer.compute_representative_license(list_comp_rep_licenses)
+            output['status'] = la_output['status']
+            output['stack_license'] = la_output['representative_license']
+
+            if la_output['status'] == 'Conflict':
+                list_conflict_lic = la_output['conflict_licenses']
+                list_conflict_pkg = []
+                for lic1, lic2 in list_conflict_lic:
+                    for pkg1 in dict_lic_pkgs[lic1]:
+                        for pkg2 in dict_lic_pkgs[lic2]:
+                            pkg_group = {
+                                pkg1: lic1,
+                                pkg2: lic2
+                            }
+                            list_conflict_pkg.append(pkg_group)
+                output['conflict_packages'] = list_conflict_pkg
+                output['status'] = 'StackConflict'
+
+            if (len(la_output['outlier_licenses'])) > 0:
+                outlier_pkg = {}
+                for lic in la_output['outlier_licenses']:
+                    for pkg in dict_lic_pkgs[lic]:
+                        outlier_pkg[pkg] = lic
+                output['outlier_packages'] = outlier_pkg
+            else:
+                output['outlier_packages'] = {}
+
+            # Analyze further and generate info for license filters
+            # let us try to compute representative license for each alternate component
+            if la_output['status'] == 'Successful':
+                lic_filter_for_alt = self._check_compatibility(output['stack_license'],
+                                                               output.get('alternate_packages', []))
+
+                lic_filter_for_com = self._check_compatibility(output['stack_license'],
+                                                               output.get('companion_packages', []))
+
+                output['license_filter'] = {
+                    'alternate_packages': lic_filter_for_alt,
+                    'companion_packages': lic_filter_for_com
+                }
+
+        except Exception:  # TODO custom exceptions
+            output['status'] = 'Failure'
+            output['stack_license'] = None
+            output['message'] = "Some unexpected exception happened!"
+            msg = traceback.format_exc()
+            logging.error("Unexpected error happened!\n{}".format(msg))
+
+        return output
