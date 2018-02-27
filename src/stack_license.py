@@ -97,7 +97,6 @@ class StackLicenseAnalyzer(object):
         :param payload: Input list of package information
         :return: Detailed license analysis output
         """
-
         # check input
         if not payload or not payload['packages']:
             output = dict()
