@@ -12,7 +12,7 @@ jwt.register_algorithm('RS256', RSAAlgorithm(RSAAlgorithm.SHA256))
 
 
 def decode_token():
-    """Function to decode auth token."""
+    """Decode JWT token entered by the user."""
     token = request.headers.get('Authorization')
     if token is None:
         return {}
@@ -40,7 +40,7 @@ def decode_token():
 
 
 def login_required(view):
-    """Wrapper function for auth."""
+    """Validate the token entered by the user."""
     def wrapper(*args, **kwargs):
         # Disable authentication for local setup
         if getenv('DISABLE_AUTHENTICATION') in ('1', 'True', 'true'):

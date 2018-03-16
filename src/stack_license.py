@@ -29,10 +29,7 @@ def get_session_retry(retries=3, backoff_factor=0.2, status_forcelist=(404, 500,
 
 
 def convert_version_to_proper_semantic(version):
-    """
-    Needed for maven version like 1.5.2.RELEASE to be converted to
-    1.5.2-RELEASE for semantic version to work.
-    """
+    """Needed for maven version correction."""
     version = version.replace('.', '-', 3)
     version = version.replace('-', '.', 2)
     return version
@@ -292,6 +289,7 @@ class StackLicenseAnalyzer(object):
         return output
 
     def extract_component_details(self, component):
+        """Extract component details."""
         licenses = component.get("version", {}).get("declared_licenses", [])
         name = component.get("version", {}).get("pname", [""])[0]
         version = component.get("version", {}).get("version", [""])[0]

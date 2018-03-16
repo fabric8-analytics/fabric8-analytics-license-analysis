@@ -1,11 +1,9 @@
+"""Utility function to fetch public key."""
 from requests import get, exceptions
 
 
 def fetch_public_key(app):
     """Get public key and caches it on the app object for future use."""
-    # TODO: even though saving the key on the app object is not very nice,
-    #  it's actually safe - the worst thing that can happen is that we will
-    #  fetch and save the same value on the app object multiple times
     if not getattr(app, 'public_key', ''):
         keycloak_url = app.config.get(
                 'BAYESIAN_FETCH_PUBLIC_KEY', '')
