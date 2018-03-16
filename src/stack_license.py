@@ -1,13 +1,61 @@
 """Class representing stack license analyzer."""
 
 import os
+import requests
+import json
+
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 from src.license_analysis import LicenseAnalyzer
 import logging
 import traceback
-
+import semantic_version as sv
 from src.config import DATA_DIR
 from src.util.data_store.local_filesystem import LocalFileSystem
+
+_logger = logging.getLogger(__name__)
+
+
+def get_session_retry(retries=3, backoff_factor=0.2, status_forcelist=(404, 500, 502, 504),
+                      session=None):
+    """Set HTTP Adapter with retries to session."""
+    session = session or requests.Session()
+    retry = Retry(total=retries, read=retries, connect=retries,
+                  backoff_factor=backoff_factor, status_forcelist=status_forcelist)
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    return session
+
+
+def convert_version_to_proper_semantic(version):
+    """needed for maven version like 1.5.2.RELEASE to be converted to
+    1.5.2-RELEASE for semantic version to work'"""
+    version = version.replace('.', '-', 3)
+    version = version.replace('-', '.', 2)
+    return version
+
+
+def select_latest_version(input_version='0.0.0', libio='0.0.0', anitya='0.0.0'):
+    libio_latest_version = convert_version_to_proper_semantic(libio)
+    anitya_latest_version = convert_version_to_proper_semantic(anitya)
+    input_version = convert_version_to_proper_semantic(input_version)
+
+    try:
+        latest_version = libio_latest_version
+        return_version = libio
+        if sv.SpecItem('<' + anitya_latest_version).match(sv.Version(libio_latest_version)):
+            latest_version = anitya_latest_version
+            return_version = anitya
+        if sv.SpecItem('<' + input_version).match(sv.Version(latest_version)):
+            # User provided version is higher. Do not show the latest version in the UI
+            return_version = ''
+    except ValueError:
+        # In case of failure let's not show any latest version at all
+        return_version = ''
+        pass
+
+    return return_version
 
 
 class StackLicenseAnalyzer(object):
@@ -110,14 +158,29 @@ class StackLicenseAnalyzer(object):
         count_comp_no_license = 0  # keep track of number of component with no license
         output['conflict_packages'] = []
         output['outlier_packages'] = {}
+        output['distinct_licenses'] = []
+
+        synonyms_dir = os.path.join(DATA_DIR, "synonyms")
+        synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+        list_synonym_jsons = synonyms_store.list_files()
+        for synonym_json in list_synonym_jsons:
+            syn = synonyms_store.read_json_file(synonym_json)
+            break
 
         try:
             # First, let us try to compute representative license for each component
             list_comp_rep_licenses = []
             is_stack_license_possible = True
             for pkg in output['packages']:
+                list_of_licenses = []
                 la_output = self.license_analyzer.compute_representative_license(
                     pkg.get('licenses', []))
+                for lic in pkg.get('licenses', []):
+                    s = syn.get(lic)
+                    if s:
+                        list_of_licenses.append(s)
+                    else:
+                        list_of_licenses.append(lic)
 
                 pkg['license_analysis'] = {
                     'status': la_output['status'],
@@ -145,6 +208,8 @@ class StackLicenseAnalyzer(object):
                     is_stack_license_possible = False
                 else:
                     list_comp_rep_licenses.append(la_output['representative_license'])
+                output['distinct_licenses'] = output['distinct_licenses'] + \
+                    list(set(list_of_licenses))
 
             # Return if we could not compute license for some component
             if is_stack_license_possible is False:
@@ -220,5 +285,92 @@ class StackLicenseAnalyzer(object):
             output['message'] = "Some unexpected exception happened!"
             msg = traceback.format_exc()
             logging.error("Unexpected error happened!\n{}".format(msg))
+
+        return output
+
+    def extract_component_details(self, component):
+        licenses = component.get("version", {}).get("declared_licenses", [])
+        name = component.get("version", {}).get("pname", [""])[0]
+        version = component.get("version", {}).get("version", [""])[0]
+        ecosystem = component.get("version", {}).get("pecosystem", [""])[0]
+        component_summary = {
+            "ecosystem": ecosystem,
+            "name": name,
+            "version": version,
+            "licenses": licenses
+        }
+
+        return component_summary
+
+    def get_dependency_data(self, resolved, ecosystem):
+        result = []
+        url = os.getenv('GREMLIN_SERVICE_URL')
+        for elem in resolved:
+            if elem["package"] is None or elem["version"] is None:
+                _logger.warning("Either component name or component version is missing")
+                continue
+            qstring = \
+                "g.V().has('pecosystem', '{}').has('pname', '{}').has('version', '{}')"\
+                .format(ecosystem, elem["package"], elem["version"]) + \
+                ".as('version').in('has_version').as('package')" + \
+                ".select('version','package').by(valueMap());"
+
+            # qstring = \
+            #     "g.V().has('pecosystem', '{}').has('pname', '{}').has('version', '{}')" \
+            #         .format(ecosystem, elem["package"], elem["version"]) + \
+            #     ".valueMap('pecosystem', 'pname', 'version', 'declared_licenses')"
+            payload = {'gremlin': qstring}
+
+            try:
+                graph_req = get_session_retry().post(url, data=json.dumps(payload))
+
+                if graph_req.status_code == 200:
+                    graph_resp = graph_req.json()
+                    if 'result' not in graph_resp:
+                        continue
+                    if len(graph_resp['result']['data']) == 0:
+                        continue
+
+                    result.append(graph_resp["result"])
+                else:
+                    _logger.error("Failed retrieving dependency data.")
+                    continue
+            except Exception:
+                _logger.exception("Error retrieving dependency data!")
+                continue
+
+        return {"result": result}
+
+    def extract_user_stack_package_licenses(self, resolved, ecosystem):
+        user_stack = self.get_dependency_data(resolved, ecosystem)
+        list_package_licenses = []
+        if user_stack is not None:
+            for component in user_stack.get('result', []):
+                data = component.get("data", None)
+                if data:
+                    component_data = self.extract_component_details(data[0])
+                    license_scoring_input = {
+                        'package': component_data['name'],
+                        'version': component_data['version'],
+                        'licenses': component_data['licenses']
+                    }
+                    list_package_licenses.append(license_scoring_input)
+        analyzed_pkg = [x.get('package') for x in list_package_licenses]
+        for pk in resolved:
+            if not pk.get('licenses'):
+                pk.update({'licenses': list()})
+            if pk.get('package') not in analyzed_pkg:
+                list_package_licenses.append(pk)
+
+        return list_package_licenses
+
+    def license_recommender(self, input):
+        resolved = input['_resolved']
+        ecosystem = input['ecosystem']
+        user_stack_packages = self.extract_user_stack_package_licenses(resolved, ecosystem)
+        payload = {
+            "packages": user_stack_packages
+        }
+        output = self.compute_stack_license(payload=payload)
 
         return output

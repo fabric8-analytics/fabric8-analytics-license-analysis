@@ -39,6 +39,15 @@ objects:
             value: "/"
           - name: MAJORITY_THRESHOLD
             value: "0.6"
+          - name: BAYESIAN_FETCH_PUBLIC_KEY
+            valueFrom:
+              configMapKeyRef:
+                name: bayesian-config
+                key: keycloak-url
+          - name: BAYESIAN_JWT_AUDIENCE
+            value: "fabric8-online-platform,openshiftio-public"
+          - name: GREMLIN_SERVICE_URL
+            value: ${GREMLIN_SERVICE_URL}
           name: f8a-license-analysis
           image: "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${IMAGE_TAG}"
           ports:
