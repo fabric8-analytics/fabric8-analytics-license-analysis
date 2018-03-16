@@ -29,14 +29,17 @@ def get_session_retry(retries=3, backoff_factor=0.2, status_forcelist=(404, 500,
 
 
 def convert_version_to_proper_semantic(version):
-    """needed for maven version like 1.5.2.RELEASE to be converted to
-    1.5.2-RELEASE for semantic version to work'"""
+    """
+    Needed for maven version like 1.5.2.RELEASE to be converted to
+    1.5.2-RELEASE for semantic version to work.
+    """
     version = version.replace('.', '-', 3)
     version = version.replace('-', '.', 2)
     return version
 
 
 def select_latest_version(input_version='0.0.0', libio='0.0.0', anitya='0.0.0'):
+    """Return the latest version of packages."""
     libio_latest_version = convert_version_to_proper_semantic(libio)
     anitya_latest_version = convert_version_to_proper_semantic(anitya)
     input_version = convert_version_to_proper_semantic(input_version)
@@ -303,6 +306,7 @@ class StackLicenseAnalyzer(object):
         return component_summary
 
     def get_dependency_data(self, resolved, ecosystem):
+        """Get packages data form graph DB."""
         result = []
         url = os.getenv('GREMLIN_SERVICE_URL')
         for elem in resolved:
@@ -342,6 +346,7 @@ class StackLicenseAnalyzer(object):
         return {"result": result}
 
     def extract_user_stack_package_licenses(self, resolved, ecosystem):
+        """Extract packages details from graph result."""
         user_stack = self.get_dependency_data(resolved, ecosystem)
         list_package_licenses = []
         if user_stack is not None:
@@ -365,6 +370,22 @@ class StackLicenseAnalyzer(object):
         return list_package_licenses
 
     def license_recommender(self, input):
+        """
+        Perform a detailed license analysis for the given list of packages.
+
+        It first identifies representative license for each package. Then, it
+        computes representative license for the entire stack itself.
+
+        If there is any unknown license, this function will give up.
+
+        If there is any conflict then it returns pairs of conflicting licenses.
+
+        If a representative stack-license is possible, then it tries to identify
+        license based outlier packages.
+
+        :param payload: Input list of package information
+        :return: Detailed license analysis output
+        """
         resolved = input['_resolved']
         ecosystem = input['ecosystem']
         user_stack_packages = self.extract_user_stack_package_licenses(resolved, ecosystem)
