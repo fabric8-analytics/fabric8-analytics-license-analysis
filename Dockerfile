@@ -2,9 +2,8 @@ FROM centos:7
 MAINTAINER Harjindersingh Mistry<hmistry@redhat.com>
 
 RUN yum install -y epel-release && \
-    yum install -y python34-setuptools gcc gcc-c++ python34-pip python34-devel && \
+    yum install -y python34-setuptools autoconf g++ gcc gcc-c++ python34-pip python34-devel && \
     yum clean all
-
 
 # install python packages
 COPY ./requirements.txt /
