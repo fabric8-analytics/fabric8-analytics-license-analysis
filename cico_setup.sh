@@ -16,6 +16,7 @@ prep() {
     systemctl start docker
     yum -y install epel-release
     yum -y install python34 python34-virtualenv which
+    yum -y install gcc
 }
 
 build_image() {
