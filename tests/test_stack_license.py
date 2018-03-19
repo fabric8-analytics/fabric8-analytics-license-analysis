@@ -175,8 +175,9 @@ def test_component_license_failure():
     assert output['stack_license'] is None
 
 
+# this does not needs to be tested, the special handling code has been commented out in sources
 @patch('src.stack_license.len', return_value=0)
-def test_component_license_weird_failure(mocking_object):
+def __test_component_license_weird_failure(mocking_object):
     """Test how the package w/o any license is handled."""
     payload = {
         'packages': [
