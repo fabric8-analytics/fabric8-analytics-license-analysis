@@ -1,5 +1,12 @@
 pytest
-boto3
+requests
+boto3==1.4.6
+botocore==1.6.6           # via boto3, s3transfer
+jmespath==0.9.3           # via boto3, botocore
+python-dateutil==2.6.1    # via botocore
+s3transfer==0.1.10        # via boto3
+cython==0.25.2
+pandas==0.19.2
 pytest-cov
 gunicorn
 flask-cors==3.0.2
