@@ -1,5 +1,6 @@
 """Unit tests for the LicenseAnalyzer module."""
 
+from unittest.mock import *
 from src.license_analysis import LicenseAnalyzer
 from src.util.data_store.local_filesystem import LocalFileSystem
 
@@ -15,7 +16,7 @@ def test_print_graph():
     license_analyzer.print_license_graph()
 
 
-def test_compute_rep_license_successful():
+def test_compute_representative_license_successful():
     """Test the method LicenseAnalyzer.compute_representative_license()."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
@@ -92,7 +93,7 @@ def test_compute_rep_license_successful():
     assert set(output['outlier_licenses']) == set(['lgplv2.1', 'lgplv3+'])
 
 
-def test_compute_rep_license_unknown():
+def test_compute_representative_license_unknown():
     """Test the method LicenseAnalyzer.compute_representative_license() for unknown license."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
@@ -109,7 +110,7 @@ def test_compute_rep_license_unknown():
     assert not output['outlier_licenses']
 
 
-def test_compute_rep_license_no_conflict():
+def test_compute_representative_license_no_conflict():
     """Test method LicenseAnalyzer.compute_representative_license() for non-conflicting licenses."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
@@ -125,7 +126,7 @@ def test_compute_rep_license_no_conflict():
     assert not output['outlier_licenses']
 
 
-def test_compute_rep_license_no_conflict_2():
+def test_compute_representative_license_no_conflict_2():
     """Test method LicenseAnalyzer.compute_representative_license() for non-conflicting licenses."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
@@ -140,7 +141,7 @@ def test_compute_rep_license_no_conflict_2():
     assert output['conflict_licenses'] == []
 
 
-def test_compute_rep_license_conflict_1():
+def test_compute_representative_license_conflict_1():
     """Test the method LicenseAnalyzer.compute_representative_license() for conflicting licenses."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
@@ -158,7 +159,7 @@ def test_compute_rep_license_conflict_1():
     assert 'gplv3+' in conflicts[0]
 
 
-def test_compute_rep_license_conflict_2():
+def test_compute_representative_license_conflict_2():
     """Test the method LicenseAnalyzer.compute_representative_license() for conflicting licenses."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
@@ -176,7 +177,7 @@ def test_compute_rep_license_conflict_2():
     assert 'gplv3+' in conflicts[0]
 
 
-def test_compute_rep_license_conflict_3():
+def test_compute_representative_license_conflict_3():
     """Test the method LicenseAnalyzer.compute_representative_license() for conflicting licenses."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
@@ -196,7 +197,7 @@ def test_compute_rep_license_conflict_3():
     assert 'affero gplv3' in conflicts[0] or 'affero gplv3' in conflicts[1]
 
 
-def test_compute_rep_license_repeating_licenses():
+def test_compute_representative_license_repeating_licenses():
     """Test the method LicenseAnalyzer.compute_representative_license() for correct behaviour."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
@@ -212,6 +213,34 @@ def test_compute_rep_license_repeating_licenses():
     assert not output['conflict_licenses']
     assert not output['outlier_licenses']
     assert 'gplv2' in output['synonyms']
+
+
+class MockedVertice:
+    """Mocked vertice object used by the following test."""
+
+    def __init__(self):
+        """Construct instance of this class."""
+        self.id = None
+
+    def get_prop_value(self, prop_name=None):
+        """Get property value."""
+        return None
+
+
+@patch('src.directed_graph.DirectedGraph.find_common_reachable_vertices',
+       return_value=[MockedVertice(), MockedVertice()])
+def test_compute_representative_error_checking(mocking_object):
+    """Test the method LicenseAnalyzer.compute_representative_license() for correct behaviour."""
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+    list_licenses = ['gplv2', 'gplv2', 'gplv2']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] == 'Failure'
+    assert output['reason'] == 'Something unexpected happened!'
+    assert output['representative_license'] is None
 
 
 def test_check_compatibility_input_sanity_checks():
