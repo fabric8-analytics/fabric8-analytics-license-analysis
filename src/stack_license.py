@@ -154,11 +154,15 @@ class StackLicenseAnalyzer(object):
                     format(count_comp_no_license)
                 return output
 
+            # INFO: the following check is not necessary because the control
+            # flow newer reach to this block
+
             # If there is no component license then something unexpected happened
-            if len(list_comp_rep_licenses) == 0:
-                output['status'] = 'Failure'
-                output['stack_license'] = None
-                output['message'] = "Something weird happened!"
+            # if len(list_comp_rep_licenses) == 0:
+            #    output['status'] = 'Failure'
+            #    output['stack_license'] = None
+            #    output['message'] = "Something weird happened!"
+            #    return output
 
             # Prepare a map of license -> package, which is used later to prepare output
             assert (len(output['packages']) == len(list_comp_rep_licenses))
