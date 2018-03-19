@@ -159,6 +159,7 @@ class StackLicenseAnalyzer(object):
                 output['status'] = 'Failure'
                 output['stack_license'] = None
                 output['message'] = "Something weird happened!"
+                return output
 
             # Prepare a map of license -> package, which is used later to prepare output
             assert (len(output['packages']) == len(list_comp_rep_licenses))
