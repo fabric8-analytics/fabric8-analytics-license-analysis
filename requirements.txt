@@ -18,7 +18,6 @@ markupsafe==0.23          # via jinja2
 passlib==1.6.5            # via flask-security
 pycrypto==2.6.1
 pyjwt==1.5.0
-python-dateutil==2.5.3    # via aniso8601
 pytz==2016.7              # via flask-restful
 requests-futures==0.9.7
 requests==2.18.1          # via requests-futures
@@ -26,3 +25,11 @@ six==1.10.0               # via flask-appconfig, flask-cors, flask-restful, pyth
 urllib3==1.21.1           # via requests
 werkzeug==0.12.2          # via flask, flask-wtf
 wtforms==2.1              # via flask-wtf
+pytest-cov
+boto3==1.4.6
+botocore==1.6.6           # via boto3, s3transfer
+jmespath==0.9.3           # via boto3, botocore
+python-dateutil==2.6.1    # via botocore
+s3transfer==0.1.10        # via boto3
+cython==0.25.2
+pandas==0.19.2
