@@ -1,5 +1,6 @@
 """Unit tests for the StackLicenseAnalyzer module."""
 
+from unittest.mock import *
 from src.stack_license import StackLicenseAnalyzer
 
 
@@ -172,6 +173,47 @@ def test_component_license_failure():
     assert output is not None
     assert output['status'] == 'Failure'
     assert output['stack_license'] is None
+
+
+@patch('src.stack_license.len', return_value=0)
+def test_component_license_weird_failure(mocking_object):
+    """Test how the package w/o any license is handled."""
+    payload = {
+        'packages': [
+            {
+                'package': 'p1',
+                'version': '1.1',
+                'licenses': ['MIT', 'PD']
+            },
+            {
+                'package': 'p2',
+                'version': '1.1',
+                'licenses': ['BSD', 'GPL V2']
+            }
+        ],
+        'alternate_packages': [
+            {
+                'package': 'p11',
+                'version': '1.1',
+                'licenses': ['APACHE']
+            },
+            {
+                'package': 'p21',
+                'version': '1.1',
+                'licenses': ['BSD', 'GPL V2']
+            },
+            {
+                'package': 'p31',
+                'version': '1.1',
+                'licenses': ['ABCD', 'XYZ']
+            }
+        ]
+    }
+    output = stack_license_analyzer.compute_stack_license(payload=payload)
+    assert output is not None
+    assert output['status'] == 'Failure'
+    assert output['stack_license'] is None
+    assert output['message'] == 'Something weird happened!'
 
 
 def test_check_compatibility():
