@@ -369,8 +369,7 @@ class StackLicenseAnalyzer(object):
 
     def _extract_conflict_packages(self, license_service_output):
         """
-        This helper function extracts conflict licenses from the given output
-        of license analysis REST service.
+        Extract conflict packages from response.
 
         It returns a list of pairs of packages whose licenses are in conflict.
         Note that this information is only available when each component license
@@ -400,8 +399,7 @@ class StackLicenseAnalyzer(object):
 
     def _extract_unknown_licenses(self, license_service_output):
         """
-        This helper function extracts unknown licenses information from the given
-        output of license analysis REST service.
+        Extract unknown licenses from response.
 
         At the moment, there are two types of unknowns:
 
@@ -463,8 +461,7 @@ class StackLicenseAnalyzer(object):
 
     def _extract_license_outliers(self, license_service_output):
         """
-        This helper function extracts license outliers from the given output of
-        license analysis REST service.
+        Extract outliers from response.
 
         :param license_service_output: output of license analysis REST service
         :return: list of license outlier packages
@@ -507,9 +504,9 @@ class StackLicenseAnalyzer(object):
         }
         resp = self.compute_stack_license(payload=payload)
         output = resp
-        output['conflict_packages'] = self._extract_conflict_packages(resp);
-        output['outlier_packages'] = self._extract_license_outliers(resp);
-        output['unknown_licenses'] = self._extract_unknown_licenses(resp);
-        output['stack_license'] = [resp['stack_license']];
-        print('reached');
+        output['conflict_packages'] = self._extract_conflict_packages(resp)
+        output['outlier_packages'] = self._extract_license_outliers(resp)
+        output['unknown_licenses'] = self._extract_unknown_licenses(resp)
+        output['stack_license'] = [resp['stack_license']]
+
         return output
