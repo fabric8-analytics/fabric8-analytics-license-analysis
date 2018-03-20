@@ -57,7 +57,6 @@ def stack_license():
 @login_required
 def stack_license_api():
     """Handle the REST API endpoint /api/v1/license-recommender."""
-    decoded = decode_token()
     input_json = request.get_json(force=True)
     # app.logger.debug("Stack analysis input: {}".format(input_json))
 
