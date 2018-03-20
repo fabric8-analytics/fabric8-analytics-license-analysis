@@ -1,13 +1,61 @@
 """Class representing stack license analyzer."""
 
 import os
+import requests
+import json
+
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 from src.license_analysis import LicenseAnalyzer
 import logging
 import traceback
-
+import semantic_version as sv
 from src.config import DATA_DIR
 from src.util.data_store.local_filesystem import LocalFileSystem
+
+_logger = logging.getLogger(__name__)
+
+
+def get_session_retry(retries=3, backoff_factor=0.2, status_forcelist=(404, 500, 502, 504),
+                      session=None):
+    """Set HTTP Adapter with retries to session."""
+    session = session or requests.Session()
+    retry = Retry(total=retries, read=retries, connect=retries,
+                  backoff_factor=backoff_factor, status_forcelist=status_forcelist)
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    return session
+
+
+def convert_version_to_proper_semantic(version):
+    """Needed for maven version correction."""
+    version = version.replace('.', '-', 3)
+    version = version.replace('-', '.', 2)
+    return version
+
+
+def select_latest_version(input_version='0.0.0', libio='0.0.0', anitya='0.0.0'):
+    """Return the latest version of packages."""
+    libio_latest_version = convert_version_to_proper_semantic(libio)
+    anitya_latest_version = convert_version_to_proper_semantic(anitya)
+    input_version = convert_version_to_proper_semantic(input_version)
+
+    try:
+        latest_version = libio_latest_version
+        return_version = libio
+        if sv.SpecItem('<' + anitya_latest_version).match(sv.Version(libio_latest_version)):
+            latest_version = anitya_latest_version
+            return_version = anitya
+        if sv.SpecItem('<' + input_version).match(sv.Version(latest_version)):
+            # User provided version is higher. Do not show the latest version in the UI
+            return_version = ''
+    except ValueError:
+        # In case of failure let's not show any latest version at all
+        return_version = ''
+        pass
+
+    return return_version
 
 
 class StackLicenseAnalyzer(object):
@@ -110,14 +158,29 @@ class StackLicenseAnalyzer(object):
         count_comp_no_license = 0  # keep track of number of component with no license
         output['conflict_packages'] = []
         output['outlier_packages'] = {}
+        output['distinct_licenses'] = []
+
+        synonyms_dir = os.path.join(DATA_DIR, "synonyms")
+        synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+        list_synonym_jsons = synonyms_store.list_files()
+        for synonym_json in list_synonym_jsons:
+            syn = synonyms_store.read_json_file(synonym_json)
+            break
 
         try:
             # First, let us try to compute representative license for each component
             list_comp_rep_licenses = []
             is_stack_license_possible = True
             for pkg in output['packages']:
+                list_of_licenses = []
                 la_output = self.license_analyzer.compute_representative_license(
                     pkg.get('licenses', []))
+                for lic in pkg.get('licenses', []):
+                    s = syn.get(lic)
+                    if s:
+                        list_of_licenses.append(s)
+                    else:
+                        list_of_licenses.append(lic)
 
                 pkg['license_analysis'] = {
                     'status': la_output['status'],
@@ -145,6 +208,8 @@ class StackLicenseAnalyzer(object):
                     is_stack_license_possible = False
                 else:
                     list_comp_rep_licenses.append(la_output['representative_license'])
+                output['distinct_licenses'] = output['distinct_licenses'] + \
+                    list(set(list_of_licenses))
 
             # Return if we could not compute license for some component
             if is_stack_license_possible is False:
@@ -224,5 +289,228 @@ class StackLicenseAnalyzer(object):
             output['message'] = "Some unexpected exception happened!"
             msg = traceback.format_exc()
             logging.error("Unexpected error happened!\n{}".format(msg))
+
+        return output
+
+    def extract_component_details(self, component):
+        """Extract component details."""
+        licenses = component.get("version", {}).get("declared_licenses", [])
+        name = component.get("version", {}).get("pname", [""])[0]
+        version = component.get("version", {}).get("version", [""])[0]
+        ecosystem = component.get("version", {}).get("pecosystem", [""])[0]
+        component_summary = {
+            "ecosystem": ecosystem,
+            "name": name,
+            "version": version,
+            "licenses": licenses
+        }
+
+        return component_summary
+
+    def get_dependency_data(self, resolved, ecosystem):
+        """Get packages data form graph DB."""
+        result = []
+        url = os.getenv('GREMLIN_SERVICE_URL')
+        for elem in resolved:
+            if elem["package"] is None or elem["version"] is None:
+                _logger.warning("Either component name or component version is missing")
+                continue
+            qstring = \
+                "g.V().has('pecosystem', '{}').has('pname', '{}').has('version', '{}')"\
+                .format(ecosystem, elem["package"], elem["version"]) + \
+                ".as('version').in('has_version').as('package')" + \
+                ".select('version','package').by(valueMap());"
+
+            # qstring = \
+            #     "g.V().has('pecosystem', '{}').has('pname', '{}').has('version', '{}')" \
+            #         .format(ecosystem, elem["package"], elem["version"]) + \
+            #     ".valueMap('pecosystem', 'pname', 'version', 'declared_licenses')"
+            payload = {'gremlin': qstring}
+
+            try:
+                graph_req = get_session_retry().post(url, data=json.dumps(payload))
+
+                if graph_req.status_code == 200:
+                    graph_resp = graph_req.json()
+                    if 'result' not in graph_resp:
+                        continue
+                    if len(graph_resp['result']['data']) == 0:
+                        continue
+
+                    result.append(graph_resp["result"])
+                else:
+                    _logger.error("Failed retrieving dependency data.")
+                    continue
+            except Exception:
+                _logger.exception("Error retrieving dependency data!")
+                continue
+
+        return {"result": result}
+
+    def extract_user_stack_package_licenses(self, resolved, ecosystem):
+        """Extract packages details from graph result."""
+        user_stack = self.get_dependency_data(resolved, ecosystem)
+        list_package_licenses = []
+        if user_stack is not None:
+            for component in user_stack.get('result', []):
+                data = component.get("data", None)
+                if data:
+                    component_data = self.extract_component_details(data[0])
+                    license_scoring_input = {
+                        'package': component_data['name'],
+                        'version': component_data['version'],
+                        'licenses': component_data['licenses']
+                    }
+                    list_package_licenses.append(license_scoring_input)
+        analyzed_pkg = [x.get('package') for x in list_package_licenses]
+        for pk in resolved:
+            if not pk.get('licenses'):
+                pk.update({'licenses': list()})
+            if pk.get('package') not in analyzed_pkg:
+                list_package_licenses.append(pk)
+
+        return list_package_licenses
+
+    def _extract_conflict_packages(self, license_service_output):
+        """
+        Extract conflict packages from response.
+
+        It returns a list of pairs of packages whose licenses are in conflict.
+        Note that this information is only available when each component license
+        was identified ( i.e. no unknown and no component level conflict ) and
+        there was a stack level license conflict.
+
+        :param license_service_output: output of license analysis REST service
+        :return: list of pairs of packages whose licenses are in conflict
+        """
+        license_conflict_packages = []
+        if not license_service_output:
+            return license_conflict_packages
+
+        conflict_packages = license_service_output.get('conflict_packages', [])
+        for conflict_pair in conflict_packages:
+            list_pkgs = list(conflict_pair.keys())
+            assert len(list_pkgs) == 2
+            d = {
+                "package1": list_pkgs[0],
+                "license1": conflict_pair[list_pkgs[0]],
+                "package2": list_pkgs[1],
+                "license2": conflict_pair[list_pkgs[1]]
+            }
+            license_conflict_packages.append(d)
+
+        return license_conflict_packages
+
+    def _extract_unknown_licenses(self, license_service_output):
+        """
+        Extract unknown licenses from response.
+
+        At the moment, there are two types of unknowns:
+
+        a. really unknown licenses: those licenses, which are not understood by our system.
+        b. component level conflicting licenses: if a component has multiple licenses
+            associated then license analysis service tries to identify a representative
+            license for this component. If some licenses are in conflict, then its
+            representative license cannot be identified and this is another type of
+            'unknown' !
+
+        This function returns both types of unknown licenses.
+
+        :param license_service_output: output of license analysis REST service
+        :return: list of packages with unknown licenses and/or conflicting licenses
+        """
+        really_unknown_licenses = []
+        lic_conflict_licenses = []
+        if not license_service_output:
+            return really_unknown_licenses
+
+        if license_service_output.get('status', '') == 'Unknown':
+            list_components = license_service_output.get('packages', [])
+            for comp in list_components:
+                license_analysis = comp.get('license_analysis', {})
+                if license_analysis.get('status', '') == 'Unknown':
+                    pkg = comp.get('package', 'Unknown')
+                    comp_unknown_licenses = license_analysis.get('unknown_licenses', [])
+                    for lic in comp_unknown_licenses:
+                        really_unknown_licenses.append({
+                            'package': pkg,
+                            'license': lic
+                        })
+
+        if license_service_output.get('status', '') == 'ComponentLicenseConflict':
+            list_components = license_service_output.get('packages', [])
+            for comp in list_components:
+                license_analysis = comp.get('license_analysis', {})
+                if license_analysis.get('status', '') == 'Conflict':
+                    pkg = comp.get('package', 'Unknown')
+                    d = {
+                        "package": pkg
+                    }
+                    comp_conflict_licenses = license_analysis.get('conflict_licenses', [])
+                    list_conflicting_pairs = []
+                    for pair in comp_conflict_licenses:
+                        assert (len(pair) == 2)
+                        list_conflicting_pairs.append({
+                            'license1': pair[0],
+                            'license2': pair[1]
+                        })
+                    d['conflict_licenses'] = list_conflicting_pairs
+                    lic_conflict_licenses.append(d)
+
+        output = {
+            'really_unknown': really_unknown_licenses,
+            'component_conflict': lic_conflict_licenses
+        }
+        return output
+
+    def _extract_license_outliers(self, license_service_output):
+        """
+        Extract outliers from response.
+
+        :param license_service_output: output of license analysis REST service
+        :return: list of license outlier packages
+        """
+        outliers = []
+        if not license_service_output:
+            return outliers
+
+        outlier_packages = license_service_output.get('outlier_packages', {})
+        for pkg in outlier_packages.keys():
+            outliers.append({
+                'package': pkg,
+                'license': outlier_packages.get(pkg, 'Unknown')
+            })
+
+        return outliers
+
+    def license_recommender(self, input):
+        """
+        Perform a detailed license analysis for the given list of packages.
+
+        It first identifies representative license for each package. Then, it
+        computes representative license for the entire stack itself.
+
+        If there is any unknown license, this function will give up.
+
+        If there is any conflict then it returns pairs of conflicting licenses.
+
+        If a representative stack-license is possible, then it tries to identify
+        license based outlier packages.
+
+        :param payload: Input list of package information
+        :return: Detailed license analysis output
+        """
+        resolved = input['_resolved']
+        ecosystem = input['ecosystem']
+        user_stack_packages = self.extract_user_stack_package_licenses(resolved, ecosystem)
+        payload = {
+            "packages": user_stack_packages
+        }
+        resp = self.compute_stack_license(payload=payload)
+        output = resp
+        output['conflict_packages'] = self._extract_conflict_packages(resp)
+        output['outlier_packages'] = self._extract_license_outliers(resp)
+        output['unknown_licenses'] = self._extract_unknown_licenses(resp)
+        output['stack_license'] = [resp['stack_license']]
 
         return output

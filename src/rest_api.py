@@ -8,6 +8,12 @@ from flask_cors import CORS
 import sys
 import logging
 from src.stack_license import StackLicenseAnalyzer
+from src.auth import login_required, decode_token
+
+try:
+    from importlib import reload
+except ImportError:
+    from imp import reload
 
 
 # Python2.x: Make default encoding as UTF-8
@@ -42,6 +48,19 @@ def stack_license():
     # app.logger.debug("Stack analysis input: {}".format(input_json))
 
     response = app.stack_license_analyzer.compute_stack_license(payload=input_json)
+    # app.logger.debug("Stack analysis output: {}".format(response))
+
+    return flask.jsonify(response)
+
+
+@app.route('/api/v1/license-recommender', methods=['POST'])
+@login_required
+def stack_license_api():
+    """Handle the REST API endpoint /api/v1/license-recommender."""
+    input_json = request.get_json(force=True)
+    # app.logger.debug("Stack analysis input: {}".format(input_json))
+
+    response = app.stack_license_analyzer.license_recommender(input=input_json)
     # app.logger.debug("Stack analysis output: {}".format(response))
 
     return flask.jsonify(response)
