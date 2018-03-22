@@ -310,7 +310,9 @@ class StackLicenseAnalyzer(object):
     def get_dependency_data(self, resolved, ecosystem):
         """Get packages data form graph DB."""
         result = []
-        url = os.getenv('GREMLIN_SERVICE_URL')
+        URL = "http://{host}:{port}".format(
+            host=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_HOST", "localhost"),
+            port=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_PORT", "8182"))
         for elem in resolved:
             if elem["package"] is None or elem["version"] is None:
                 _logger.warning("Either component name or component version is missing")
@@ -328,7 +330,7 @@ class StackLicenseAnalyzer(object):
             payload = {'gremlin': qstring}
 
             try:
-                graph_req = get_session_retry().post(url, data=json.dumps(payload))
+                graph_req = get_session_retry().post(URL, data=json.dumps(payload))
 
                 if graph_req.status_code == 200:
                     graph_resp = graph_req.json()

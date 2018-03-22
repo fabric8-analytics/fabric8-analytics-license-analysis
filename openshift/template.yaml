@@ -48,8 +48,10 @@ objects:
                 key: keycloak-url
           - name: BAYESIAN_JWT_AUDIENCE
             value: "fabric8-online-platform,openshiftio-public"
-          - name: GREMLIN_SERVICE_URL
-            value: ${GREMLIN_SERVICE_URL}
+          - name: BAYESIAN_GREMLIN_HTTP_SERVICE_HOST
+            value: bayesian-gremlin-http
+          - name: BAYESIAN_GREMLIN_HTTP_SERVICE_PORT
+            value: "8182"
           name: f8a-license-analysis
           image: "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${IMAGE_TAG}"
           ports:
