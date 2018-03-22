@@ -39,7 +39,7 @@ License Analysis Service analyzes the given stack and returns the following:
 ```
 ENDPOINT: /api/vi/stack_license
 BODY: JSON data
-[
+{
     "packages": [
             {
                 "package": "p1",
@@ -47,7 +47,7 @@ BODY: JSON data
                 "licenses": ["APACHE", "EPL 1.0"]
             }
         ]
-]
+}
 ```
 
 
