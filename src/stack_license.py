@@ -306,7 +306,7 @@ class StackLicenseAnalyzer(object):
     def get_dependency_data(self, resolved, ecosystem):
         """Get packages data form graph DB."""
         result = []
-        GREMLIN_SERVER_URL_REST = "http://{host}:{port}".format(
+        URL = "http://{host}:{port}".format(
             host=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_HOST", "localhost"),
             port=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_PORT", "8182"))
         for elem in resolved:
@@ -326,7 +326,7 @@ class StackLicenseAnalyzer(object):
             payload = {'gremlin': qstring}
 
             try:
-                graph_req = get_session_retry().post(GREMLIN_SERVER_URL_REST, data=json.dumps(payload))
+                graph_req = get_session_retry().post(URL, data=json.dumps(payload))
 
                 if graph_req.status_code == 200:
                     graph_resp = graph_req.json()
