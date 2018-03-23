@@ -54,3 +54,7 @@ BODY: JSON data
 ## Tree used for license comparision
 
 ![License Diagram](https://user-images.githubusercontent.com/7105965/35150022-87594334-fd3e-11e7-8fad-380eaadf47fd.jpg)
+
+### References:
+
+* [The Free-Libre / Open Source Software (FLOSS) License Slide  by by David A. Wheeler](https://www.dwheeler.com/essays/floss-license-slide.pdf)
