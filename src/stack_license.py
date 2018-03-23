@@ -513,6 +513,5 @@ class StackLicenseAnalyzer(object):
         output['conflict_packages'] = self._extract_conflict_packages(resp)
         output['outlier_packages'] = self._extract_license_outliers(resp)
         output['unknown_licenses'] = self._extract_unknown_licenses(resp)
-        output['stack_license'] = [resp['stack_license']]
 
         return output
