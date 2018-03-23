@@ -208,9 +208,8 @@ class StackLicenseAnalyzer(object):
                     is_stack_license_possible = False
                 else:
                     list_comp_rep_licenses.append(la_output['representative_license'])
-                output['distinct_licenses'] = output['distinct_licenses'] + \
+            output['distinct_licenses'] = output['distinct_licenses'] + \
                     list(set(list_of_licenses))
-
             # Return if we could not compute license for some component
             if is_stack_license_possible is False:
                 # output['status'] should have been set already
