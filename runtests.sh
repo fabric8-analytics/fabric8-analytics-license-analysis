@@ -22,6 +22,20 @@ function prepare_venv() {
 
 # the module src/config.py must exists because it is included from stack_license and license_analysis.py as well.
 cp src/config.py.template src/config.py
+
+echo "*****************************************"
+echo "*** Cyclomatic complexity measurement ***"
+echo "*****************************************"
+radon cc -s -a -i venv .
+
+echo "*****************************************"
+echo "*** Maintainability Index measurement ***"
+echo "*****************************************"
+radon mi -s -i venv .
+
+echo "*****************************************"
+echo "*** Unit tests ***"
+echo "*****************************************"
 cd tests
 mkdir testdir1
 mkdir testdir4

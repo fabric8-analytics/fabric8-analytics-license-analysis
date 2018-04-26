@@ -33,3 +33,4 @@ python-dateutil==2.6.1    # via botocore
 s3transfer==0.1.10        # via boto3
 cython==0.25.2
 pandas==0.19.2
+radon

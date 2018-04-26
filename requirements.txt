@@ -50,3 +50,4 @@ six==1.10.0
 urllib3==1.21.1
 werkzeug==0.12.2
 wtforms==2.1
+radon==2.0.0
