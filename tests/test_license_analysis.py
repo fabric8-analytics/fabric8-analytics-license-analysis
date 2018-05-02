@@ -18,6 +18,7 @@ def test_print_graph():
 
 def test_compute_representative_license_successful():
     """Test the method LicenseAnalyzer.compute_representative_license()."""
+    # TODO: reduce cyclomatic complexity
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
     synonyms_dir = "synonyms"
@@ -281,6 +282,7 @@ def test_check_compatibility_input_sanity_checks():
 
 def test_check_compatibility():
     """Test the method LicenseAnalyzer.check_compatibility()."""
+    # TODO: reduce cyclomatic complexity
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
     synonyms_dir = "synonyms"
