@@ -1,0 +1,16 @@
+# base image source https://github.com/rhdt/EL-Dockerfiles/blob/master/base/python3/Dockerfile
+
+FROM prod.registry.devshift.net/osio-prod/base/python3:latest
+
+# install python packages
+COPY ./requirements.txt /
+RUN pip3 install -r requirements.txt && rm requirements.txt
+
+COPY ./src /src
+COPY ./tests/license_graph /license_graph
+COPY ./tests/synonyms /synonyms
+RUN cp /src/config.py.template /src/config.py
+
+ADD scripts/entrypoint.sh /bin/entrypoint.sh
+
+ENTRYPOINT ["/bin/entrypoint.sh"]
