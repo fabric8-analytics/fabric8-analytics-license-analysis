@@ -129,6 +129,7 @@ class StackLicenseAnalyzer(object):
         return output
 
     # TODO needs refactoring
+    # TODO: reduce cyclomatic complexity
     def compute_stack_license(self, payload):
         """Perform a detailed license analysis for the given list of packages.
 
