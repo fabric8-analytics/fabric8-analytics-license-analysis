@@ -44,6 +44,7 @@
     "AL 2.0": "apache 2.0",
     "AL2.0": "apache 2.0",
     "GPL": "gplv2",
+    "GPL-2.0": "gplv2",
     "new BSD": "bsd-new", 
     "GNU Lesser General Public License, Version 2.1": "lgplv2.1", 
     "Revised BSD": "bsd-new", 
