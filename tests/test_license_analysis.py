@@ -175,8 +175,9 @@ def test_compute_representative_license_conflict_2():
     assert "conflict_licenses" in output
     conflicts = output["conflict_licenses"]
     assert len(conflicts) == 2
-    assert 'gplv2' in conflicts[0]
-    assert 'apache 2.0' in conflicts[0]
+    assert 'gplv2' in conflicts[0] and 'gplv2' in conflicts[1]
+    assert 'apache 2.0' in conflicts[0] or 'apache 2.0' in conflicts[1]
+    assert 'gplv3+' in conflicts[1] or 'gplv3+' in conflicts[0]
 
 
 def test_compute_representative_license_conflict_3():
@@ -333,7 +334,8 @@ def test_check_compatibility():
     assert output['status'] == 'Successful'
     assert len(output['compatible_licenses']) == 2
     compatible_licenses = set(output['compatible_licenses'][0])
-    assert compatible_licenses == set(['mit', 'lgplv2.1'])
+    assert compatible_licenses == set(
+        ['mit', 'mpl 1.1']) or compatible_licenses == set(['mit', 'lgplv2.1'])
 
     lic_a = 'CDDL 1.1'
     list_lic_b = ['MIT', 'lgplv2.1', 'MPL 1.1']
