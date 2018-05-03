@@ -46,8 +46,8 @@ def test_compute_representative_license_successful():
 
     list_licenses = ['epl 1.0', 'lgplv3+']
     output = license_analyzer.compute_representative_license(list_licenses)
-    assert output['status'] == 'Successful'
-    assert output['representative_license'] == 'lgplv3+'
+    assert output['status'] == 'Conflict'
+    assert output['representative_license'] is None
 
     list_licenses = ['MIT', 'BSD', 'PD']
     output = license_analyzer.compute_representative_license(list_licenses)
@@ -61,8 +61,8 @@ def test_compute_representative_license_successful():
 
     list_licenses = ['GPL 2', 'W3C', 'APACHE', 'BOUNCYCASTLE', 'CDDL 2', 'CPAL']
     output = license_analyzer.compute_representative_license(list_licenses)
-    assert output['status'] == 'Successful'
-    assert output['representative_license'] == 'gplv2'
+    assert output['status'] == 'Conflict'
+    assert output['representative_license'] is None
 
     list_licenses = ['CPAL', 'CPL', 'EPL', 'MIT']
     output = license_analyzer.compute_representative_license(list_licenses)
@@ -136,10 +136,11 @@ def test_compute_representative_license_no_conflict_2():
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
     list_licenses = ['MIT', 'APACHE', 'MPL 1.1', 'lgplv2.1', 'lgplv3+']
     output = license_analyzer.compute_representative_license(list_licenses)
-    assert output['status'] == 'Successful'
-    assert output['representative_license'] == 'gplv3+'
+    assert output['status'] == 'Conflict'
+    assert output['representative_license'] is None
     assert "conflict_licenses" in output
-    assert output['conflict_licenses'] == []
+    conflicts = output["conflict_licenses"]
+    assert len(conflicts) == 3
 
 
 def test_compute_representative_license_conflict_1():
@@ -173,9 +174,9 @@ def test_compute_representative_license_conflict_2():
     assert output['representative_license'] is None
     assert "conflict_licenses" in output
     conflicts = output["conflict_licenses"]
-    assert len(conflicts) == 1
+    assert len(conflicts) == 2
     assert 'gplv2' in conflicts[0]
-    assert 'gplv3+' in conflicts[0]
+    assert 'apache 2.0' in conflicts[0]
 
 
 def test_compute_representative_license_conflict_3():
@@ -319,17 +320,20 @@ def test_check_compatibility():
     list_lic_b = ['APACHE', 'MIT']
     output = license_analyzer.check_compatibility(lic_a, list_lic_b)
     assert output['status'] == 'Successful'
-    assert len(output['compatible_licenses']) == 1
-    compatible_licenses = set(output['compatible_licenses'][0])
-    assert compatible_licenses == set(['apache 2.0', 'mit'])
+    assert len(output['compatible_licenses']) == 2
+    compatible_licenses1 = set(output['compatible_licenses'][0])
+    compatible_licenses2 = set(output['compatible_licenses'][1])
+    assert (compatible_licenses2 == set(['mit', 'apache 2.0']) or
+            compatible_licenses1 == set(['mit', 'apache 2.0']))
+    assert (compatible_licenses2 == set(['mit']) or compatible_licenses1 == set(['mit']))
 
     lic_a = 'APACHE'
     list_lic_b = ['MIT', 'lgplv2.1', 'MPL 1.1']
     output = license_analyzer.check_compatibility(lic_a, list_lic_b)
     assert output['status'] == 'Successful'
-    assert len(output['compatible_licenses']) == 1
+    assert len(output['compatible_licenses']) == 2
     compatible_licenses = set(output['compatible_licenses'][0])
-    assert compatible_licenses == set(['mit', 'lgplv2.1', 'mpl 1.1'])
+    assert compatible_licenses == set(['mit', 'lgplv2.1'])
 
     lic_a = 'CDDL 1.1'
     list_lic_b = ['MIT', 'lgplv2.1', 'MPL 1.1']
@@ -337,7 +341,7 @@ def test_check_compatibility():
     assert output['status'] == 'Successful'
     assert len(output['compatible_licenses']) == 1
     compatible_licenses = set(output['compatible_licenses'][0])
-    assert compatible_licenses == set(['lgplv2.1', 'mit', 'mpl 1.1'])
+    assert compatible_licenses == set(['mit', 'mpl 1.1'])
 
     lic_a = 'PD'
     list_lic_b = ['MIT', 'BSD (2 clause)']
