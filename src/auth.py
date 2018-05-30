@@ -11,9 +11,8 @@ from src.utils import fetch_public_key
 jwt.register_algorithm('RS256', RSAAlgorithm(RSAAlgorithm.SHA256))
 
 
-def decode_token():
+def decode_token(token):
     """Decode JWT token entered by the user."""
-    token = request.headers.get('Authorization')
     if token is None:
         return {}
 
@@ -39,6 +38,11 @@ def decode_token():
     return decoded_token
 
 
+def get_token_from_auth_header():
+    """Get the authorization token read from the request header."""
+    return request.headers.get('Authorization')
+
+
 def login_required(view):
     """Validate the token entered by the user."""
     def wrapper(*args, **kwargs):
@@ -50,7 +54,8 @@ def login_required(view):
         user = None
 
         try:
-            decoded = decode_token()
+            token = get_token_from_auth_header()
+            decoded = decode_token(token)
             if not decoded:
                 lgr.exception(
                     'Provide an Authorization token with the API request')
