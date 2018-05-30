@@ -299,9 +299,8 @@ def test_check_compatibility_input_sanity_checks():
     assert not output['compatible_licenses']
 
 
-def test_check_compatibility():
-    """Test the method LicenseAnalyzer.check_compatibility()."""
-    # TODO: reduce cyclomatic complexity
+def test_check_compatibility_some_unknown_licenses():
+    """Test the method LicenseAnalyzer.check_compatibility() - some unknown licenses."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
     synonyms_dir = "synonyms"
@@ -318,6 +317,15 @@ def test_check_compatibility():
     assert not output['conflict_licenses']
     assert not output['compatible_licenses']
 
+
+def test_check_compatibility_all_permissive_licenses():
+    """Test the method LicenseAnalyzer.check_compatibility() - all licenses are permissive."""
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+
     lic_a = 'APACHE'
     list_lic_b = ['PD', 'MIT', 'BSD']  # all permissive
     output = license_analyzer.check_compatibility(lic_a, list_lic_b)
@@ -333,6 +341,15 @@ def test_check_compatibility():
     assert len(output['compatible_licenses']) == 1
     compatible_licenses = set(output['compatible_licenses'][0])
     assert compatible_licenses == set(['public domain', 'mit', 'bsd-new'])
+
+
+def test_check_compatibility():
+    """Test the method LicenseAnalyzer.check_compatibility()."""
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
 
     lic_a = 'PD'
     list_lic_b = ['APACHE', 'MIT']
