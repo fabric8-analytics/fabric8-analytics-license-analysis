@@ -16,9 +16,8 @@ def test_print_graph():
     license_analyzer.print_license_graph()
 
 
-def test_compute_representative_license_successful():
-    """Test the method LicenseAnalyzer.compute_representative_license()."""
-    # TODO: reduce cyclomatic complexity
+def test_compute_representative_license_no_licenses():
+    """Test the method LicenseAnalyzer.compute_representative_license() - none licenses found."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
     synonyms_dir = "synonyms"
@@ -34,6 +33,25 @@ def test_compute_representative_license_successful():
     assert output['status'] == 'Failure'
     assert output['representative_license'] is None
 
+    list_licenses = ['epl 1.0', 'lgplv3+']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] == 'Conflict'
+    assert output['representative_license'] is None
+
+    list_licenses = ['GPL 2', 'W3C', 'APACHE', 'BOUNCYCASTLE', 'CDDL 2', 'CPAL']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] == 'Conflict'
+    assert output['representative_license'] is None
+
+
+def test_compute_representative_license_one_license():
+    """Test the method LicenseAnalyzer.compute_representative_license() - one license found."""
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+
     list_licenses = ['This software released into the public domain. Anyone is free to copy']
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] == 'Successful'
@@ -43,11 +61,6 @@ def test_compute_representative_license_successful():
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] == 'Successful'
     assert output['representative_license'] == 'mit'
-
-    list_licenses = ['epl 1.0', 'lgplv3+']
-    output = license_analyzer.compute_representative_license(list_licenses)
-    assert output['status'] == 'Conflict'
-    assert output['representative_license'] is None
 
     list_licenses = ['MIT', 'BSD', 'PD']
     output = license_analyzer.compute_representative_license(list_licenses)
@@ -59,15 +72,19 @@ def test_compute_representative_license_successful():
     assert output['status'] == 'Successful'
     assert output['representative_license'] == 'apache 2.0'
 
-    list_licenses = ['GPL 2', 'W3C', 'APACHE', 'BOUNCYCASTLE', 'CDDL 2', 'CPAL']
-    output = license_analyzer.compute_representative_license(list_licenses)
-    assert output['status'] == 'Conflict'
-    assert output['representative_license'] is None
-
     list_licenses = ['CPAL', 'CPL', 'EPL', 'MIT']
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] == 'Successful'
     assert output['representative_license'] == 'mpl 2.0'
+
+
+def test_compute_representative_license_outlier_licenses():
+    """Test the method LicenseAnalyzer.compute_representative_license() - outlier licenses."""
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
 
     list_licenses = ['MIT', 'BSD', 'PD', 'APACHE', 'CDDL 1.0']
     output = license_analyzer.compute_representative_license(list_licenses)
@@ -282,9 +299,8 @@ def test_check_compatibility_input_sanity_checks():
     assert not output['compatible_licenses']
 
 
-def test_check_compatibility():
-    """Test the method LicenseAnalyzer.check_compatibility()."""
-    # TODO: reduce cyclomatic complexity
+def test_check_compatibility_some_unknown_licenses():
+    """Test the method LicenseAnalyzer.check_compatibility() - some unknown licenses."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)
     synonyms_dir = "synonyms"
@@ -301,6 +317,15 @@ def test_check_compatibility():
     assert not output['conflict_licenses']
     assert not output['compatible_licenses']
 
+
+def test_check_compatibility_all_permissive_licenses():
+    """Test the method LicenseAnalyzer.check_compatibility() - all licenses are permissive."""
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
+
     lic_a = 'APACHE'
     list_lic_b = ['PD', 'MIT', 'BSD']  # all permissive
     output = license_analyzer.check_compatibility(lic_a, list_lic_b)
@@ -316,6 +341,15 @@ def test_check_compatibility():
     assert len(output['compatible_licenses']) == 1
     compatible_licenses = set(output['compatible_licenses'][0])
     assert compatible_licenses == set(['public domain', 'mit', 'bsd-new'])
+
+
+def test_check_compatibility():
+    """Test the method LicenseAnalyzer.check_compatibility()."""
+    src_dir = "license_graph"
+    graph_store = LocalFileSystem(src_dir=src_dir)
+    synonyms_dir = "synonyms"
+    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
+    license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
 
     lic_a = 'PD'
     list_lic_b = ['APACHE', 'MIT']
