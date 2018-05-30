@@ -8,6 +8,12 @@ from os import getenv
 from src.exceptions import HTTPError
 from src.utils import fetch_public_key
 
+# just to make sure the following statement does not raise an exception
+try:
+    jwt.unregister_algorithm('RS256')
+except KeyError:
+    pass
+
 jwt.register_algorithm('RS256', RSAAlgorithm(RSAAlgorithm.SHA256))
 
 
