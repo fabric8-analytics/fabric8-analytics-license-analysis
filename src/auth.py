@@ -8,12 +8,22 @@ from os import getenv
 from src.exceptions import HTTPError
 from src.utils import fetch_public_key
 
+# just to make sure the following statement does not raise an exception
+try:
+    jwt.unregister_algorithm('RS256')
+except KeyError:
+    pass
+
 jwt.register_algorithm('RS256', RSAAlgorithm(RSAAlgorithm.SHA256))
 
 
-def decode_token():
+def get_audiences():
+    """Retrieve all JWT audiences."""
+    return current_app.config.get('BAYESIAN_JWT_AUDIENCE').split(',')
+
+
+def decode_token(token):
     """Decode JWT token entered by the user."""
-    token = request.headers.get('Authorization')
     if token is None:
         return {}
 
@@ -21,7 +31,10 @@ def decode_token():
         _, token = token.split(' ', 1)
 
     pub_key = fetch_public_key(current_app)
-    audiences = current_app.config.get('BAYESIAN_JWT_AUDIENCE').split(',')
+    audiences = get_audiences()
+
+    decoded_token = None
+
     for aud in audiences:
         try:
             decoded_token = jwt.decode(token, pub_key, audience=aud)
@@ -39,9 +52,15 @@ def decode_token():
     return decoded_token
 
 
+def get_token_from_auth_header():
+    """Get the authorization token read from the request header."""
+    return request.headers.get('Authorization')
+
+
 def login_required(view):
     """Validate the token entered by the user."""
     def wrapper(*args, **kwargs):
+        """Check if the login is required and if the user can be authorized."""
         # Disable authentication for local setup
         if getenv('DISABLE_AUTHENTICATION') in ('1', 'True', 'true'):
             return view(*args, **kwargs)
@@ -50,7 +69,8 @@ def login_required(view):
         user = None
 
         try:
-            decoded = decode_token()
+            token = get_token_from_auth_header()
+            decoded = decode_token(token)
             if not decoded:
                 lgr.exception(
                     'Provide an Authorization token with the API request')
