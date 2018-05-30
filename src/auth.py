@@ -11,6 +11,11 @@ from src.utils import fetch_public_key
 jwt.register_algorithm('RS256', RSAAlgorithm(RSAAlgorithm.SHA256))
 
 
+def get_audiences():
+    """Retrieve all JWT audiences."""
+    return current_app.config.get('BAYESIAN_JWT_AUDIENCE').split(',')
+
+
 def decode_token(token):
     """Decode JWT token entered by the user."""
     if token is None:
@@ -20,7 +25,8 @@ def decode_token(token):
         _, token = token.split(' ', 1)
 
     pub_key = fetch_public_key(current_app)
-    audiences = current_app.config.get('BAYESIAN_JWT_AUDIENCE').split(',')
+    audiences = get_audiences()
+
     for aud in audiences:
         try:
             decoded_token = jwt.decode(token, pub_key, audience=aud)
