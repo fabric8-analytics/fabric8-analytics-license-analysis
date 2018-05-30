@@ -27,6 +27,8 @@ def decode_token(token):
     pub_key = fetch_public_key(current_app)
     audiences = get_audiences()
 
+    decoded_token = None
+
     for aud in audiences:
         try:
             decoded_token = jwt.decode(token, pub_key, audience=aud)
@@ -52,6 +54,7 @@ def get_token_from_auth_header():
 def login_required(view):
     """Validate the token entered by the user."""
     def wrapper(*args, **kwargs):
+        """Check if the login is required and if the user can be authorized."""
         # Disable authentication for local setup
         if getenv('DISABLE_AUTHENTICATION') in ('1', 'True', 'true'):
             return view(*args, **kwargs)
