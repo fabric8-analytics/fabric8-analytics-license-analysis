@@ -5,6 +5,7 @@ import pytest
 from unittest.mock import *
 
 from src.auth import *
+from src.utils import *
 
 
 def mocked_fetch_public_key_1(app):
@@ -27,39 +28,39 @@ def mocked_get_audiences_2():
     return ["audience1", "audience2"]
 
 
-@patch("src.get_audiences", side_effect=mocked_get_audiences)
-@patch("src.fetch_public_key", side_effect=mocked_fetch_public_key_1)
+@patch("auth.get_audiences", side_effect=mocked_get_audiences)
+@patch("auth.fetch_public_key", side_effect=mocked_fetch_public_key_1)
 def test_decode_token_invalid_input_1(mocked_fetch_public_key, x):
     """Test the invalid input handling during token decoding."""
     assert decode_token(None) == {}
 
 
-@patch("src.get_audiences", side_effect=mocked_get_audiences)
-@patch("src.fetch_public_key", side_effect=mocked_fetch_public_key_1)
+@patch("auth.get_audiences", side_effect=mocked_get_audiences)
+@patch("auth.fetch_public_key", side_effect=mocked_fetch_public_key_1)
 def test_decode_token_invalid_input_2(mocked_fetch_public_key, x):
     """Test the invalid input handling during token decoding."""
     with pytest.raises(Exception):
         assert decode_token("Foobar") is None
 
 
-@patch("src.get_audiences", side_effect=mocked_get_audiences)
-@patch("src.fetch_public_key", side_effect=mocked_fetch_public_key_1)
+@patch("auth.get_audiences", side_effect=mocked_get_audiences)
+@patch("auth.fetch_public_key", side_effect=mocked_fetch_public_key_1)
 def test_decode_token_invalid_input_3(mocked_fetch_public_key, x):
     """Test the invalid input handling during token decoding."""
     with pytest.raises(Exception):
         assert decode_token("Bearer ") is None
 
 
-@patch("src.get_audiences", side_effect=mocked_get_audiences)
-@patch("src.fetch_public_key", side_effect=mocked_fetch_public_key_2)
+@patch("auth.get_audiences", side_effect=mocked_get_audiences)
+@patch("auth.fetch_public_key", side_effect=mocked_fetch_public_key_2)
 def test_decode_token_invalid_input_4(mocked_fetch_public_key, x):
     """Test the invalid input handling during token decoding."""
     with pytest.raises(Exception):
         assert decode_token("Bearer ") is None
 
 
-@patch("src.get_audiences", side_effect=mocked_get_audiences_2())
-@patch("src.fetch_public_key", side_effect=mocked_fetch_public_key_2)
+@patch("auth.get_audiences", side_effect=mocked_get_audiences_2())
+@patch("auth.fetch_public_key", side_effect=mocked_fetch_public_key_2)
 def test_decode_token_invalid_input_5(mocked_fetch_public_key, mocked_get_audiences):
     """Test the handling wrong JWT tokens."""
     with pytest.raises(Exception):
