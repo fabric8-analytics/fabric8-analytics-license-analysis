@@ -128,6 +128,18 @@ class StackLicenseAnalyzer(object):
         }
         return output
 
+    def get_outlier_packages(self, la_output, dict_lic_pkgs):
+        """Get outlier packages."""
+        if len(la_output['outlier_licenses']) > 0:
+            outlier_pkg = {}
+            for lic in la_output['outlier_licenses']:
+                for pkg in dict_lic_pkgs[lic]:
+                    outlier_pkg[pkg] = lic
+            return outlier_pkg
+        else:
+            return {}
+        return outlier_pkg
+
     # TODO needs refactoring
     # TODO: reduce cyclomatic complexity
     def compute_stack_license(self, payload):
@@ -260,14 +272,7 @@ class StackLicenseAnalyzer(object):
                 output['conflict_packages'] = list_conflict_pkg
                 output['status'] = 'StackConflict'
 
-            if (len(la_output['outlier_licenses'])) > 0:
-                outlier_pkg = {}
-                for lic in la_output['outlier_licenses']:
-                    for pkg in dict_lic_pkgs[lic]:
-                        outlier_pkg[pkg] = lic
-                output['outlier_packages'] = outlier_pkg
-            else:
-                output['outlier_packages'] = {}
+            output['outlier_packages'] = self.get_outlier_packages(la_output, dict_lic_pkgs)
 
             # Analyze further and generate info for license filters
             # let us try to compute representative license for each alternate component
