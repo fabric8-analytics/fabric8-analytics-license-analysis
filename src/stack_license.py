@@ -140,6 +140,20 @@ class StackLicenseAnalyzer(object):
             return {}
         return outlier_pkg
 
+    def get_conflict_packages(self, la_output, dict_lic_pkgs):
+        """Get conflict packages."""
+        list_conflict_lic = la_output['conflict_licenses']
+        list_conflict_pkg = []
+        for lic1, lic2 in list_conflict_lic:
+            for pkg1 in dict_lic_pkgs[lic1]:
+                for pkg2 in dict_lic_pkgs[lic2]:
+                    pkg_group = {
+                        pkg1: lic1,
+                        pkg2: lic2
+                    }
+                    list_conflict_pkg.append(pkg_group)
+        return list_conflict_pkg
+
     # TODO needs refactoring
     # TODO: reduce cyclomatic complexity
     def compute_stack_license(self, payload):
@@ -259,17 +273,7 @@ class StackLicenseAnalyzer(object):
             output['stack_license'] = la_output['representative_license']
 
             if la_output['status'] == 'Conflict':
-                list_conflict_lic = la_output['conflict_licenses']
-                list_conflict_pkg = []
-                for lic1, lic2 in list_conflict_lic:
-                    for pkg1 in dict_lic_pkgs[lic1]:
-                        for pkg2 in dict_lic_pkgs[lic2]:
-                            pkg_group = {
-                                pkg1: lic1,
-                                pkg2: lic2
-                            }
-                            list_conflict_pkg.append(pkg_group)
-                output['conflict_packages'] = list_conflict_pkg
+                output['conflict_packages'] = self.get_conflict_packages(la_output, dict_lic_pkgs)
                 output['status'] = 'StackConflict'
 
             output['outlier_packages'] = self.get_outlier_packages(la_output, dict_lic_pkgs)
