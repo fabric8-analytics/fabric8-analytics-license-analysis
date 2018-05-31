@@ -494,6 +494,49 @@ def test_get_depencency_data5(mock_get_session_retry):
     assert depencency_data["result"] == []
 
 
+def mocked_get_session_retry6():
+    """Implement mocked function get_session_retry()."""
+    result = {
+        "result": {
+            "data": [{
+                "version": {
+                    "declared_licenses": ["license1"],
+                    "pname": ["The package"],
+                    "version": ["1.0.0"],
+                    "pecosystem": ["Maven"]
+                }}]
+         }
+    }
+    return _gremlin_response(200, True, result)
+
+
+@patch('src.stack_license.get_session_retry', side_effect=mocked_get_session_retry6)
+def test_extract_user_stack_package_licenses(mock_get_session_retry):
+    """Test the extract_user_stack_package_licenses method."""
+    resolved = RESOLVED_PACKAGES
+    resolved = [
+        {"package": "The package",
+         "version": "1.0.0"},
+        {"package": "The package",
+         "version": "2.0.0"},
+    ]
+
+    depencency_data = stack_license_analyzer.extract_user_stack_package_licenses(resolved, "Maven")
+    assert depencency_data is not None
+    dependencies = len(depencency_data)
+    assert dependencies == 2
+
+    for i in range(0, dependencies):
+        d = depencency_data[0]
+        # package check
+        assert "package" in d
+        assert d["package"] == "The package"
+        # licence check
+        assert "licenses" in d
+        assert len(d["licenses"]) == 1
+        assert d["licenses"][0] == "license1"
+
+
 def test_convert_version_to_proper_semantic():
     """Test the convert_version_to_proper_semantic function."""
     versions = [
