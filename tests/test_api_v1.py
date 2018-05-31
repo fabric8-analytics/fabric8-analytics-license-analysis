@@ -50,3 +50,21 @@ def test_stack_license_endpoint(client):
     assert "status" in json_data
     assert json_data["status"] == "Successful"
     assert json_data['stack_license'] == 'gplv2'
+
+
+def test_license_recommender_endpoint_empty_payload(client):
+    """Test the endpont /api/v1/license_recommender."""
+    payload = {}
+    with pytest.raises(Exception):
+        response = client.post(api_route_for("license-recommender"), data=json.dumps(payload))
+
+
+def test_license_recommender_endpoint_payload(client):
+    """Test the endpont /api/v1/license_recommender."""
+    payload = {"_resolved": [],
+               "ecosystem": "pypi"}
+    response = client.post(api_route_for("license-recommender"), data=json.dumps(payload))
+    assert response.status_code == 200
+    json_data = get_json_from_response(response)
+    assert "status" in json_data
+    assert json_data["status"] == "Failure"

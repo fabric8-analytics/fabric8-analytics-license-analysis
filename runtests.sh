@@ -20,6 +20,8 @@ function prepare_venv() {
 
 [ "$NOVENV" == "1" ] || prepare_venv || exit 1
 
+export DISABLE_AUTHENTICATION=1
+
 # the module src/config.py must exists because it is included from stack_license and license_analysis.py as well.
 cp src/config.py.template src/config.py
 
