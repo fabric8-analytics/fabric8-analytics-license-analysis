@@ -384,6 +384,116 @@ def test_extract_license_outliers():
     _check_package(p2)
 
 
+class _gremlin_response:
+
+    def __init__(self, status_code, ok, json):
+        self.status_code = status_code
+        self.ok = ok
+        self._json = json
+
+    def post(self, url, data):
+        return self
+
+    def json(self):
+        return self._json
+
+
+def mocked_get_session_retry():
+    """Implement mocked function get_session_retry()."""
+    return _gremlin_response(200, True, "")
+
+
+RESOLVED_PACKAGES = [
+    {"package": "The package",
+     "version": "1.0.0"},
+    {"package": None,
+     "version": "1.0.0"},
+    {"package": "The package 2",
+     "version": None}
+]
+
+
+@patch('src.stack_license.get_session_retry', side_effect=mocked_get_session_retry)
+def test_get_depencency_data(mock_get_session_retry):
+    """Test the get_dependency_data method."""
+    resolved = RESOLVED_PACKAGES
+    depencency_data = stack_license_analyzer.get_dependency_data(resolved, "Maven")
+    assert depencency_data is not None
+    assert "result" in depencency_data
+    assert depencency_data["result"] == []
+
+
+def mocked_get_session_retry2():
+    """Implement mocked function get_session_retry()."""
+    return _gremlin_response(404, False, "")
+
+
+@patch('src.stack_license.get_session_retry', side_effect=mocked_get_session_retry2)
+def test_get_depencency_data2(mock_get_session_retry):
+    """Test the get_dependency_data method."""
+    resolved = RESOLVED_PACKAGES
+    depencency_data = stack_license_analyzer.get_dependency_data(resolved, "Maven")
+    assert depencency_data is not None
+    assert "result" in depencency_data
+    assert depencency_data["result"] == []
+
+
+def mocked_get_session_retry3():
+    """Implement mocked function get_session_retry()."""
+    result = {
+        "result": {
+            "data": []
+         }
+    }
+    return _gremlin_response(200, True, result)
+
+
+@patch('src.stack_license.get_session_retry', side_effect=mocked_get_session_retry3)
+def test_get_depencency_data3(mock_get_session_retry):
+    """Test the get_dependency_data method."""
+    resolved = RESOLVED_PACKAGES
+    depencency_data = stack_license_analyzer.get_dependency_data(resolved, "Maven")
+    assert depencency_data is not None
+    assert "result" in depencency_data
+    assert depencency_data["result"] == []
+
+
+def mocked_get_session_retry4():
+    """Implement mocked function get_session_retry()."""
+    result = {
+        "result": {
+            "data": ["this is fake result"]
+         }
+    }
+    return _gremlin_response(200, True, result)
+
+
+@patch('src.stack_license.get_session_retry', side_effect=mocked_get_session_retry4)
+def test_get_depencency_data4(mock_get_session_retry):
+    """Test the get_dependency_data method."""
+    resolved = RESOLVED_PACKAGES
+    depencency_data = stack_license_analyzer.get_dependency_data(resolved, "Maven")
+    assert depencency_data is not None
+    assert "result" in depencency_data
+    assert "data" in depencency_data["result"][0]
+
+
+def mocked_get_session_retry5():
+    """Implement mocked function get_session_retry()."""
+    raise Exception("something wrong happened")
+
+
+@patch('src.stack_license.get_session_retry', side_effect=mocked_get_session_retry5)
+def test_get_depencency_data5(mock_get_session_retry):
+    """Test the get_dependency_data method."""
+    resolved = RESOLVED_PACKAGES
+    depencency_data = stack_license_analyzer.get_dependency_data(resolved, "Maven")
+    assert depencency_data is not None
+    assert depencency_data is not None
+    assert "result" in depencency_data
+    assert depencency_data["result"] == []
+
+
 def test_convert_version_to_proper_semantic():
     """Test the convert_version_to_proper_semantic function."""
     versions = [
