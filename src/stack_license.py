@@ -138,7 +138,6 @@ class StackLicenseAnalyzer(object):
             return outlier_pkg
         else:
             return {}
-        return outlier_pkg
 
     def get_conflict_packages(self, la_output, dict_lic_pkgs):
         """Get conflict packages."""
