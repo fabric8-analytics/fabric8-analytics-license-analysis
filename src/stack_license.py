@@ -197,7 +197,7 @@ class StackLicenseAnalyzer(object):
         try:
             # First, let us try to compute representative license for each component
             list_comp_rep_licenses = []
-            distinct_licenses = []
+            distinct_licenses = set()
             is_stack_license_possible = True
             for pkg in output['packages']:
                 list_of_licenses = []
@@ -207,10 +207,10 @@ class StackLicenseAnalyzer(object):
                     s = syn.get(lic)
                     if s:
                         list_of_licenses.append(s)
-                        distinct_licenses.append(s)
+                        distinct_licenses.add(s)
                     else:
                         list_of_licenses.append(lic)
-                        distinct_licenses.append(lic)
+                        distinct_licenses.add(lic)
 
                 pkg['license_analysis'] = {
                     'status': la_output['status'],
@@ -239,7 +239,7 @@ class StackLicenseAnalyzer(object):
                 else:
                     list_comp_rep_licenses.append(la_output['representative_license'])
             output['distinct_licenses'] = output['distinct_licenses'] + \
-                list(set(distinct_licenses))
+                list(distinct_licenses)
             # Return if we could not compute license for some component
             if is_stack_license_possible is False:
                 # output['status'] should have been set already
