@@ -1,5 +1,7 @@
 #! /bin/bash
 
+COVERAGE_THRESHOLD=90
+
 
 threshold=0.6
 
@@ -41,4 +43,4 @@ echo "*****************************************"
 cd tests
 mkdir testdir1
 mkdir testdir4
-PYTHONDONTWRITEBYTECODE=1 python3 `which pytest` --cov=../src/ --cov-report term-missing -vv .
+PYTHONDONTWRITEBYTECODE=1 python3 `which pytest` --cov=../src/ --cov-report term-missing --cov-fail-under=$COVERAGE_THRESHOLD -vv .
