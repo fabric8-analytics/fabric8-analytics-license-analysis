@@ -1,6 +1,6 @@
 # base image source https://github.com/rhdt/EL-Dockerfiles/blob/master/base/python3/Dockerfile
 
-FROM prod.registry.devshift.net/osio-prod/base/python3:latest
+FROM quay.io/openshiftio/rhel-base-python3:latest
 
 # install python packages
 COPY ./requirements.txt /

@@ -119,13 +119,13 @@ parameters:
   displayName: Docker registry
   required: true
   name: DOCKER_REGISTRY
-  value: "registry.devshift.net"
+  value: "quay.io"
 
 - description: Docker image to use
   displayName: Docker image
   required: true
   name: DOCKER_IMAGE
-  value: "fabric8-analytics/license-analysis"
+  value: "openshiftio/rhel-fabric8-analytics-license-analysis"
 
 - description: Image tag
   displayName: Image tag
