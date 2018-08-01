@@ -5,6 +5,7 @@ from imp import reload
 import flask
 from flask import Flask, request
 from flask_cors import CORS
+from functools import lru_cache
 import sys
 import logging
 from src.stack_license import StackLicenseAnalyzer
@@ -30,6 +31,7 @@ CORS(app)
 
 
 @app.before_first_request
+@lru_cache(maxsize=32)
 def load_model():
     """Initialize the stack license analyzer before the first request."""
     app.stack_license_analyzer = StackLicenseAnalyzer()
