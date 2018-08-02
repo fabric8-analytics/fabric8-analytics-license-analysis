@@ -40,7 +40,7 @@ objects:
           - name: MAJORITY_THRESHOLD
             value: "0.6"
           - name: DISABLE_AUTHENTICATION
-            value: "1"
+            value: "0"
           - name: BAYESIAN_FETCH_PUBLIC_KEY
             valueFrom:
               configMapKeyRef:
