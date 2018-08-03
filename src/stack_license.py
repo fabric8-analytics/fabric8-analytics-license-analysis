@@ -180,6 +180,13 @@ class StackLicenseAnalyzer(object):
             logging.debug("stack license analysis input is invalid")
             return output
 
+        for pkg in payload['packages']:
+            if pkg.get('package') is None or pkg.get('version') is None:
+                output = {
+                    'status': 'Failure',
+                    'message': 'Either component name or component version is missing'
+                }
+                return output
         output = payload  # output info will be inserted inside payload structure
         count_comp_no_license = 0  # keep track of number of component with no license
         output['conflict_packages'] = []
