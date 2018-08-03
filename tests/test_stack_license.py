@@ -317,8 +317,7 @@ def test_unexpected_exception_handling():
     output = stack_license_analyzer.compute_stack_license(payload=payload)
     assert output is not None
     assert output['status'] == 'Failure'
-    assert output['stack_license'] is None
-    assert output['message'] == "Some unexpected exception happened!"
+    assert output['message'] == "Input was invalid"
 
 
 def _check_package(package):
