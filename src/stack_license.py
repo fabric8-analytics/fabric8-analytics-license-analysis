@@ -181,7 +181,6 @@ class StackLicenseAnalyzer(object):
             return output
 
         for pkg in payload['packages']:
-            print(pkg)
             if pkg.get('package') is None or pkg.get('version') is None:
                 output = {
                     'status': 'Failure',
