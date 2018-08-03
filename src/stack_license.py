@@ -172,7 +172,7 @@ class StackLicenseAnalyzer(object):
         :return: Detailed license analysis output
         """
         # check input
-        if not payload or not payload.get('packages'):
+        if not payload or not payload.get('packages') or type(payload.get('packages')) != list:
             output = {
                 'status': 'Failure',
                 'message': 'Input was invalid'
