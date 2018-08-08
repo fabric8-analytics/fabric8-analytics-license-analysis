@@ -96,7 +96,7 @@ def login_required(view):
             g.current_user = user
         else:
             g.current_user = APIUser('unauthenticated@no.auth.token')
-            return flask.jsonify('Authentication required'), 401
+            return flask.jsonify(dict(error='Authentication required')), 401
         return view(*args, **kwargs)
     return wrapper
 
