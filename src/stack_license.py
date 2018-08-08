@@ -13,6 +13,7 @@ import logging
 import traceback
 import semantic_version as sv
 from src.config import DATA_DIR
+from src.utils import http_error
 from src.util.data_store.local_filesystem import LocalFileSystem
 
 _logger = logging.getLogger(__name__)
@@ -522,14 +523,14 @@ class StackLicenseAnalyzer(object):
         :return: Detailed license analysis output
         """
         if input.get('_resolved') is None or input.get('ecosystem') is None:
-            return flask.jsonify(dict(error="Either list of packages or ecosystem value is "
-                                            "missing from payload")), 400
+            return http_error("Either list of packages or ecosystem value is missing "
+                              "from payload"), 400
 
         else:
             for pkg in input.get('_resolved'):
                 if pkg.get('package') is None or pkg.get('version') is None:
-                    return flask.jsonify(dict(error="Either component name or component "
-                                                    "version is missing from payload")), 400
+                    return http_error("Either component name or component version is missing "
+                                      "from payload"), 400
             resolved = input['_resolved']
             ecosystem = input['ecosystem']
             user_stack_packages = self.extract_user_stack_package_licenses(resolved, ecosystem)
