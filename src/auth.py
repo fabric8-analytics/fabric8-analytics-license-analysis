@@ -83,7 +83,7 @@ def login_required(view):
         except jwt.ExpiredSignatureError as exc:
             lgr.exception('Expired JWT token')
             decoded = {'email': 'unauthenticated@jwt.failed'}
-            return flask.jsonify('Authentication failed - token has expired'), 401
+            return flask.jsonify(dict('Authentication failed - token has expired')), 401
         except Exception as exc:
             lgr.exception('Failed decoding JWT token')
             decoded = {'email': 'unauthenticated@jwt.failed'}
