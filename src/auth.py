@@ -3,10 +3,11 @@
 from flask import current_app, request, g
 from flask_security import UserMixin
 import jwt
+import flask
 from jwt.contrib.algorithms.pycrypto import RSAAlgorithm
 from os import getenv
 from src.exceptions import HTTPError
-from src.utils import fetch_public_key
+from src.utils import fetch_public_key, http_error
 
 # just to make sure the following statement does not raise an exception
 try:
@@ -25,7 +26,7 @@ def get_audiences():
 def decode_token(token):
     """Decode JWT token entered by the user."""
     if token is None:
-        return {}
+        return http_error('Auth token audience cannot be verified.'), 401
 
     if token.startswith('Bearer '):
         _, token = token.split(' ', 1)
@@ -47,8 +48,8 @@ def decode_token(token):
             break
 
     if decoded_token is None:
-        raise jwt.InvalidTokenError('Auth token audience cannot be verified.')
-
+        # raise jwt.InvalidTokenError('Auth token audience cannot be verified.')
+        return {}
     return decoded_token
 
 
@@ -74,18 +75,18 @@ def login_required(view):
             if not decoded:
                 lgr.exception(
                     'Provide an Authorization token with the API request')
-                raise HTTPError(401, 'Authentication failed - token missing')
+                return http_error('Authentication failed - Not a valid Auth token provided'), 401
 
             lgr.info('Successfuly authenticated user {e} using JWT'.
                      format(e=decoded.get('email')))
         except jwt.ExpiredSignatureError as exc:
             lgr.exception('Expired JWT token')
             decoded = {'email': 'unauthenticated@jwt.failed'}
-            raise HTTPError(401, 'Authentication failed - token has expired') from exc
+            return http_error('Authentication failed - token has expired'), 401
         except Exception as exc:
             lgr.exception('Failed decoding JWT token')
             decoded = {'email': 'unauthenticated@jwt.failed'}
-            raise HTTPError(401, 'Authentication failed - could not decode JWT token') from exc
+            return http_error('Authentication failed - could not decode JWT token'), 401
         else:
             user = APIUser(decoded.get('email', 'nobody@nowhere.nodomain'))
 
@@ -93,7 +94,7 @@ def login_required(view):
             g.current_user = user
         else:
             g.current_user = APIUser('unauthenticated@no.auth.token')
-            raise HTTPError(401, 'Authentication required')
+            return http_error('Authentication required'), 401
         return view(*args, **kwargs)
     return wrapper
 

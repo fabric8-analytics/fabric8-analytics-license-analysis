@@ -62,8 +62,7 @@ def stack_license_api():
 
     response = app.stack_license_analyzer.license_recommender(input=input_json)
     # app.logger.debug("Stack analysis output: {}".format(response))
-
-    return flask.jsonify(response)
+    return response
 
 
 if __name__ == "__main__":

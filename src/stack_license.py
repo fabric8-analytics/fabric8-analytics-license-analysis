@@ -3,6 +3,7 @@
 import os
 import requests
 import json
+import flask
 
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
@@ -12,6 +13,7 @@ import logging
 import traceback
 import semantic_version as sv
 from src.config import DATA_DIR
+from src.utils import http_error
 from src.util.data_store.local_filesystem import LocalFileSystem
 
 _logger = logging.getLogger(__name__)
@@ -520,16 +522,25 @@ class StackLicenseAnalyzer(object):
         :param payload: Input list of package information
         :return: Detailed license analysis output
         """
-        resolved = input['_resolved']
-        ecosystem = input['ecosystem']
-        user_stack_packages = self.extract_user_stack_package_licenses(resolved, ecosystem)
-        payload = {
-            "packages": user_stack_packages
-        }
-        resp = self.compute_stack_license(payload=payload)
-        output = resp
-        output['conflict_packages'] = self._extract_conflict_packages(resp)
-        output['outlier_packages'] = self._extract_license_outliers(resp)
-        output['unknown_licenses'] = self._extract_unknown_licenses(resp)
+        if input.get('_resolved') is None or input.get('ecosystem') is None:
+            return http_error("Either list of packages or ecosystem value is missing "
+                              "from payload"), 400
 
-        return output
+        else:
+            for pkg in input.get('_resolved'):
+                if pkg.get('package') is None or pkg.get('version') is None:
+                    return http_error("Either component name or component version is missing "
+                                      "from payload"), 400
+            resolved = input['_resolved']
+            ecosystem = input['ecosystem']
+            user_stack_packages = self.extract_user_stack_package_licenses(resolved, ecosystem)
+            payload = {
+                "packages": user_stack_packages
+            }
+            resp = self.compute_stack_license(payload=payload)
+            output = resp
+            output['conflict_packages'] = self._extract_conflict_packages(resp)
+            output['outlier_packages'] = self._extract_license_outliers(resp)
+            output['unknown_licenses'] = self._extract_unknown_licenses(resp)
+
+            return flask.jsonify(output)
