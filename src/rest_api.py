@@ -28,7 +28,6 @@ app = Flask(__name__)
 app.config.from_object('config')
 CORS(app)
 
-
 @app.before_first_request
 def load_model():
     """Initialize the stack license analyzer before the first request."""
@@ -39,7 +38,6 @@ def load_model():
 def heart_beat():
     """Handle the REST API endpoint /."""
     return flask.jsonify({"status": "ok"})
-
 
 @app.route('/api/v1/stack_license', methods=['POST'])
 def stack_license():
@@ -52,18 +50,17 @@ def stack_license():
 
     return flask.jsonify(response)
 
-
 @app.route('/api/v1/license-recommender', methods=['POST'])
 @login_required
 def stack_license_api():
     """Handle the REST API endpoint /api/v1/license-recommender."""
+
     input_json = request.get_json(force=True)
     # app.logger.debug("Stack analysis input: {}".format(input_json))
 
     response = app.stack_license_analyzer.license_recommender(input=input_json)
     # app.logger.debug("Stack analysis output: {}".format(response))
-
-    return flask.jsonify(response)
+    return response
 
 
 if __name__ == "__main__":
