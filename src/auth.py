@@ -75,7 +75,8 @@ def login_required(view):
             if not decoded:
                 lgr.exception(
                     'Provide an Authorization token with the API request')
-                return flask.jsonify(dict(error='Authentication failed - Not a valid Auth token provided')), 401
+                return flask.jsonify(dict(error='Authentication failed - Not a valid Auth token '
+                                                'provided')), 401
 
             lgr.info('Successfuly authenticated user {e} using JWT'.
                      format(e=decoded.get('email')))
@@ -86,7 +87,8 @@ def login_required(view):
         except Exception as exc:
             lgr.exception('Failed decoding JWT token')
             decoded = {'email': 'unauthenticated@jwt.failed'}
-            return flask.jsonify(dict(error='Authentication failed - could not decode JWT token')), 401
+            return flask.jsonify(dict(error='Authentication failed - could not decode JWT '
+                                            'token')), 401
         else:
             user = APIUser(decoded.get('email', 'nobody@nowhere.nodomain'))
 
