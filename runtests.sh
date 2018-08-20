@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# each command can cause test failure
+set -e
+
 COVERAGE_THRESHOLD=90
 
 export TERM=xterm
