@@ -70,7 +70,8 @@ def mocked_get_audiences_3():
 @patch("auth.fetch_public_key", side_effect=mocked_fetch_public_key_1)
 def test_decode_token_invalid_input_1(mocked_fetch_public_key, mocked_get_audiences):
     """Test the invalid input handling during token decoding."""
-    assert decode_token(None) == {}
+    with pytest.raises(Exception):
+        assert decode_token(None) == {}
 
 
 @patch("auth.get_audiences", side_effect=mocked_get_audiences)
