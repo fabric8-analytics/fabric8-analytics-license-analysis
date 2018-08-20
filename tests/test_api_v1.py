@@ -55,8 +55,12 @@ def test_stack_license_endpoint(client):
 def test_license_recommender_endpoint_empty_payload(client):
     """Test the endpont /api/v1/license_recommender."""
     payload = {}
-    with pytest.raises(Exception):
-        response = client.post(api_route_for("license-recommender"), data=json.dumps(payload))
+    response = client.post(api_route_for("license-recommender"), data=json.dumps(payload))
+    assert response.status_code == 400
+    json_data = get_json_from_response(response)
+    assert "error" in json_data
+    assert json_data["error"] == \
+        "Either list of packages or ecosystem value is missing from payload"
 
 
 def test_license_recommender_endpoint_payload(client):
