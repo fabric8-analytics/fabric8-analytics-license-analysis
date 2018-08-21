@@ -2,10 +2,9 @@
 
 from unittest.mock import *
 import pytest
-import os
 
 from src.util.data_store.s3_data_store import S3DataStore
-from tests.s3_mocks import MockedS3Data, MockedS3Resource, MockedS3Objects, MockedS3Bucket
+from tests.s3_mocks import MockedS3Resource, MockedS3Bucket
 from tests.pandas_mocks import MockedData
 
 
@@ -89,7 +88,7 @@ def test_list_files_mocked_s3():
 
 
 @patch('src.util.data_store.s3_data_store.S3DataStore.list_files', return_value=['file1', 'file2'])
-def test_read_all_json_files_positive(mocked_object):
+def test_read_all_json_files_positive(_mocked_object):
     """Check the method read_all_json_files()."""
     s3DataStore = S3DataStore("bucket", "access_key", "secret_key")
     s3DataStore.s3_resource = MockedS3Resource()
@@ -133,7 +132,7 @@ def test_write_pandas_df_into_json_file():
 
 
 @patch('src.util.data_store.s3_data_store.pd', return_value="json data")
-def test_read_json_file_into_pandas_df(mocked_df):
+def test_read_json_file_into_pandas_df(_mocked_df):
     """Check the method read_json_file_into_pandas_df()."""
     s3DataStore = S3DataStore("bucket", "access_key", "secret_key")
     s3DataStore.s3_resource = MockedS3Resource()

@@ -1,6 +1,5 @@
 """Tests for the class LocalFileSystem."""
 
-import pytest
 import os
 
 from src.config import DATA_DIR

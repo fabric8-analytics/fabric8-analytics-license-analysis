@@ -177,7 +177,7 @@ def test_component_license_failure():
 
 # this does not needs to be tested, the special handling code has been commented out in sources
 @patch('src.stack_license.len', return_value=0)
-def __test_component_license_weird_failure(mocking_object):
+def __test_component_license_weird_failure(_mocking_object):
     """Test how the package w/o any license is handled."""
     payload = {
         'packages': [
@@ -391,6 +391,8 @@ class _gremlin_response:
         self._json = json
 
     def post(self, url, data):
+        assert url
+        assert data
         return self
 
     def json(self):
@@ -413,7 +415,7 @@ RESOLVED_PACKAGES = [
 
 
 @patch('src.stack_license.get_session_retry', side_effect=mocked_get_session_retry)
-def test_get_depencency_data(mock_get_session_retry):
+def test_get_depencency_data(_mock_get_session_retry):
     """Test the get_dependency_data method."""
     resolved = RESOLVED_PACKAGES
     depencency_data = stack_license_analyzer.get_dependency_data(resolved, "Maven")
@@ -428,7 +430,7 @@ def mocked_get_session_retry2():
 
 
 @patch('src.stack_license.get_session_retry', side_effect=mocked_get_session_retry2)
-def test_get_depencency_data2(mock_get_session_retry):
+def test_get_depencency_data2(_mock_get_session_retry):
     """Test the get_dependency_data method."""
     resolved = RESOLVED_PACKAGES
     depencency_data = stack_license_analyzer.get_dependency_data(resolved, "Maven")
@@ -448,7 +450,7 @@ def mocked_get_session_retry3():
 
 
 @patch('src.stack_license.get_session_retry', side_effect=mocked_get_session_retry3)
-def test_get_depencency_data3(mock_get_session_retry):
+def test_get_depencency_data3(_mock_get_session_retry):
     """Test the get_dependency_data method."""
     resolved = RESOLVED_PACKAGES
     depencency_data = stack_license_analyzer.get_dependency_data(resolved, "Maven")
@@ -468,7 +470,7 @@ def mocked_get_session_retry4():
 
 
 @patch('src.stack_license.get_session_retry', side_effect=mocked_get_session_retry4)
-def test_get_depencency_data4(mock_get_session_retry):
+def test_get_depencency_data4(_mock_get_session_retry):
     """Test the get_dependency_data method."""
     resolved = RESOLVED_PACKAGES
     depencency_data = stack_license_analyzer.get_dependency_data(resolved, "Maven")
@@ -483,7 +485,7 @@ def mocked_get_session_retry5():
 
 
 @patch('src.stack_license.get_session_retry', side_effect=mocked_get_session_retry5)
-def test_get_depencency_data5(mock_get_session_retry):
+def test_get_depencency_data5(_mock_get_session_retry):
     """Test the get_dependency_data method."""
     resolved = RESOLVED_PACKAGES
     depencency_data = stack_license_analyzer.get_dependency_data(resolved, "Maven")
@@ -510,7 +512,7 @@ def mocked_get_session_retry6():
 
 
 @patch('src.stack_license.get_session_retry', side_effect=mocked_get_session_retry6)
-def test_extract_user_stack_package_licenses(mock_get_session_retry):
+def test_extract_user_stack_package_licenses(_mock_get_session_retry):
     """Test the extract_user_stack_package_licenses method."""
     resolved = RESOLVED_PACKAGES
     resolved = [

@@ -1,12 +1,6 @@
 """Unit tests for the REST API module."""
 
 import json
-import os
-import urllib.parse as urlparse
-
-from flask import current_app, url_for
-import pytest
-import requests
 
 
 def api_route_for(route):
