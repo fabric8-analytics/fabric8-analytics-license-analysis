@@ -1,11 +1,11 @@
 """Unit tests for token handling functions."""
 
 import pytest
-from unittest.mock import *
+from unittest.mock import patch
 import jwt
 from jwt.contrib.algorithms.pycrypto import RSAAlgorithm
 
-from auth import *
+from auth import decode_token
 
 
 def setup_module(_module):
@@ -83,7 +83,7 @@ def test_decode_token_invalid_input_2(_mocked_fetch_public_key, _mocked_get_audi
 
 @patch("auth.get_audiences", side_effect=mocked_get_audiences)
 @patch("auth.fetch_public_key", side_effect=mocked_fetch_public_key_1)
-def _test_decode_token_invalid_input_3(_mocked_fetch_public_key, _mocked_get_audiences):
+def test_decode_token_invalid_input_3(_mocked_fetch_public_key, _mocked_get_audiences):
     """Test the invalid input handling during token decoding."""
     with pytest.raises(Exception):
         assert decode_token("Bearer ") is None
