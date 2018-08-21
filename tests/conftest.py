@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.rest_api import *
+from src.rest_api import app
 
 
 @pytest.fixture

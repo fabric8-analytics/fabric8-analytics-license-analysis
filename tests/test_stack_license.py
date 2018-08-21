@@ -1,7 +1,8 @@
 """Unit tests for the StackLicenseAnalyzer module."""
 
-from unittest.mock import *
-from src.stack_license import *
+from unittest.mock import patch
+from src.stack_license import StackLicenseAnalyzer
+from src.stack_license import convert_version_to_proper_semantic, select_latest_version
 
 
 # single instance of stack license analyzer

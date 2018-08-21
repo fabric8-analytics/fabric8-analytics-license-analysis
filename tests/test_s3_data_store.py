@@ -1,6 +1,6 @@
 """Tests for the class S3DataStore."""
 
-from unittest.mock import *
+from unittest.mock import patch
 import pytest
 
 from src.util.data_store.s3_data_store import S3DataStore
