@@ -1,6 +1,5 @@
 """Unit tests for the errors module."""
 
-import unittest
 import pytest
 from src.exceptions import HTTPError
 

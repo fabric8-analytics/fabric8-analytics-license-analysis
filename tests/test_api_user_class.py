@@ -1,6 +1,5 @@
 """Unit tests for the APIUser class."""
 
-import unittest
 from src.auth import APIUser
 
 

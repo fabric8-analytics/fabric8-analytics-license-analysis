@@ -244,12 +244,13 @@ class MockedVertice:
 
     def get_prop_value(self, prop_name=None):
         """Get property value."""
+        print(prop_name)
         return None
 
 
 @patch('src.directed_graph.DirectedGraph.find_common_reachable_vertices',
        return_value=[MockedVertice(), MockedVertice()])
-def test_compute_representative_error_checking(mocking_object):
+def test_compute_representative_error_checking(_mocking_object):
     """Test the method LicenseAnalyzer.compute_representative_license() for correct behaviour."""
     src_dir = "license_graph"
     graph_store = LocalFileSystem(src_dir=src_dir)

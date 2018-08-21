@@ -27,6 +27,7 @@ class MockedS3Object:
 
     def put(self, Body=None):
         """Fake the behaviour of put method."""
+        assert Body
         return
 
 
@@ -39,6 +40,8 @@ class MockedS3Resource:
 
     def Object(self, bucket_name, filename):
         """Fake the behaviour of Object constructor."""
+        assert bucket_name
+        assert filename
         return MockedS3Object()
 
 
@@ -57,6 +60,7 @@ class MockedS3Objects:
 
     def filter(self, Prefix=None):
         """Fake the behaviour of filter method."""
+        print(Prefix)
         # TODO: implement proper filter?
         return [MockedS3Object("file1"),
                 MockedS3Object("file3")]
