@@ -48,7 +48,8 @@ class LicenseAnalyzer(object):
             'postgresql',
             'apache 1.1',
             'cpl 1.0',
-            'cpal 1.0'
+            'cpal 1.0',
+            'ISC'
         ]
 
         # IMPORTANT: Order matters in the following tuple
