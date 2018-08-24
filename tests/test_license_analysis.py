@@ -62,6 +62,11 @@ def test_compute_representative_license_one_license():
     assert output['status'] == 'Successful'
     assert output['representative_license'] == 'mit'
 
+    list_licenses = ['PD', 'MIT', 'ISC']
+    output = license_analyzer.compute_representative_license(list_licenses)
+    assert output['status'] == 'Successful'
+    assert output['representative_license'] == 'ISC'
+
     list_licenses = ['MIT', 'BSD', 'PD']
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] == 'Successful'

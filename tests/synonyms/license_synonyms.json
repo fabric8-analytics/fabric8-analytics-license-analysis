@@ -353,5 +353,7 @@
     "CDDL 2": "cddlv1.1+",
     "CDDL 1.0": "cddlv1.1+",
     "MPL 2.0": "mpl 2.0",
-    "MPLv2.0": "mpl 2.0"
+    "MPLv2.0": "mpl 2.0",
+    "ISC": "ISC",
+    "Internet Systems Consortium ": "ISC"
 }
