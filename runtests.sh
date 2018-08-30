@@ -34,6 +34,7 @@ function prepare_venv() {
     fi
 
     ${VIRTUALENV} -p python3 venv && source venv/bin/activate && python3 "$(which pip3)" install -r requirements.txt
+    
     if [ $? -ne 0 ]
     then
         printf "%sPython virtual environment can't be initialized%s" "${RED}" "${NORMAL}"

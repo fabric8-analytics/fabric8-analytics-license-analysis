@@ -8,7 +8,7 @@ from flask_cors import CORS
 import sys
 import logging
 from src.stack_license import StackLicenseAnalyzer
-from src.auth import login_required
+from fabric8a_auth.auth import login_required, decode_token
 
 try:
     from importlib import reload

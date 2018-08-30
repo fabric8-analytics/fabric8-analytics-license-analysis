@@ -9,6 +9,7 @@ RUN yum install -y epel-release && \
 # install python packages
 COPY ./requirements.txt /
 RUN pip3 install -r requirements.txt && rm requirements.txt
+RUN pip3 install git+https://github.com/humaton/fabric8-analytics-auth.git@devel
 
 COPY ./src /src
 COPY ./tests/license_graph /license_graph
