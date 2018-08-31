@@ -305,8 +305,8 @@ def test_stack_licenses_computation():
     output = stack_license_analyzer.compute_stack_license(payload=payload)
     assert output is not None
     assert output['status'] == 'Successful'
-    assert output['stack_license'] == 'cddlv1.1+'
-    assert output["outlier_packages"] == {'p1': 'cddlv1.1+'}
+    assert output['stack_license'] == 'epl 1.0'
+    assert output["outlier_packages"] == {'p1': 'epl 1.0'}
 
 
 def test_unexpected_exception_handling():

@@ -584,7 +584,8 @@ class LicenseAnalyzer(object):
 
         # now, we need to find compatibility class for lic_b and every lic_b
         lic_a_group = self._get_compatibility_classes(lic_a)
-        assert(len(lic_a_group) > 0)
+        print(len(lic_a_group))
+        # assert(len(lic_a_group) > 0)
         lic_b_groups = {lic_b: self._get_compatibility_classes(lic_b) for lic_b in list_lic_b}
 
         # initialize dict that maps every lic_b to one of lic_a's compatibility classes
