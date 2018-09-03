@@ -1,5 +1,5 @@
 {
   "license": "epl 1.0",
   "type": "WP",
-  "neighbours": ["cddl_v1.1+"]
+  "neighbours": []
 }
