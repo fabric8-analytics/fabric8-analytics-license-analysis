@@ -96,7 +96,7 @@ def test_compute_representative_license_outlier_licenses():
     list_licenses = ['MIT', 'BSD', 'MPL 2.0']
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] == 'Successful'
-    assert output['representative_license'] == 'lgplv2.1'
+    assert output['representative_license'] == 'mpl 2.0'
     assert set(output['outlier_licenses']) == set(['mpl 2.0'])
 
     list_licenses = ['MIT', 'BSD', 'PD', 'lgplv2.1', 'lgplv3+']
@@ -360,18 +360,12 @@ def test_check_compatibility():
     output = license_analyzer.check_compatibility(lic_a, list_lic_b)
     assert output['status'] == 'Successful'
     assert len(output['compatible_licenses']) == 2
-    compatible_licenses = set(output['compatible_licenses'][0])
-    assert (compatible_licenses2 == set(['mit']) or
-            compatible_licenses1 == set(['mit']))
-    assert (compatible_licenses2 == set(['apache 2.0', 'mit']) or
-            compatible_licenses1 == set(['apache 2.0', 'mit']))
-    lic_a = 'Eclipse Public License'
-    list_lic_b = ['MIT', 'lgplv2.1', 'MPL 2.0']
-    output = license_analyzer.check_compatibility(lic_a, list_lic_b)
-    assert output['status'] == 'Successful'
-    assert len(output['compatible_licenses']) == 1
-    compatible_licenses = set(output['compatible_licenses'][0])
-    assert compatible_licenses == set(['lgplv2.1', 'mit'])
+    compatible_licenses1 = set(output['compatible_licenses'][0])
+    compatible_licenses2 = set(output['compatible_licenses'][1])
+    assert (compatible_licenses2 == set(['lgplv2.1', 'mit', 'mpl 1.1']) or
+            compatible_licenses1 == set(['lgplv2.1', 'mit', 'mpl 1.1']))
+    assert (compatible_licenses2 == set(['lgplv2.1', 'mit']) or
+            compatible_licenses1 == set(['lgplv2.1', 'mit']))
 
     lic_a = 'PD'
     list_lic_b = ['MIT', 'BSD (2 clause)']
@@ -381,9 +375,10 @@ def test_check_compatibility():
     compatible_licenses = set(output['compatible_licenses'][0])
     assert compatible_licenses == set(['bsd-simplified', 'mit'])
 
-    lic_a = 'Eclipse Public License'
+    lic_a = 'CPL'
     list_lic_b = ['MIT', 'CPAL', 'PostgreSQL', 'JSON']
     output = license_analyzer.check_compatibility(lic_a, list_lic_b)
+    print(output)
     assert output['status'] == 'Successful'
     assert len(output['compatible_licenses']) == 1
     compatible_licenses = set(output['compatible_licenses'][0])
