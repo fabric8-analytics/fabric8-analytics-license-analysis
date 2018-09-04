@@ -378,7 +378,6 @@ def test_check_compatibility():
     lic_a = 'CPL'
     list_lic_b = ['MIT', 'CPAL', 'PostgreSQL', 'JSON']
     output = license_analyzer.check_compatibility(lic_a, list_lic_b)
-    print(output)
     assert output['status'] == 'Successful'
     assert len(output['compatible_licenses']) == 1
     compatible_licenses = set(output['compatible_licenses'][0])
