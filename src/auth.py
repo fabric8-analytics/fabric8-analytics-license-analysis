@@ -79,11 +79,11 @@ def login_required(view):
 
             lgr.info('Successfuly authenticated user {e} using JWT'.
                      format(e=decoded.get('email')))
-        except jwt.ExpiredSignatureError as exc:
+        except jwt.ExpiredSignatureError:
             lgr.exception('Expired JWT token')
             decoded = {'email': 'unauthenticated@jwt.failed'}
             return http_error('Authentication failed - token has expired'), 401
-        except Exception as exc:
+        except Exception:
             lgr.exception('Failed decoding JWT token')
             decoded = {'email': 'unauthenticated@jwt.failed'}
             return http_error('Authentication failed - could not decode JWT token'), 401

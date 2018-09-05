@@ -11,6 +11,7 @@ from tests.pandas_mocks import MockedData
 def test_initial_state():
     """Check the initial state of S3DataStore object."""
     s3DataStore = S3DataStore("bucket", "access_key", "secret_key")
+    assert s3DataStore
 
 
 def test_get_name():
