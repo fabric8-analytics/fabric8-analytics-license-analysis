@@ -3,10 +3,8 @@
 from flask import current_app, request, g
 from flask_security import UserMixin
 import jwt
-import flask
 from jwt.contrib.algorithms.pycrypto import RSAAlgorithm
 from os import getenv
-from src.exceptions import HTTPError
 from src.utils import fetch_public_key, http_error
 
 # just to make sure the following statement does not raise an exception
