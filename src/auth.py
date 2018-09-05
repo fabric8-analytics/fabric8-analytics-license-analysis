@@ -3,10 +3,8 @@
 from flask import current_app, request, g
 from flask_security import UserMixin
 import jwt
-import flask
 from jwt.contrib.algorithms.pycrypto import RSAAlgorithm
 from os import getenv
-from src.exceptions import HTTPError
 from src.utils import fetch_public_key, http_error
 
 # just to make sure the following statement does not raise an exception
@@ -79,11 +77,11 @@ def login_required(view):
 
             lgr.info('Successfuly authenticated user {e} using JWT'.
                      format(e=decoded.get('email')))
-        except jwt.ExpiredSignatureError as exc:
+        except jwt.ExpiredSignatureError:
             lgr.exception('Expired JWT token')
             decoded = {'email': 'unauthenticated@jwt.failed'}
             return http_error('Authentication failed - token has expired'), 401
-        except Exception as exc:
+        except Exception:
             lgr.exception('Failed decoding JWT token')
             decoded = {'email': 'unauthenticated@jwt.failed'}
             return http_error('Authentication failed - could not decode JWT token'), 401
