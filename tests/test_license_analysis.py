@@ -133,7 +133,7 @@ def test_compute_representative_license_no_conflict():
     list_licenses = ['APACHE', 'MPL 2.0']
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] == 'Successful'
-    assert output['representative_license'] == 'lgplv3+'
+    assert output['representative_license'] == 'mpl 2.0'
     assert "conflict_licenses" in output
     assert not output['conflict_licenses']
     assert not output['outlier_licenses']
@@ -183,10 +183,10 @@ def test_compute_representative_license_conflict_2():
     assert output['representative_license'] is None
     assert "conflict_licenses" in output
     conflicts = output["conflict_licenses"]
-    assert len(conflicts) == 2
-    assert 'gplv2' in conflicts[0] and 'gplv2' in conflicts[1]
-    assert 'apache 2.0' in conflicts[0] or 'apache 2.0' in conflicts[1]
-    assert 'gplv3+' in conflicts[1] or 'gplv3+' in conflicts[0]
+    assert len(conflicts) == 1
+    assert 'gplv2' in conflicts[0] and 'gplv3+' in conflicts[0]
+    # assert 'apache 2.0' in conflicts[0] or 'apache 2.0' in conflicts[1]
+    # assert 'gplv3+' in conflicts[1] or 'gplv3+' in conflicts[0]
 
 
 def test_compute_representative_license_conflict_3():
@@ -348,12 +348,9 @@ def test_check_compatibility():
     list_lic_b = ['APACHE', 'MIT']
     output = license_analyzer.check_compatibility(lic_a, list_lic_b)
     assert output['status'] == 'Successful'
-    assert len(output['compatible_licenses']) == 2
-    compatible_licenses1 = set(output['compatible_licenses'][0])
-    compatible_licenses2 = set(output['compatible_licenses'][1])
-    assert (compatible_licenses2 == set(['mit', 'apache 2.0']) or
-            compatible_licenses1 == set(['mit', 'apache 2.0']))
-    assert (compatible_licenses2 == set(['mit']) or compatible_licenses1 == set(['mit']))
+    assert len(output['compatible_licenses']) == 1
+    compatible_licenses = set(output['compatible_licenses'][0])
+    assert compatible_licenses == set(['apache 2.0', 'mit'])
 
     lic_a = 'APACHE'
     list_lic_b = ['MIT', 'lgplv2.1', 'MPL 1.1']

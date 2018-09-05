@@ -1,5 +1,5 @@
 {
   "license": "apache 2.0",
   "type": "P",
-  "neighbours": ["lgpl_v3+"]
+  "neighbours": ["lgpl_v3+", "mpl_2.0"]
 }
