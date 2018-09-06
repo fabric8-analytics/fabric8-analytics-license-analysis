@@ -87,7 +87,7 @@ class S3DataStore(AbstractDataStore):
         self.write_json_file(filename=filename, contents=data.to_json())
         return None
 
-    def read_json_file_into_pandas_df(self, filename, index_col=False):
+    def read_json_file_into_pandas_df(self, filename):
         """Read Pandas results in JSON format from the AWS S3."""
         json_string = self.read_json_file(filename=filename)
         return pd.read_json(json_string)
