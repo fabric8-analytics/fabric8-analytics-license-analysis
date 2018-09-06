@@ -59,12 +59,12 @@ class LocalFileSystem(AbstractDataStore):
             json.dump(contents, outfile)
         return None
 
-    def upload_file(self, src, target):
+    def upload_file(self, _src, _target):
         """Upload file into data store."""
         # self.bucket.upload_file(src, target)
         return None
 
-    def download_file(self, src, target):
+    def download_file(self, _src, _target):
         """Download file from data store."""
         # self.bucket.download_file(src, target)
         return None
@@ -86,5 +86,6 @@ class LocalFileSystem(AbstractDataStore):
     @classmethod
     def convert_list_of_tuples_to_string(cls, tuple_list):
         """Perform conversion from list of tuples to string."""
+        assert cls
         string_value = str(tuple_list)
         return string_value
