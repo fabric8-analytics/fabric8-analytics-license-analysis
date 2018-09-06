@@ -133,6 +133,8 @@
     "Rsfs": "unknown",
     "modify": "unknown", 
     "BSD-derived (http://www.repoze.org/LICENSE.txt)": "bsd-new",
+    "The New BSD License": "bsd-new",
+    "Apache Public License 2.0": "apache 2.0",
     "The Apache Software License": "apache 2.0",
     "Eclipse Public License": "epl 1.0",
     "lgpl": "lgplv2.1",
