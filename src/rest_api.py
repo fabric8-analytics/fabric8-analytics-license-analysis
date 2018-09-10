@@ -10,17 +10,6 @@ import logging
 from src.stack_license import StackLicenseAnalyzer
 from src.auth import login_required
 
-try:
-    from importlib import reload
-except ImportError:
-    from imp import reload
-
-
-# Python2.x: Make default encoding as UTF-8
-if sys.version_info.major == 2:
-    reload(sys)
-    sys.setdefaultencoding('UTF8')
-
 
 # logging.basicConfig(filename='/tmp/error.log', level=logging.DEBUG)
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
