@@ -1,7 +1,5 @@
 """Definition of all REST API endpoints of the license analysis module."""
 
-from imp import reload
-
 import flask
 from flask import Flask, request
 from flask_cors import CORS
