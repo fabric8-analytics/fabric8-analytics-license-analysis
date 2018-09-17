@@ -2,7 +2,8 @@
 
 from unittest.mock import patch
 from src.stack_license import StackLicenseAnalyzer
-from src.stack_license import convert_version_to_proper_semantic, select_latest_version
+from src.stack_license import convert_version_to_proper_semantic, select_latest_version,\
+    filter_incorrect_splitting
 
 
 # single instance of stack license analyzer
@@ -319,6 +320,16 @@ def test_unexpected_exception_handling():
     assert output is not None
     assert output['status'] == 'Failure'
     assert output['message'] == "Input was invalid"
+
+
+def test_filter_incorrect_splitting():
+    """Test to check and rectify the incorrect splitting of licenses."""
+    incorrect_splitted_license1 = ["The Apache License", "Version 2.0", "EPL"]
+    incorrect_splitted_license2 = ["Apache Software License", "Version 1.1", "MIT"]
+    assert set(filter_incorrect_splitting(incorrect_splitted_license1)) == \
+        set(["The Apache License, Version 2.0", "EPL"])
+    assert set(filter_incorrect_splitting(incorrect_splitted_license2)) == \
+        set(["Apache Software License, Version 1.1", "MIT"])
 
 
 def _check_package(package):
