@@ -119,6 +119,7 @@
     "Baekmuk": "unknown", 
     "MIT or BSD": "bsd-simplified",
     "Bouncy Castle License": "bouncycastle",
+    "Bouncy Castle Licence": "bouncycastle",
     "BOUNCYCASTLE": "bouncycastle",
     "Apache License v2.0": "apache 2.0", 
     "The Apache Software License, Version 1.1": "apache 1.1",
