@@ -258,12 +258,18 @@ class StackLicenseAnalyzer(object):
                 if la_output['status'] == 'Failure':
                     count_comp_no_license = count_comp_no_license + 1
                     output['status'] = 'Failure'
+                    output['message'] = 'Cannot calculate stack license due to unknown' \
+                                        'dependencies or license not supported.'
                     is_stack_license_possible = False
                 elif la_output['status'] == 'Conflict':
                     output['status'] = 'ComponentConflict'
+                    output['message'] = 'Cannot calculate stack license due to component' \
+                                        ' conflict.'
                     is_stack_license_possible = False
                 elif la_output['status'] == 'Unknown':
                     output['status'] = 'Unknown'
+                    output['message'] = 'Cannot calculate stack license due to unknown' \
+                                        'dependencies or license not supported.'
                     is_stack_license_possible = False
 
                 if la_output['representative_license'] is None:
@@ -277,8 +283,6 @@ class StackLicenseAnalyzer(object):
             if is_stack_license_possible is False:
                 # output['status'] should have been set already
                 output['stack_license'] = None
-                output['message'] = "No declared licenses found for {} component(s).". \
-                    format(count_comp_no_license)
                 return output
 
             # INFO: the following check is not necessary because the control
@@ -311,6 +315,7 @@ class StackLicenseAnalyzer(object):
             if la_output['status'] == 'Conflict':
                 output['conflict_packages'] = self.get_conflict_packages(la_output, dict_lic_pkgs)
                 output['status'] = 'StackConflict'
+                output['message'] = 'Cannot calculate stack license due to stack conflict.'
 
             output['outlier_packages'] = self.get_outlier_packages(la_output, dict_lic_pkgs)
 
@@ -355,9 +360,10 @@ class StackLicenseAnalyzer(object):
     def get_dependency_data(self, resolved, ecosystem):
         """Get packages data form graph DB."""
         result = []
-        URL = "http://{host}:{port}".format(
-            host=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_HOST", "localhost"),
-            port=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_PORT", "8182"))
+        URL = "http://bayesian-gremlin-http-bayesian-preview.b6ff.rh-idev.openshiftapps.com"
+        # URL = "http://{host}:{port}".format(
+        #     host=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_HOST", "localhost"),
+        #     port=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_PORT", "8182"))
         for elem in resolved:
             if elem["package"] is None or elem["version"] is None:
                 _logger.warning("Either component name or component version is missing")
