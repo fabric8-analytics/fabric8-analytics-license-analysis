@@ -70,6 +70,7 @@ class LicenseAnalyzer(object):
 
     def find_synonym(self, license_name):
         """Find synomym for given license name."""
+        license_name = license_name.strip(" ").lower()
         if license_name in self.known_licenses:
             return license_name
 
