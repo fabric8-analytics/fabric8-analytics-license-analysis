@@ -360,10 +360,9 @@ class StackLicenseAnalyzer(object):
     def get_dependency_data(self, resolved, ecosystem):
         """Get packages data form graph DB."""
         result = []
-        URL = "http://bayesian-gremlin-http-bayesian-preview.b6ff.rh-idev.openshiftapps.com"
-        # URL = "http://{host}:{port}".format(
-        #     host=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_HOST", "localhost"),
-        #     port=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_PORT", "8182"))
+        URL = "http://{host}:{port}".format(
+            host=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_HOST", "localhost"),
+            port=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_PORT", "8182"))
         for elem in resolved:
             if elem["package"] is None or elem["version"] is None:
                 _logger.warning("Either component name or component version is missing")
