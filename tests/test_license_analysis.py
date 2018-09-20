@@ -117,7 +117,7 @@ def test_compute_representative_license_unknown():
     output = license_analyzer.compute_representative_license(list_licenses)
     assert output['status'] == 'Unknown'
     assert output['representative_license'] is None
-    assert set(output['unknown_licenses']) == set(['SOME_JUNK_LIC'])
+    assert set(output['unknown_licenses']) == set(['some_junk_lic'])
     assert output['reason'] == 'Some unknown licenses found'
     assert not output['conflict_licenses']
     assert not output['outlier_licenses']

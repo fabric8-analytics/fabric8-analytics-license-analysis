@@ -18,6 +18,15 @@ from src.util.data_store.local_filesystem import LocalFileSystem
 
 _logger = logging.getLogger(__name__)
 
+possible_affected_licenses = ["GNU Lesser General Public License", "Version 2.1", "Version 1.1",
+                              "Apache Software License", "The Apache Software License",
+                              "Eclipse Public License", "Version 1.0", "Version 2.0",
+                              "Mozilla Public License", "Apache License", "version 2.0",
+                              "GNU General Public License", "Version 3", "Version 2",
+                              "GNU Affero General Public License", "The Apache License",
+                              "The GNU Lesser General Public License", "version 3",
+                              "The GNU General Public License"]
+
 
 def get_session_retry(retries=3, backoff_factor=0.2, status_forcelist=(404, 500, 502, 504),
                       session=None):
@@ -35,6 +44,17 @@ def convert_version_to_proper_semantic(version):
     version = version.replace('.', '-', 3)
     version = version.replace('-', '.', 2)
     return version
+
+
+def filter_incorrect_splitting(package_licenses):
+    """Filter incorrect splitting of license."""
+    affected_licenses = list(set(package_licenses) & set(possible_affected_licenses))
+    affected_licenses = sorted(affected_licenses)
+    assert len(affected_licenses) == 2
+    package_licenses = list(set(package_licenses) - set(affected_licenses))
+    package_licenses.append(affected_licenses[0] + ', ' + affected_licenses[1])
+
+    return package_licenses
 
 
 def select_latest_version(input_version='0.0.0', libio='0.0.0', anitya='0.0.0'):
@@ -189,6 +209,7 @@ class StackLicenseAnalyzer(object):
                     'message': 'Either component name or component version is missing'
                 }
                 return output
+        # payload = filter_incorrect_splitting(payload)
         output = payload  # output info will be inserted inside payload structure
         count_comp_no_license = 0  # keep track of number of component with no license
         output['conflict_packages'] = []
@@ -209,6 +230,10 @@ class StackLicenseAnalyzer(object):
             is_stack_license_possible = True
             for pkg in output['packages']:
                 list_of_licenses = []
+                for license in pkg.get('licenses', []):
+                    if license.startswith('version') or license.startswith('Version'):
+                        pkg['licenses'] = filter_incorrect_splitting(pkg['licenses'])
+                        break
                 la_output = self.license_analyzer.compute_representative_license(
                     pkg.get('licenses', []))
                 for lic in pkg.get('licenses', []):
@@ -233,12 +258,18 @@ class StackLicenseAnalyzer(object):
                 if la_output['status'] == 'Failure':
                     count_comp_no_license = count_comp_no_license + 1
                     output['status'] = 'Failure'
+                    output['message'] = 'Cannot calculate stack license due to unknown' \
+                                        'dependencies or license not supported.'
                     is_stack_license_possible = False
                 elif la_output['status'] == 'Conflict':
                     output['status'] = 'ComponentConflict'
+                    output['message'] = 'Cannot calculate stack license due to component' \
+                                        ' conflict.'
                     is_stack_license_possible = False
                 elif la_output['status'] == 'Unknown':
                     output['status'] = 'Unknown'
+                    output['message'] = 'Cannot calculate stack license due to unknown' \
+                                        'dependencies or license not supported.'
                     is_stack_license_possible = False
 
                 if la_output['representative_license'] is None:
@@ -252,8 +283,6 @@ class StackLicenseAnalyzer(object):
             if is_stack_license_possible is False:
                 # output['status'] should have been set already
                 output['stack_license'] = None
-                output['message'] = "No declared licenses found for {} component(s).". \
-                    format(count_comp_no_license)
                 return output
 
             # INFO: the following check is not necessary because the control
@@ -286,6 +315,7 @@ class StackLicenseAnalyzer(object):
             if la_output['status'] == 'Conflict':
                 output['conflict_packages'] = self.get_conflict_packages(la_output, dict_lic_pkgs)
                 output['status'] = 'StackConflict'
+                output['message'] = 'Cannot calculate stack license due to stack conflict.'
 
             output['outlier_packages'] = self.get_outlier_packages(la_output, dict_lic_pkgs)
 
