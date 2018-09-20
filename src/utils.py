@@ -1,5 +1,4 @@
 """Utility function to fetch public key."""
-from requests import get, exceptions
 import flask
 
 
