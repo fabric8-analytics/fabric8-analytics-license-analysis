@@ -9,6 +9,8 @@ import sys
 import logging
 from src.stack_license import StackLicenseAnalyzer
 from fabric8a_auth.auth import login_required, decode_token
+from fabric8a_auth.errors import AuthError
+from flask.json import jsonify
 
 try:
     from importlib import reload
@@ -63,6 +65,12 @@ def stack_license_api():
     response = app.stack_license_analyzer.license_recommender(input=input_json)
     # app.logger.debug("Stack analysis output: {}".format(response))
     return response
+
+
+@app.errorhandler(AuthError)
+def api_401_handler(err):
+    """Handle AuthError exceptions."""
+    return jsonify(error=err.error), err.status_code
 
 
 if __name__ == "__main__":
