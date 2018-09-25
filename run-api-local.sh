@@ -1,5 +1,15 @@
 #!/bin/bash
 
+PYTHONPATH=$(pwd)/src/
+export PYTHONPATH
+
+function prepare_venv() {
+    virtualenv -p python3 venv && source venv/bin/activate && python3 "$(which pip3)" install -r requirements.txt &&
+     python3 "$(which pip3)" install git+https://github.com/fabric8-analytics/fabric8-analytics-auth.git
+}
+
+[ "$NOVENV" == "1" ] || prepare_venv || exit 1
+
 # Usage info
 # Ref. Link http://mywiki.wooledge.org/BashFAQ/035
 show_help() {
@@ -34,6 +44,9 @@ while getopts ht:p: opt; do
       ;;
   esac
 done
+#setup auth library variables
+export OSIO_AUTH_URL='http://auth.openshift.io'
+export FABRIC8_ANALYTICS_JWT_AUDIENCE='fabric8-online-platform'
 
 export MAJORITY_THRESHOLD=$threshold
 export SERVICE_PORT=$port
