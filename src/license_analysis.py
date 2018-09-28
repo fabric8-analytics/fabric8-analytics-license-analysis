@@ -49,7 +49,8 @@ class LicenseAnalyzer(object):
             'apache 1.1',
             'cpl 1.0',
             'cpal 1.0',
-            'ISC'
+            'ISC',
+            'gwt'
         ]
 
         # IMPORTANT: Order matters in the following tuple
