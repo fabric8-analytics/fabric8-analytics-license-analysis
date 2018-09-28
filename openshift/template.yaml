@@ -47,7 +47,7 @@ objects:
                 name: bayesian-config
                 key: keycloak-url
           - name: BAYESIAN_JWT_AUDIENCE
-            value: "fabric8-online-platform,openshiftio-public"
+            value: "fabric8-online-platform,openshiftio-public,https://prod-preview.openshift.io,https://openshift.io"
           - name: BAYESIAN_GREMLIN_HTTP_SERVICE_HOST
             value: bayesian-gremlin-http
           - name: BAYESIAN_GREMLIN_HTTP_SERVICE_PORT
