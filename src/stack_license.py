@@ -223,7 +223,7 @@ class StackLicenseAnalyzer(object):
             syn = synonyms_store.read_json_file(synonym_json)
             break
         for pkg in output['packages']:
-            if not pkg['licenses']:
+            if not pkg['licenses'] or pkg['licenses'] is None:
                 output['packages'].remove(pkg)
         try:
             # First, let us try to compute representative license for each component
