@@ -236,6 +236,7 @@
     "bsd-style license": "unknown",
     "compile": "unknown",
     "modified bsd": "bsd-new",
+    "mit/bsd": "bsd-new",
     "tumbolia public license": "unknown",
     "standard pil license": "unknown",
     "gnu library or lesser general public license": "lgplv2.1",
