@@ -34,7 +34,7 @@ function prepare_venv() {
     fi
 
     ${VIRTUALENV} -p python3 venv && source venv/bin/activate && python3 "$(which pip3)" install -r requirements.txt\
-     && "$(which pip3)" install git+https://github.com/fabric8-analytics/fabric8-analytics-auth.git@491ca6d
+     && "$(which pip3)" install git+https://github.com/fabric8-analytics/fabric8-analytics-auth.git@5211e23
     
     if [ $? -ne 0 ]
     then

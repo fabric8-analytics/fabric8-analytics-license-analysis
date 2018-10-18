@@ -41,11 +41,6 @@ objects:
             value: "0.6"
           - name: DISABLE_AUTHENTICATION
             value: "0"
-          - name: BAYESIAN_FETCH_PUBLIC_KEY
-            valueFrom:
-              configMapKeyRef:
-                name: bayesian-config
-                key: keycloak-url
           - name: FABRIC8_ANALYTICS_JWT_AUDIENCE
             value: "fabric8-online-platform,openshiftio-public,https://prod-preview.openshift.io,https://openshift.io"
           - name: OSIO_AUTH_URL

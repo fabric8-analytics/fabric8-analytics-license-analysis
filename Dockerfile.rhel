@@ -2,7 +2,7 @@
 
 FROM quay.io/openshiftio/rhel-base-python3:latest
 
-ENV F8A_AUTH_VERSION=491ca6d
+ENV F8A_AUTH_VERSION=5211e23
 
 # install python packages
 COPY ./requirements.txt /
