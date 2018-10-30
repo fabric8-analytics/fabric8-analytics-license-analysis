@@ -1,7 +1,7 @@
 FROM centos:7
 MAINTAINER Harjindersingh Mistry<hmistry@redhat.com>
 
-ENV F8A_AUTH_VERSION=5211e23
+ENV F8A_AUTH_VERSION=fff8f49
 
 RUN yum install -y epel-release && \
     yum install -y python34-setuptools git gcc gcc-c++ python34-pip python34-devel \
