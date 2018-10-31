@@ -104,3 +104,7 @@ ENV/
 .pyc
 config.py
 .pytest_cache
+
+html/
+latex/
+
