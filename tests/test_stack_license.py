@@ -1,5 +1,7 @@
 """Unit tests for the StackLicenseAnalyzer module."""
 
+# TODO: reduce maintainability index of this module
+
 from unittest.mock import patch
 from src.stack_license import StackLicenseAnalyzer
 from src.stack_license import convert_version_to_proper_semantic, select_latest_version,\

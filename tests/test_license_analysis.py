@@ -1,5 +1,7 @@
 """Unit tests for the LicenseAnalyzer module."""
 
+# TODO: reduce maintainability index of this module
+
 from unittest.mock import patch
 from src.license_analysis import LicenseAnalyzer
 from src.util.data_store.local_filesystem import LocalFileSystem
