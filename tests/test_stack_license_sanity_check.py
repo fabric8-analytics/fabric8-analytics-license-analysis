@@ -1,6 +1,5 @@
 """Unit tests for the StackLicenseAnalyzer module."""
 
-from unittest.mock import patch
 from src.stack_license import StackLicenseAnalyzer
 
 
