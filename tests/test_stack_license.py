@@ -1,7 +1,5 @@
 """Unit tests for the StackLicenseAnalyzer module."""
 
-# TODO: reduce maintainability index of this module
-
 from unittest.mock import patch
 from src.stack_license import StackLicenseAnalyzer
 from src.stack_license import convert_version_to_proper_semantic, select_latest_version,\
@@ -10,29 +8,6 @@ from src.stack_license import convert_version_to_proper_semantic, select_latest_
 
 # single instance of stack license analyzer
 stack_license_analyzer = StackLicenseAnalyzer()
-
-
-def test_input_sanity_checks():
-    """Check if the method compute_stack_license perform input sanity checking."""
-    payload = None
-    output = stack_license_analyzer.compute_stack_license(payload=payload)
-    assert output is not None
-    assert output['status'] == 'Failure'
-    assert output['message'] == 'Input was invalid'
-
-    payload = {}
-    output = stack_license_analyzer.compute_stack_license(payload=payload)
-    assert output is not None
-    assert output['status'] == 'Failure'
-    assert output['message'] == 'Input was invalid'
-
-    payload = {
-        'packages': []
-    }
-    output = stack_license_analyzer.compute_stack_license(payload=payload)
-    assert output is not None
-    assert output['status'] == 'Failure'
-    assert output['message'] == 'Input was invalid'
 
 
 def test_component_license_conflict():
@@ -51,6 +26,8 @@ def test_component_license_conflict():
             }
         ]
     }
+
+    # compute the stack license for the given payload
     output = stack_license_analyzer.compute_stack_license(payload=payload)
     assert output is not None
     assert output['status'] == 'ComponentConflict'
@@ -73,6 +50,8 @@ def test_stack_license_conflict():
             }
         ]
     }
+
+    # compute the stack license for the given payload
     output = stack_license_analyzer.compute_stack_license(payload=payload)
     assert output is not None
     assert output['status'] == 'StackConflict'
@@ -95,6 +74,8 @@ def test_stack_license_successful():
             }
         ]
     }
+
+    # compute the stack license for the given payload
     output = stack_license_analyzer.compute_stack_license(payload=payload)
     assert output is not None
     assert output['status'] == 'Successful'
@@ -134,6 +115,8 @@ def test_stack_license_filter():
             }
         ]
     }
+
+    # compute the stack license for the given payload
     output = stack_license_analyzer.compute_stack_license(payload=payload)
     assert output is not None
     assert output['status'] == 'Successful'
@@ -156,6 +139,8 @@ def test_component_license_unknown():
             }
         ]
     }
+
+    # compute the stack license for the given payload
     output = stack_license_analyzer.compute_stack_license(payload=payload)
     assert output is not None
     assert output['status'] == 'Unknown'
@@ -173,6 +158,8 @@ def test_component_license_failure():
             }
         ]
     }
+
+    # compute the stack license for the given payload
     output = stack_license_analyzer.compute_stack_license(payload=payload)
     assert output is not None
     assert output['status'] == 'Failure'
@@ -214,6 +201,8 @@ def __test_component_license_weird_failure(_mocking_object):
             }
         ]
     }
+
+    # compute the stack license for the given payload
     output = stack_license_analyzer.compute_stack_license(payload=payload)
     assert output is not None
     assert output['status'] == 'Failure'
@@ -310,18 +299,6 @@ def test_stack_licenses_computation():
     assert output['status'] == 'Successful'
     assert output['stack_license'] == 'epl 1.0'
     assert output["outlier_packages"] == {'p1': 'epl 1.0'}
-
-
-def test_unexpected_exception_handling():
-    """Test that the improper payload is process w/o failures."""
-    # the payload is not correct so we expect the exception to occur
-    payload = {
-        'packages': 'garbage'
-    }
-    output = stack_license_analyzer.compute_stack_license(payload=payload)
-    assert output is not None
-    assert output['status'] == 'Failure'
-    assert output['message'] == "Input was invalid"
 
 
 def test_filter_incorrect_splitting():
