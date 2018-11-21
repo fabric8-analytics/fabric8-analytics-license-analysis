@@ -17,6 +17,7 @@ click==6.7                # via flask
 colorama==0.3.9           # via radon
 configparser==3.5.0       # via flake8
 coverage==4.5.1           # via pytest-cov
+codecov==2.0.15
 cython==0.25.2
 docutils==0.14            # via botocore, sphinx
 enum34==1.1.6             # via flake8
