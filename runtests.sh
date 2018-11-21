@@ -70,5 +70,5 @@ mkdir testdir4
 PYTHONDONTWRITEBYTECODE=1 python3 "$(which pytest)" --cov=../src/ --cov-report term-missing --cov-fail-under=$COVERAGE_THRESHOLD -vv .
 
 cp -r ../.git ./
-codecov --token=3a540a46-f7e9-4050-b36a-97f81b948bcb
+codecov --token=183ca5be-96e6-4125-b680-f4f519c76413
 printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}"
