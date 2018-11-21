@@ -1,6 +1,7 @@
 pytest
 gunicorn
 flask-cors==3.0.2
+codecov
 semantic-version==2.6.0
 flask-cors==3.0.2
 flask-login==0.3.2        # via flask-security
