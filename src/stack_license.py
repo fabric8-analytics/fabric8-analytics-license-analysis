@@ -176,7 +176,7 @@ class StackLicenseAnalyzer(object):
         return list_conflict_pkg
 
     def _is_improper_payload_for_stack_analysis(self, payload):
-        """Check if the payload send to stack analysis has correct content."""
+        """Check if the payload sent to stack analysis has correct content."""
         return not payload or not payload.get('packages') or type(payload.get('packages')) != list
 
     def _missing_component_attribute(self, pkg):
