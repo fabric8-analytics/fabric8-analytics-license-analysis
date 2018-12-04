@@ -175,6 +175,14 @@ class StackLicenseAnalyzer(object):
                     list_conflict_pkg.append(pkg_group)
         return list_conflict_pkg
 
+    def _is_improper_payload_for_stack_analysis(self, payload):
+        """Check if the payload send to stack analysis has correct content."""
+        return not payload or not payload.get('packages') or type(payload.get('packages')) != list
+
+    def _missing_component_attribute(self, pkg):
+        """Check whether package name or package version is missing."""
+        return pkg.get('package') is None or pkg.get('version') is None
+
     # TODO needs refactoring
     # TODO: reduce cyclomatic complexity
     def compute_stack_license(self, payload):
@@ -194,7 +202,7 @@ class StackLicenseAnalyzer(object):
         :return: Detailed license analysis output
         """
         # check input
-        if not payload or not payload.get('packages') or type(payload.get('packages')) != list:
+        if self._is_improper_payload_for_stack_analysis(payload):
             output = {
                 'status': 'Failure',
                 'message': 'Input was invalid'
@@ -203,12 +211,13 @@ class StackLicenseAnalyzer(object):
             return output
 
         for pkg in payload['packages']:
-            if pkg.get('package') is None or pkg.get('version') is None:
+            if self._missing_component_attribute(pkg):
                 output = {
                     'status': 'Failure',
                     'message': 'Either component name or component version is missing'
                 }
                 return output
+
         # payload = filter_incorrect_splitting(payload)
         output = payload  # output info will be inserted inside payload structure
         count_comp_no_license = 0  # keep track of number of component with no license
