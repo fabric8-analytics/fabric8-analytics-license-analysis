@@ -53,7 +53,7 @@ BODY: JSON data
 ```
 
 
-## Tree used for license comparision
+## Tree used for license comparison
 
 ![License Diagram](https://user-images.githubusercontent.com/7105965/45091694-e39c0680-b130-11e8-90c1-6f2149a9aa18.png)
 
@@ -115,7 +115,7 @@ Please note that only semantical problems are reported.
 
 #### Check for scripts written in BASH
 
-The script named `check-bashscripts.sh` can be used to check all BASH scripts (in fact: all files with the `.sh` extension) for various possible issues, incompatibilies, and caveats. This script can be run w/o any arguments:
+The script named `check-bashscripts.sh` can be used to check all BASH scripts (in fact: all files with the `.sh` extension) for various possible issues, incompatibilities, and caveats. This script can be run w/o any arguments:
 
 ```
 ./check-bashscripts.sh
