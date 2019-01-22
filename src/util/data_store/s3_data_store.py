@@ -12,7 +12,14 @@ class S3DataStore(AbstractDataStore):
     """Class representing the data store that uses AWS S3."""
 
     def __init__(self, src_bucket_name, access_key, secret_key):
-        """Construct the class, creates session to AWS S3, and initialize attributes."""
+        """Create a new S3 data store instance.
+
+        :src_bucket_name: The name of S3 bucket to connect to
+        :access_key: The access key for S3
+        :secret_key: The secret key for S3
+
+        :returns: An instance of the S3 data store class
+        """
         self.session = boto3.session.Session(aws_access_key_id=access_key,
                                              aws_secret_access_key=secret_key)
         self.s3_resource = self.session.resource('s3', config=botocore.client.Config(
@@ -21,7 +28,7 @@ class S3DataStore(AbstractDataStore):
         self.bucket_name = src_bucket_name
 
     def get_name(self):
-        """Return printable name of this storage."""
+        """Get name of this object's bucket."""
         return "S3:" + self.bucket_name
 
     def read_json_file(self, filename):
