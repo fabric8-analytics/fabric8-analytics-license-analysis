@@ -59,7 +59,7 @@ pytest-cov==2.5.1
 pytest==3.5.0
 python-dateutil==2.6.1
 pytz==2016.7
-radon==2.0.0
+radon==3.0.1
 requests-futures==0.9.7
 requests==2.18.1
 s3transfer==0.1.10
