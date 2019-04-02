@@ -108,3 +108,4 @@ config.py
 html/
 latex/
 
+.DS_Store
