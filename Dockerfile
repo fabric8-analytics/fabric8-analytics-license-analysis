@@ -4,7 +4,7 @@ MAINTAINER Harjindersingh Mistry<hmistry@redhat.com>
 ENV F8A_AUTH_VERSION=fff8f49
 
 RUN yum install -y epel-release && \
-    yum install -y python34-setuptools git gcc gcc-c++ python34-pip python34-devel \
+    yum install -y python36-setuptools git gcc gcc-c++ python36-pip python36-devel \
     libffi-devel openssl-devel && yum clean all
 
 
