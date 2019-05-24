@@ -22,7 +22,7 @@ prep() {
     yum -y install docker git
     systemctl start docker
     yum -y install epel-release
-    yum -y install python34 python34-virtualenv which
+    yum -y install python36 python36-virtualenv which
     yum -y install gcc
 }
 
