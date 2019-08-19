@@ -324,8 +324,9 @@ class LicenseAnalyzer(object):
         # also, we need to gather total unique classes for input vertices
         list_groups = []
         for v in license_vertices:
-            vertex_groups = vertex2groups[v]
-            list_groups += vertex_groups
+            vertex_groups = vertex2groups.get(v)
+            if vertex_groups:
+                list_groups += vertex_groups
 
         # create a dictionary to store vertex licenses per compatibility class
         list_groups = list(set(list_groups))
@@ -336,7 +337,7 @@ class LicenseAnalyzer(object):
         # insert each vertex license into appropriate class
         for v in license_vertices:
             license = v.get_prop_value('license')
-            vertex_groups = vertex2groups[v]
+            vertex_groups = vertex2groups.get(v, [])
             # ignore vertex if it falls into every class
             if set(vertex_groups) != set(list_groups):
                 for g in vertex_groups:
