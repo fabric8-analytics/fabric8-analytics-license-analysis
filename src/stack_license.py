@@ -25,7 +25,7 @@ possible_affected_licenses = ["GNU Lesser General Public License", "Version 2.1"
                               "GNU General Public License", "Version 3", "Version 2",
                               "GNU Affero General Public License", "The Apache License",
                               "The GNU Lesser General Public License", "version 3",
-                              "The GNU General Public License"]
+                              "The GNU General Public License", "version 2", "version 2.1"]
 
 
 def get_session_retry(retries=3, backoff_factor=0.2, status_forcelist=(404, 500, 502, 504),
@@ -270,7 +270,7 @@ class StackLicenseAnalyzer(object):
                     count_comp_no_license = count_comp_no_license + 1
                     output['status'] = 'Failure'
                     output['message'] = 'Cannot calculate stack license due to unknown' \
-                                        'dependencies or license not supported.'
+                                        ' dependencies or license not supported.'
                     is_stack_license_possible = False
                 elif la_output['status'] == 'Conflict':
                     output['status'] = 'ComponentConflict'
@@ -280,7 +280,7 @@ class StackLicenseAnalyzer(object):
                 elif la_output['status'] == 'Unknown':
                     output['status'] = 'Unknown'
                     output['message'] = 'Cannot calculate stack license due to unknown' \
-                                        'dependencies or license not supported.'
+                                        ' dependencies or license not supported.'
                     is_stack_license_possible = False
 
                 if la_output['representative_license'] is None:
