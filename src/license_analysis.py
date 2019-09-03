@@ -614,5 +614,4 @@ class LicenseAnalyzer(object):
         output['reason'] = 'Compatibility and/or conflict identified'
         output['conflict_licenses'] = list_conflicting_licenses
         output['compatible_licenses'] = list_compatible_licenses
-
         return output
