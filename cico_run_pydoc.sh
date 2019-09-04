@@ -9,4 +9,4 @@ prep() {
 }
 
 prep
-./check-docstyle.sh
+./qa/check-docstyle.sh

@@ -1,5 +1,9 @@
 #! /bin/bash
 
+SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+
+pushd "${SCRIPT_DIR}/.." > /dev/null
+
 # each command can cause test failure
 set -e
 
@@ -72,3 +76,5 @@ PYTHONDONTWRITEBYTECODE=1 python3 "$(which pytest)" --cov=../src/ --cov-report t
 cp -r ../.git ./
 codecov --token=183ca5be-96e6-4125-b680-f4f519c76413
 printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}"
+
+popd > /dev/null
