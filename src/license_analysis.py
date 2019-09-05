@@ -330,7 +330,7 @@ class LicenseAnalyzer(object):
 
         # create a dictionary to store vertex licenses per compatibility class
         list_groups = list(set(list_groups))
-        assert(len(list_groups) > 1)
+        assert len(list_groups) > 1
 
         list_items = [(x, []) for x in list_groups]
         map_groups = dict(list_items)
@@ -587,7 +587,7 @@ class LicenseAnalyzer(object):
 
         # now, we need to find compatibility class for lic_b and every lic_b
         lic_a_group = self._get_compatibility_classes(lic_a)
-        assert(len(lic_a_group) > 0)
+        assert len(lic_a_group) > 0
         lic_b_groups = {lic_b: self._get_compatibility_classes(lic_b) for lic_b in list_lic_b}
 
         # initialize dict that maps every lic_b to one of lic_a's compatibility classes
