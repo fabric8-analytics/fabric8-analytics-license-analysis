@@ -84,8 +84,8 @@ class DirectedGraph(object):
 
     def add_edge(self, from_id, to_id, cost=0):
         """Add an edget between two vertices."""
-        assert(from_id in self.vertex_dict)
-        assert(to_id in self.vertex_dict)
+        assert from_id in self.vertex_dict
+        assert to_id in self.vertex_dict
         self.vertex_dict[from_id].add_neighbor(self.vertex_dict[to_id], cost)
 
     def get_vertex_ids(self):
