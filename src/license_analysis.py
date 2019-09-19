@@ -69,6 +69,12 @@ class LicenseAnalyzer(object):
         self._find_compatibility_classes()
         self._find_type_compatibility_classes()
 
+    def graph_node_identifier(self, lic):
+        """Provide the graph node identifier if a node exists for multiple licenses."""
+        if lic == "gplv3":
+            return "gplv3+"
+        return lic
+
     def find_synonym(self, license_name):
         """Find synomym for given license name."""
         license_name = license_name.strip(" ").lower()
@@ -76,6 +82,7 @@ class LicenseAnalyzer(object):
             return license_name
 
         synonym = self.syn.get(license_name)
+        synonym = self.graph_node_identifier(synonym)
         if synonym in self.known_licenses:
             return synonym  # return known synonym
         else:
@@ -614,5 +621,4 @@ class LicenseAnalyzer(object):
         output['reason'] = 'Compatibility and/or conflict identified'
         output['conflict_licenses'] = list_conflicting_licenses
         output['compatible_licenses'] = list_compatible_licenses
-
         return output
