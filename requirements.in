@@ -20,7 +20,7 @@ passlib==1.6.5            # via flask-security
 pyjwt==1.5.0
 pytz==2016.7              # via flask-restful
 requests-futures==0.9.7
-requests==2.18.1          # via requests-futures
+requests==2.20.0          # via requests-futures
 six==1.10.0               # via flask-appconfig, flask-cors, flask-restful, python-dateutil
 urllib3==1.21.1           # via requests
 werkzeug==0.15.3          # via flask, flask-wtf
