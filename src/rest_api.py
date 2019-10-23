@@ -9,6 +9,8 @@ from src.stack_license import StackLicenseAnalyzer
 from fabric8a_auth.auth import login_required
 from fabric8a_auth.errors import AuthError
 from flask.json import jsonify
+from raven.contrib.flask import Sentry
+import os
 
 
 # logging.basicConfig(filename='/tmp/error.log', level=logging.DEBUG)
@@ -16,6 +18,9 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 app = Flask(__name__)
 app.config.from_object('config')
 CORS(app)
+SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
+sentry = Sentry(app, dsn=SENTRY_DSN, logging=True, level=logging.ERROR)
+app.logger.info('App initialized, ready to roll...')
 
 
 @app.before_first_request
