@@ -65,13 +65,5 @@ def api_401_handler(err):
     return jsonify(error=err.error), err.status_code
 
 
-def log_it(func):
-    """Func decorator for logging."""
-    def inner1(*args, **kwargs):
-        app.logger.info("Executed {}".format(func.__name__))
-        return func(*args, **kwargs)
-    return inner1
-
-
 if __name__ == "__main__":
     app.run()
