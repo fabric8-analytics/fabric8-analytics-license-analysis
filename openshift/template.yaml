@@ -14,7 +14,7 @@ objects:
       service: f8a-license-analysis
     name: f8a-license-analysis
   spec:
-    replicas: 1
+    replicas: "${{REPLICAS}}"
     selector:
       service: f8a-license-analysis
     template:
@@ -100,7 +100,7 @@ parameters:
   displayName: CPU request
   required: true
   name: CPU_REQUEST
-  value: "125m"
+  value: "100m"
 
 - description: CPU limit
   displayName: CPU limit
@@ -112,7 +112,7 @@ parameters:
   displayName: Memory request
   required: true
   name: MEMORY_REQUEST
-  value: "512Mi"
+  value: "128Mi"
 
 - description: Memory limit
   displayName: Memory limit
@@ -138,3 +138,8 @@ parameters:
   name: IMAGE_TAG
   value: "latest"
 
+- description: Number of deployment replicas
+  displayName: Number of deployment replicas
+  required: true
+  name: REPLICAS
+  value: "1"
