@@ -55,7 +55,7 @@ BODY: JSON data
 
 ## Tree used for license comparison
 
-![License Diagram](https://user-images.githubusercontent.com/7105965/45091694-e39c0680-b130-11e8-90c1-6f2149a9aa18.png)
+![License Diagram](https://user-images.githubusercontent.com/37098367/99516035-bc4d4f00-29b3-11eb-9d01-0d26dbe948d9.png)
 
 ### References:
 
