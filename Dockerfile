@@ -1,4 +1,4 @@
-FROM centos:7
+FROM registry.centos.org/centos/centos:7
 MAINTAINER Harjindersingh Mistry<hmistry@redhat.com>
 
 ENV F8A_AUTH_VERSION=fff8f49
