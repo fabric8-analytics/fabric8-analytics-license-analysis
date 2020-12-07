@@ -35,8 +35,6 @@ objects:
             value: "6162"
           - name: SERVICE_TIMEOUT
             value: "900"
-          - name: DATA_DIR
-            value: "/"
           - name: LIC_DATA_DIR
             value: "/"
           - name: MAJORITY_THRESHOLD
