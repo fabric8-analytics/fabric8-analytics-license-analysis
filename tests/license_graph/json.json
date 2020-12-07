@@ -1,5 +1,0 @@
-{
-  "license": "json",
-  "type": "P",
-  "neighbours": ["postgresql"]
-}

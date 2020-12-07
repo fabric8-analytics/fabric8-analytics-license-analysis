@@ -1,5 +1,0 @@
-{
-  "license": "bsd-new",
-  "type": "P",
-  "neighbours": ["gwt", "mpl_1.1", "lgpl_v2.1", "lgpl_v2.1+", "lgpl_v3+", "mpl_2.0"]
-}
