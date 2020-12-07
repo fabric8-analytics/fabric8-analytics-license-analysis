@@ -14,6 +14,7 @@ import traceback
 import semantic_version as sv
 from src.utils import http_error
 from src.util.data_store.local_filesystem import LocalFileSystem
+from src.config import LIC_DATA_DIR
 
 _logger = logging.getLogger(__name__)
 
@@ -25,7 +26,6 @@ possible_affected_licenses = ["GNU Lesser General Public License", "Version 2.1"
                               "GNU Affero General Public License", "The Apache License",
                               "The GNU Lesser General Public License", "version 3",
                               "The GNU General Public License", "version 2", "version 2.1"]
-LIC_DATA_DIR = os.environ.get("LIC_DATA_DIR", "src")
 
 
 def get_session_retry(retries=3, backoff_factor=0.2, status_forcelist=(404, 500, 502, 504),

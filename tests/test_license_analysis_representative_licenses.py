@@ -2,9 +2,9 @@
 
 from src.license_analysis import LicenseAnalyzer
 from src.util.data_store.local_filesystem import LocalFileSystem
+from src.config import LIC_DATA_DIR
 import os
 
-LIC_DATA_DIR = os.environ.get("LIC_DATA_DIR", "src")
 src_dir = os.path.join(LIC_DATA_DIR, "license_graph")
 graph_store = LocalFileSystem(src_dir=src_dir)
 synonyms_dir = os.path.join(LIC_DATA_DIR, "synonyms")
