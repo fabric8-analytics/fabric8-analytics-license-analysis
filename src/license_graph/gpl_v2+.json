@@ -1,0 +1,5 @@
+{
+  "license": "gplv2+",
+  "type": "SP",
+  "neighbours": ["gpl_v2", "gpl_v3+"]
+}

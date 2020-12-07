@@ -2,14 +2,17 @@
 
 from src.license_analysis import LicenseAnalyzer
 from src.util.data_store.local_filesystem import LocalFileSystem
+import os
+
+LIC_DATA_DIR = os.environ.get("LIC_DATA_DIR", "src")
+src_dir = os.path.join(LIC_DATA_DIR, "license_graph")
+graph_store = LocalFileSystem(src_dir=src_dir)
+synonyms_dir = os.path.join(LIC_DATA_DIR, "synonyms")
+synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
 
 
 def test_compute_representative_license_no_licenses():
     """Test the method LicenseAnalyzer.compute_representative_license() - none licenses found."""
-    src_dir = "license_graph"
-    graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "synonyms"
-    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
 
     output = license_analyzer.compute_representative_license(
@@ -24,10 +27,6 @@ def test_compute_representative_license_no_licenses():
 
 def test_compute_representative_license_one_license():
     """Test the method LicenseAnalyzer.compute_representative_license() - one license found."""
-    src_dir = "license_graph"
-    graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "synonyms"
-    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
 
     list_licenses = ['This software released into the public domain. Anyone is free to copy']
@@ -63,10 +62,6 @@ def test_compute_representative_license_one_license():
 
 def test_compute_representative_license_outlier_licenses():
     """Test the method LicenseAnalyzer.compute_representative_license() - outlier licenses."""
-    src_dir = "license_graph"
-    graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "synonyms"
-    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
 
     list_licenses = ['MIT', 'BSD', 'PD', 'APACHE', 'CDDL 1.0']
@@ -96,10 +91,6 @@ def test_compute_representative_license_outlier_licenses():
 
 def test_compute_representative_license_unknown():
     """Test the method LicenseAnalyzer.compute_representative_license() for unknown license."""
-    src_dir = "license_graph"
-    graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "synonyms"
-    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
     list_licenses = ['SOME_JUNK_LIC']
     output = license_analyzer.compute_representative_license(list_licenses)
@@ -113,10 +104,6 @@ def test_compute_representative_license_unknown():
 
 def test_compute_representative_license_no_conflict():
     """Test method LicenseAnalyzer.compute_representative_license() for non-conflicting licenses."""
-    src_dir = "license_graph"
-    graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "synonyms"
-    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
     list_licenses = ['APACHE', 'MPL 2.0']
     output = license_analyzer.compute_representative_license(list_licenses)
@@ -129,10 +116,6 @@ def test_compute_representative_license_no_conflict():
 
 def test_compute_representative_license_no_conflict_2():
     """Test method LicenseAnalyzer.compute_representative_license() for non-conflicting licenses."""
-    src_dir = "license_graph"
-    graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "synonyms"
-    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
     list_licenses = ['MIT', 'APACHE', 'MPL 1.1', 'lgplv2.1', 'lgplv3+']
     output = license_analyzer.compute_representative_license(list_licenses)
@@ -142,10 +125,6 @@ def test_compute_representative_license_no_conflict_2():
 
 def test_compute_representative_license_conflict_1():
     """Test the method LicenseAnalyzer.compute_representative_license() for conflicting licenses."""
-    src_dir = "license_graph"
-    graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "synonyms"
-    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
     list_licenses = ['gplv2', 'gplv3+']
     output = license_analyzer.compute_representative_license(list_licenses)
@@ -160,10 +139,6 @@ def test_compute_representative_license_conflict_1():
 
 def test_compute_representative_license_conflict_2():
     """Test the method LicenseAnalyzer.compute_representative_license() for conflicting licenses."""
-    src_dir = "license_graph"
-    graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "synonyms"
-    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
     list_licenses = ['gplv2', 'gplv3+', 'MIT', 'APACHE']
     output = license_analyzer.compute_representative_license(list_licenses)
@@ -179,10 +154,6 @@ def test_compute_representative_license_conflict_2():
 
 def test_compute_representative_license_conflict_3():
     """Test the method LicenseAnalyzer.compute_representative_license() for conflicting licenses."""
-    src_dir = "license_graph"
-    graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "synonyms"
-    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
     list_licenses = ['affero gplv3', 'gplv3+', 'gplv2']
     output = license_analyzer.compute_representative_license(list_licenses)
@@ -199,10 +170,6 @@ def test_compute_representative_license_conflict_3():
 
 def test_compute_representative_license_repeating_licenses():
     """Test the method LicenseAnalyzer.compute_representative_license() for correct behaviour."""
-    src_dir = "license_graph"
-    graph_store = LocalFileSystem(src_dir=src_dir)
-    synonyms_dir = "synonyms"
-    synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
     license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
     list_licenses = ['gplv2', 'gplv2', 'gplv2']
     output = license_analyzer.compute_representative_license(list_licenses)

@@ -52,7 +52,9 @@ class LicenseAnalyzer(object):
             'cpal 1.0',
             'ISC',
             'gwt',
-            'psfl'
+            'psfl',
+            'zpl 2.1',
+            'zpl 2.0'
         ]
 
         # IMPORTANT: Order matters in the following tuple

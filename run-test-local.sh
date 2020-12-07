@@ -44,6 +44,7 @@ done
 
 export MAJORITY_THRESHOLD=$threshold
 export DATA_DIR=.
+export LIC_DATA_DIR=$(pwd)/src
 
 PYTHONPATH=$(pwd)/src
 export PYTHONPATH

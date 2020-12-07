@@ -45,7 +45,6 @@ while getopts ht:p: opt; do
   esac
 done
 #setup auth library variables
-export OSIO_AUTH_URL='http://auth.openshift.io'
 export FABRIC8_ANALYTICS_JWT_AUDIENCE='fabric8-online-platform'
 
 export MAJORITY_THRESHOLD=$threshold

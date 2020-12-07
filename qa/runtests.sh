@@ -23,6 +23,7 @@ threshold=0.6
 
 export MAJORITY_THRESHOLD=$threshold
 export DATA_DIR=.
+export LIC_DATA_DIR=$(pwd)/src
 
 PYTHONPATH=$(pwd)/src
 export PYTHONPATH
@@ -69,6 +70,9 @@ echo "*****************************************"
 echo "*** Unit tests ***"
 echo "*****************************************"
 cd tests || exit
+if [ -d "testdir1" ]; then rm -rf testdir1; fi
+if [ -d "testdir4" ]; then rm -rf testdir4; fi
+
 mkdir testdir1
 mkdir testdir4
 PYTHONDONTWRITEBYTECODE=1 python3 "$(which pytest)" --cov=../src/ --cov-report term-missing --cov-fail-under=$COVERAGE_THRESHOLD -vv .
