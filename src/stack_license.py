@@ -12,9 +12,9 @@ from src.license_analysis import LicenseAnalyzer
 import logging
 import traceback
 import semantic_version as sv
-from src.config import DATA_DIR
 from src.utils import http_error
 from src.util.data_store.local_filesystem import LocalFileSystem
+from src.config import LIC_DATA_DIR
 
 _logger = logging.getLogger(__name__)
 
@@ -86,9 +86,9 @@ class StackLicenseAnalyzer(object):
     def __init__(self):
         """Initialize stack license analyzer."""
         # Data store where license graph is available
-        src_dir = os.path.join(DATA_DIR, "license_graph")
+        src_dir = os.path.join(LIC_DATA_DIR, "license_graph")
         graph_store = LocalFileSystem(src_dir=src_dir)
-        synonyms_dir = os.path.join(DATA_DIR, "synonyms")
+        synonyms_dir = os.path.join(LIC_DATA_DIR, "synonyms")
         synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
 
         self.license_analyzer = LicenseAnalyzer(graph_store, synonyms_store)
@@ -225,7 +225,7 @@ class StackLicenseAnalyzer(object):
         output['outlier_packages'] = {}
         output['distinct_licenses'] = []
 
-        synonyms_dir = os.path.join(DATA_DIR, "synonyms")
+        synonyms_dir = os.path.join(LIC_DATA_DIR, "synonyms")
         synonyms_store = LocalFileSystem(src_dir=synonyms_dir)
         list_synonym_jsons = synonyms_store.list_files()
         for synonym_json in list_synonym_jsons:

@@ -35,7 +35,7 @@ objects:
             value: "6162"
           - name: SERVICE_TIMEOUT
             value: "900"
-          - name: DATA_DIR
+          - name: LIC_DATA_DIR
             value: "/"
           - name: MAJORITY_THRESHOLD
             value: "0.6"
@@ -43,11 +43,6 @@ objects:
             value: "0"
           - name: FABRIC8_ANALYTICS_JWT_AUDIENCE
             value: "fabric8-online-platform,openshiftio-public,https://prod-preview.openshift.io,https://openshift.io"
-          - name: OSIO_AUTH_URL
-            valueFrom:
-              configMapKeyRef:
-                name: bayesian-config
-                key: auth-url
           - name: BAYESIAN_GREMLIN_HTTP_SERVICE_HOST
             value: bayesian-gremlin-http
           - name: BAYESIAN_GREMLIN_HTTP_SERVICE_PORT
