@@ -38,7 +38,7 @@ jobs:
     - name: Install virtualenv
       run: pip install -U pip && pip install virtualenv
     - name: Run Unit Tests
-      run: bash qa/runtest.sh
+      run: bash qa/runtests.sh
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
