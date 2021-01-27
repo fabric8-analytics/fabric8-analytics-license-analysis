@@ -1,4 +1,5 @@
-[![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-fabric8-analytics-license-analysis-f8a-build-master)](https://ci.centos.org/job/devtools-fabric8-analytics-license-analysis-f8a-build-master/)
+![CI](https://github.com/fabric8-analytics/fabric8-analytics-license-analysis/workflows/CI/badge.svg?branch=master)
+[![codecov](https://codecov.io/gh/fabric8-analytics/fabric8-analytics-license-analysis/branch/master/graph/badge.svg?token=qi833miGbI)](https://codecov.io/gh/fabric8-analytics/fabric8-analytics-license-analysis)
 
 # fabric8-analytics-license-analysis
 License Analysis Service analyzes the given stack and returns the following:
