@@ -75,10 +75,8 @@ if [ -d "testdir4" ]; then rm -rf testdir4; fi
 
 mkdir testdir1
 mkdir testdir4
-popd
 PYTHONDONTWRITEBYTECODE=1 python3 "$(which pytest)" --cov=../src/ --cov-report=xml --cov-fail-under=$COVERAGE_THRESHOLD -vv .
-pwd
-ls
+
 printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}"
 
 popd > /dev/null

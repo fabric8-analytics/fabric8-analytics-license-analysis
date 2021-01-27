@@ -43,7 +43,7 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./coverage.xml
+        file: ./tests/coverage.xml
   openshift-yaml-validate:
     runs-on: ubuntu-latest
     steps:
