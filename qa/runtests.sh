@@ -75,10 +75,8 @@ if [ -d "testdir4" ]; then rm -rf testdir4; fi
 
 mkdir testdir1
 mkdir testdir4
-PYTHONDONTWRITEBYTECODE=1 python3 "$(which pytest)" --cov=../src/ --cov-report term-missing --cov-fail-under=$COVERAGE_THRESHOLD -vv .
+PYTHONDONTWRITEBYTECODE=1 python3 "$(which pytest)" --cov=../src/ --cov-report=xml --cov-fail-under=$COVERAGE_THRESHOLD -vv .
 
-cp -r ../.git ./
-codecov --token=183ca5be-96e6-4125-b680-f4f519c76413
 printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}"
 
 popd > /dev/null
