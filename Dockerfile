@@ -10,6 +10,7 @@ RUN yum install -y epel-release && \
 
 # install python packages
 COPY ./requirements.txt /
+RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt && rm requirements.txt
 RUN pip3 install git+https://github.com/fabric8-analytics/fabric8-analytics-auth.git@${F8A_AUTH_VERSION}
 COPY ./src /src
