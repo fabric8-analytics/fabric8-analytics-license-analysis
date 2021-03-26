@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/ubi-minimal as builder
+FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
 
 ENV F8A_AUTH_VERSION=fff8f49
 
