@@ -11,7 +11,7 @@ GIT_HASH=`git rev-parse --short=7 HEAD`
 docker build  --no-cache \
               --force-rm \
               -t ${IMG}  \
-              -f ./Dockerfile .
+              -f ./Dockerfile.app-sre .
 
 # push the image
 skopeo copy --dest-creds "${QUAY_USER}:${QUAY_TOKEN}" \

@@ -1,4 +1,4 @@
-FROM quay.io/app-sre/fabric8-analytics-f8a-license-analysis
+FROM registry.access.redhat.com/ubi8/ubi-minimal as builder
 
 ENV F8A_AUTH_VERSION=fff8f49
 

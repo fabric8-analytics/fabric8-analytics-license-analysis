@@ -16,7 +16,7 @@ docker --config="$DOCKER_CONF" login -u="$QUAY_USER" -p="$QUAY_TOKEN" quay.io
 docker build  --no-cache \
               --force-rm \
               -t ${IMG}  \
-              -f ./Dockerfile .
+              -f ./Dockerfile.app-sre.rhel .
 
 # push the image
 skopeo copy --dest-creds "${QUAY_USER}:${QUAY_TOKEN}" \
