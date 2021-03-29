@@ -95,7 +95,7 @@ itsdangerous==0.24
     #   -r requirements.in
     #   flask
     #   flask-security
-jinja2==2.8
+jinja2==2.11.3
     # via
     #   -r requirements.in
     #   flask
