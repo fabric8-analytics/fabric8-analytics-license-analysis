@@ -3,7 +3,7 @@ services:
   license-analysis:
     build:
       context: .
-    image: fabric8-analytics/license-analysis
+    image: quay.io/app-sre/f8a-license-analysis
     network_mode: bridge
     entrypoint:
       - /bin/entrypoint.sh
