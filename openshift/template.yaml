@@ -125,7 +125,7 @@ parameters:
   displayName: Docker image
   required: true
   name: DOCKER_IMAGE
-  value: "openshiftio/fabric8-analytics-license-analysis"
+  value: "app-sre/f8a-license-analysis"
 
 - description: Image tag
   displayName: Image tag
