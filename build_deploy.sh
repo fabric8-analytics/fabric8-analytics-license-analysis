@@ -1,7 +1,7 @@
 #!/bin/bash
 set -exv
 
-BASE_IMG="fabric8-analytics-f8a-license-analysis"
+BASE_IMG="f8a-license-analysis"
 QUAY_IMAGE="quay.io/app-sre/${BASE_IMG}"
 IMG="${BASE_IMG}:latest"
 
