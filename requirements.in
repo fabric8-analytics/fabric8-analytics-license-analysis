@@ -1,9 +1,9 @@
 pytest
 gunicorn
-flask-cors==3.0.2
+flask-cors==3.0.9
 codecov
 semantic-version==2.6.0
-flask-cors==3.0.2
+flask-cors==3.0.9
 flask-login==0.3.2        # via flask-security
 flask-mail==0.9.1         # via flask-security
 flask-principal==0.4.0    # via flask-security
