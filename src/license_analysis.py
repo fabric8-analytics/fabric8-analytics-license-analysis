@@ -77,6 +77,8 @@ class LicenseAnalyzer(object):
         """Provide the graph node identifier if a node exists for multiple licenses."""
         if lic == "gplv3":
             return "gplv3+"
+        if lic == "lgplv3":
+            return "lgplv3+"
         return lic
 
     def find_synonym(self, license_name):
