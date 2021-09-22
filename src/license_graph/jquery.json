@@ -1,0 +1,5 @@
+{
+  "license": "jquery",
+  "type": "P",
+  "neighbours": ["postgresql"]
+}

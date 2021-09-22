@@ -1,5 +1,5 @@
 {
   "license": "json",
   "type": "P",
-  "neighbours": ["postgresql"]
+  "neighbours": ["w3c"]
 }
