@@ -54,7 +54,8 @@ class LicenseAnalyzer(object):
             'gwt',
             'psfl',
             'zpl 2.1',
-            'zpl 2.0'
+            'zpl 2.0',
+            'jquery'
         ]
 
         # IMPORTANT: Order matters in the following tuple

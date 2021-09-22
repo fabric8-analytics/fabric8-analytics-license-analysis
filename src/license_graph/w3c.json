@@ -1,5 +1,5 @@
 {
   "license": "w3c",
   "type": "P",
-  "neighbours": ["bouncycastle"]
+  "neighbours": ["cc_by_3.0"]
 }
