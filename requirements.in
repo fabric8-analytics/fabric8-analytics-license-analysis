@@ -17,7 +17,7 @@ jinja2==2.8               # via flask
 jsl==0.2.4
 markupsafe==0.23          # via jinja2
 passlib==1.6.5            # via flask-security
-pyjwt==1.5.0
+pyjwt==2.4.0
 pytz==2016.7              # via flask-restful
 requests-futures==0.9.7
 requests==2.20.0          # via requests-futures
