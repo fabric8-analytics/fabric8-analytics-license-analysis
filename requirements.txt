@@ -42,12 +42,24 @@ cython==0.25.2
     # via -r requirements.in
 docutils==0.14
     # via botocore
-git+https://github.com/fabric8-analytics/fabric8-analytics-auth.git@fff8f49
+fabric8a-auth @ git+https://github.com/fabric8-analytics/fabric8-analytics-auth.git@fff8f49
     # via -r requirements.in
-flake8-polyfill==1.0.2
-    # via radon
 flake8==3.5.0
     # via flake8-polyfill
+flake8-polyfill==1.0.2
+    # via radon
+flask==0.11.1
+    # via
+    #   -r requirements.in
+    #   fabric8a-auth
+    #   flask-cors
+    #   flask-login
+    #   flask-mail
+    #   flask-principal
+    #   flask-restful
+    #   flask-security
+    #   flask-wtf
+    #   raven
 flask-cors==3.0.2
     # via -r requirements.in
 flask-login==0.3.2
@@ -72,18 +84,6 @@ flask-wtf==0.13.1
     # via
     #   -r requirements.in
     #   flask-security
-flask==0.11.1
-    # via
-    #   -r requirements.in
-    #   fabric8a-auth
-    #   flask-cors
-    #   flask-login
-    #   flask-mail
-    #   flask-principal
-    #   flask-restful
-    #   flask-security
-    #   flask-wtf
-    #   raven
 gunicorn==19.7.1
     # via -r requirements.in
 idna==2.5
@@ -116,7 +116,7 @@ mccabe==0.6.1
     # via flake8
 more-itertools==4.1.0
     # via pytest
-numpy==1.14.2
+numpy==1.22.0
     # via pandas
 pandas==0.19.2
     # via -r requirements.in
@@ -138,12 +138,12 @@ pyjwt==1.5.0
     # via
     #   -r requirements.in
     #   fabric8a-auth
-pytest-cov==2.5.1
-    # via -r requirements.in
 pytest==3.5.0
     # via
     #   -r requirements.in
     #   pytest-cov
+pytest-cov==2.5.1
+    # via -r requirements.in
 python-dateutil==2.6.1
     # via
     #   -r requirements.in
@@ -158,14 +158,14 @@ radon==3.0.1
     # via -r requirements.in
 raven[flask]==6.10.0
     # via -r requirements.in
-requests-futures==0.9.7
-    # via -r requirements.in
 requests==2.20.0
     # via
     #   -r requirements.in
     #   codecov
     #   fabric8a-auth
     #   requests-futures
+requests-futures==0.9.7
+    # via -r requirements.in
 s3transfer==0.1.10
     # via
     #   -r requirements.in
