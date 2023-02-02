@@ -23,7 +23,7 @@ requests-futures==0.9.7
 requests==2.20.0          # via requests-futures
 six==1.10.0               # via flask-appconfig, flask-cors, flask-restful, python-dateutil
 urllib3==1.21.1           # via requests
-werkzeug==0.15.3          # via flask, flask-wtf
+werkzeug==0.15.5          # via flask, flask-wtf
 wtforms==2.1              # via flask-wtf
 pytest-cov
 boto3==1.4.6
